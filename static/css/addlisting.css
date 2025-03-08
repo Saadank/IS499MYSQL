@@ -1,0 +1,32 @@
+/* Specific styles for the Add Listing page */
+.addlisting {
+    margin: 20px auto;
+    padding: 20px;
+    max-width: 600px;
+    background: #ffffff;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.addlisting input,
+.addlisting select,
+.addlisting textarea {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.addlisting button {
+    background-color: #007bff;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+}
+
+.addlisting button:hover {
+    background-color: #0056b3;
+}
