@@ -3,9 +3,44 @@
 {% block title %}Home{% endblock %}
 
 {% block content %}
-<h2>Welcome to License Plate Trading</h2>
-<form method="post" class="login-form">
-    <button type="submit">Log In</button>
-</form>
-<p>Don't have an account? <a href="{{ url_for('signup_page') }}">Sign up</a></p>
+<div class="welcome-section">
+    <h1>Welcome to License Plate Trading</h1>
+    {% if username %}
+        <p>Welcome back, {{ username }}!</p>
+        <div class="user-actions">
+            <a href="{{ url_for('add_plate_page') }}" class="button">Add New Plate</a>
+            <a href="{{ url_for('list_plates') }}" class="button">View All Plates</a>
+            <a href="{{ url_for('profile_page') }}" class="button">My Profile</a>
+            <a href="{{ url_for('logout') }}" class="button">Logout</a>
+        </div>
+    {% else %}
+        <p>Please log in to add license plates or view detailed information.</p>
+        <div class="auth-actions">
+            <a href="{{ url_for('login_page') }}" class="button">Login</a>
+            <a href="{{ url_for('signup_page') }}" class="button">Sign Up</a>
+        </div>
+    {% endif %}
+</div>
+
+<div class="plates-preview">
+    <h2>Available License Plates</h2>
+    {% if plates %}
+        <div class="plates-grid">
+            {% for plate in plates %}
+            <div class="plate-card">
+                <div class="plate-number">{{ plate.plateNumber }}{{ plate.plateLetter }}</div>
+                <p class="price">{{ "%.2f"|format(plate.price) }} SAR</p>
+                {% if plate.description %}
+                    <p class="description">{{ plate.description }}</p>
+                {% endif %}
+                {% if not username %}
+                    <p class="login-prompt">Login to view details</p>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p>No license plates available.</p>
+    {% endif %}
+</div>
 {% endblock %}

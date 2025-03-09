@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Float, ForeignKey, DateTime, Text
+from sqlalchemy import Column, Integer, String, Float, ForeignKey, DateTime, Text, UniqueConstraint, CheckConstraint
 from sqlalchemy.orm import relationship
 from database import Base
 from datetime import datetime
@@ -12,20 +12,25 @@ class User(Base):
     password = Column(String(100))
     created_at = Column(DateTime, default=datetime.utcnow)
     
-    # Relationship with listings
-    listings = relationship("Listing", back_populates="owner")
+    # Relationship with license plates
+    license_plates = relationship("LicensePlate", back_populates="owner")
 
-class Listing(Base):
-    __tablename__ = "listings"
+class LicensePlate(Base):
+    __tablename__ = "license_plates"
 
-    id = Column(Integer, primary_key=True, index=True)
-    plate_number = Column(String(20), index=True)
-    description = Column(Text)
-    price = Column(Float)
-    listing_type = Column(String(20))  # 'auction' or 'sale'
-    image_path = Column(String(255), nullable=True)
+    plateID = Column(Integer, primary_key=True, index=True)
+    plateNumber = Column(String(4), nullable=False, index=True)
+    plateLetter = Column(String(4), nullable=False)
+    description = Column(Text, nullable=True)
+    price = Column(Float, nullable=False)
     created_at = Column(DateTime, default=datetime.utcnow)
     
     # Foreign key to user
-    owner_id = Column(Integer, ForeignKey("users.id"))
-    owner = relationship("User", back_populates="listings") 
+    owner_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    owner = relationship("User", back_populates="license_plates")
+
+    __table_args__ = (
+        UniqueConstraint('plateNumber', 'plateLetter', name='unique_plate_combination'),
+        CheckConstraint("plateNumber REGEXP '^[0-9]{4}$'", name='plate_number_format'),
+        CheckConstraint("plateLetter REGEXP '^[A-Za-z]{1,4}$'", name='plate_letter_format'),
+    ) 
