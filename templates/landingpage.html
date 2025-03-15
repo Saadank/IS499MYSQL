@@ -8,7 +8,7 @@
     {% if username %}
         <p>Welcome back, {{ username }}!</p>
         <div class="user-actions">
-            <a href="{{ url_for('add_plate_page') }}" class="button">Add New Plate</a>
+            <a href="/addlisting" class="button">Add New Plate</a>
             <a href="{{ url_for('list_plates') }}" class="button">View All Plates</a>
             <a href="{{ url_for('profile_page') }}" class="button">My Profile</a>
             <a href="{{ url_for('logout') }}" class="button">Logout</a>

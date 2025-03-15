@@ -19,8 +19,9 @@ file_service = FileService()
 UPLOAD_DIR = "static/uploads"
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
+
 @router.get("/addlisting", response_class=HTMLResponse)
-async def add_listing_page(
+async def add_plate_page(
     request: Request,
     user_id: int = Depends(require_auth)
 ):
@@ -31,79 +32,6 @@ async def add_listing_page(
 
 @router.post("/addlisting")
 async def create_listing(
-    request: Request,
-    plate_number: str = Form(...),
-    description: str = Form(...),
-    price: float = Form(...),
-    listing_type: str = Form(...),
-    image: UploadFile = File(None),
-    db: Session = Depends(get_db),
-    user_id: int = Depends(require_auth)
-):
-    # Validate input using schema
-    listing_data = ListingCreate(
-        plate_number=plate_number,
-        description=description,
-        price=price,
-        listing_type=listing_type
-    )
-    
-    # Handle image upload using file service
-    image_path = await file_service.save_image(image)
-    
-    # Create listing using listing service
-    listing_service = ListingService(db)
-    listing = listing_service.create_listing(
-        plate_number=listing_data.plate_number,
-        description=listing_data.description,
-        price=listing_data.price,
-        listing_type=listing_data.listing_type,
-        owner_id=user_id,
-        image_path=image_path
-    )
-    
-    return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
-
-@router.get("/auction", response_class=HTMLResponse)
-async def auction_page(
-    request: Request,
-    db: Session = Depends(get_db),
-    user_id: int = Depends(require_auth)
-):
-    listing_service = ListingService(db)
-    listings = listing_service.get_listings_by_type("auction")
-    return templates.TemplateResponse("auction.html", {
-        "request": request,
-        "listings": listings,
-        "username": request.session.get("username")
-    })
-
-@router.get("/forsale", response_class=HTMLResponse)
-async def forsale_page(
-    request: Request,
-    db: Session = Depends(get_db),
-    user_id: int = Depends(require_auth)
-):
-    listing_service = ListingService(db)
-    listings = listing_service.get_listings_by_type("sale")
-    return templates.TemplateResponse("forsale.html", {
-        "request": request,
-        "listings": listings,
-        "username": request.session.get("username")
-    })
-
-@router.get("/add-plate", response_class=HTMLResponse)
-async def add_plate_page(
-    request: Request,
-    user_id: int = Depends(require_auth)
-):
-    return templates.TemplateResponse("addlisting.html", {
-        "request": request,
-        "username": request.session.get("username")
-    })
-
-@router.post("/add-plate")
-async def create_plate(
     request: Request,
     plate_number: str = Form(...),
     plate_letter: str = Form(...),
