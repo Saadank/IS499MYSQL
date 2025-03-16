@@ -16,9 +16,17 @@ class AuthService:
     def get_user_by_username(self, username: str) -> Optional[User]:
         return self.db.query(User).filter(User.username == username).first()
 
-    def create_user(self, username: str, email: str, password: str) -> User:
+    def create_user(self, username: str, email: str, password: str, firstname: str, lastname: str, idnumber: str, address: str) -> User:
         hashed_password = hashlib.sha256(password.encode()).hexdigest()
-        db_user = User(username=username, email=email, password=hashed_password)
+        db_user = User(
+            username=username,
+            email=email,
+            password=hashed_password,
+            firstname=firstname,
+            lastname=lastname,
+            idnumber=idnumber,
+            address=address
+        )
         self.db.add(db_user)
         self.db.commit()
         self.db.refresh(db_user)

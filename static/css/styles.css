@@ -117,12 +117,17 @@ h1 {
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
-.signup-form input, .login-form input {
+.signup-form input, .login-form input, .signup-form textarea {
     width: 100%;
     padding: 10px;
     margin: 10px 0;
     border: 1px solid #ccc;
     border-radius: 5px;
+}
+
+.signup-form textarea {
+    height: 100px;
+    resize: vertical;
 }
 
 .signup-form button, .login-form button {

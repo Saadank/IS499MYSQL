@@ -9,6 +9,10 @@ class UserSignup(BaseModel):
     email: EmailStr
     password: constr(min_length=6)
     confirm_password: str
+    firstname: constr(min_length=1, max_length=50)
+    lastname: constr(min_length=1, max_length=50)
+    idnumber: constr(min_length=1, max_length=20)
+    address: constr(min_length=1, max_length=200)
 
 class LicensePlateCreate(BaseModel):
     plateNumber: constr(min_length=1, max_length=10)
