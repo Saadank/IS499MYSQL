@@ -9,3 +9,18 @@ jinja2==3.1.2 3
 pydantic[email] 
 itsdangerous
 starlette
+cryptography==41.0.7
+--------------
+to turn on the server:
+uvicorn main:app --reload
+and to turn off the server:
+uvicorn main:app --reload --host 0.0.0.0 --port 8000
+
+to turn on virtual environment:
+
+to activate virtual environment:
+.\venv\Scripts\activate
+
+to deactivate virtual environment:
+deactivate
+

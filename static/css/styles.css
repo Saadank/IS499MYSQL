@@ -2,6 +2,10 @@ h1 {
     text-align: center;
 }
 
+.text-center {
+    text-align: center;
+}
+
 .navbar {
     background-color: rgb(53, 53, 235);
     color: white;
@@ -56,9 +60,6 @@ h1 {
     margin-left: auto; /* Push the profile to the far right */
 }
 
-
-
-
 /* addlisting page */
 /* Style for the form container */
 .addlisting {
@@ -105,29 +106,33 @@ h1 {
     background-color: rgb(41, 41, 200);
 }
 
-
-
 /* Signup & Login Form Styling */
 .signup-form, .login-form {
     width: 40%;
-    margin: auto;
+    margin: 20px auto;
     padding: 20px;
     background-color: #f4f4f4;
     border-radius: 8px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    text-align: left;
+}
+
 .signup-form input, .login-form input, .signup-form textarea {
     width: 100%;
     padding: 10px;
-    margin: 10px 0;
+    margin: 5px 0;
     border: 1px solid #ccc;
     border-radius: 5px;
-}
-
-.signup-form textarea {
-    height: 100px;
-    resize: vertical;
+    text-align: center;
 }
 
 .signup-form button, .login-form button {
@@ -143,4 +148,175 @@ h1 {
 
 .signup-form button:hover, .login-form button:hover {
     background-color: rgb(41, 41, 200);
+}
+
+.signup-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: calc(100vh - 100px);
+    padding: 20px;
+}
+
+/* For Sale Page Styling */
+.forsale-container {
+    padding: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.search-container {
+    background-color: #f4f4f4;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin-bottom: 30px;
+}
+
+.search-form {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+}
+
+.search-group {
+    flex: 1;
+    min-width: 200px;
+}
+
+.search-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: bold;
+}
+
+.search-group select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+}
+
+.search-button {
+    background-color: rgb(53, 53, 235);
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    align-self: flex-end;
+}
+
+.search-button:hover {
+    background-color: rgb(41, 41, 200);
+}
+
+.plates-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 20px;
+    padding: 20px 0;
+    position: relative;
+}
+
+.plate-card {
+    background-color: white;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+.plate-card h3 {
+    margin: 0 0 10px 0;
+    color: rgb(53, 53, 235);
+}
+
+.plate-card .price {
+    font-size: 1.2em;
+    font-weight: bold;
+    color: #2c5282;
+    margin: 10px 0;
+}
+
+.plate-card .description {
+    color: #666;
+    margin: 10px 0;
+}
+
+.plate-card .date {
+    color: #999;
+    font-size: 0.9em;
+    margin: 10px 0;
+}
+
+.view-button {
+    display: inline-block;
+    background-color: rgb(53, 53, 235);
+    color: white;
+    padding: 8px 16px;
+    border-radius: 5px;
+    text-decoration: none;
+    margin-top: 10px;
+}
+
+.view-button:hover {
+    background-color: rgb(41, 41, 200);
+}
+
+.no-results {
+    text-align: center;
+    grid-column: 1 / -1;
+    padding: 20px;
+    background-color: #f4f4f4;
+    border-radius: 8px;
+    color: #666;
+}
+
+.number-dropdowns, .letter-dropdowns {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+}
+
+.digit-select, .letter-select {
+    width: 60px;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+    text-align: center;
+}
+
+.plates-section {
+    position: relative;
+    margin-top: 30px;
+}
+
+.sort-container {
+    grid-column: 1 / -1;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+    padding: 10px;
+    background-color: #f4f4f4;
+    border-radius: 5px;
+}
+
+.sort-container label {
+    font-weight: bold;
+    color: #333;
+}
+
+.sort-container select {
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 14px;
+    background-color: white;
 }

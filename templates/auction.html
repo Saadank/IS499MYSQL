@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Live Auction</h2>
+    
+    {% if active_auction and plate %}
+    <div class="card mb-4">
+        <div class="card-body">
+            <h3 class="card-title">Current Auction</h3>
+            <div class="row">
+                <div class="col-md-6">
+                    <h4>Plate: {{ plate.plateNumber }} {{ plate.plateLetter }}</h4>
+                    <p>Description: {{ plate.description }}</p>
+                    <p>Current Price: ${{ "%.2f"|format(active_auction.current_price) }}</p>
+                    <p>Starting Price: ${{ "%.2f"|format(active_auction.start_price) }}</p>
+                </div>
+                <div class="col-md-6">
+                    <div class="timer-container text-center">
+                        <h4>Time Remaining</h4>
+                        <div id="countdown" class="display-4"></div>
+                    </div>
+                </div>
+            </div>
+            
+            {% if user_id %}
+            <form action="/auctions/bid/{{ active_auction.id }}" method="POST" class="mt-3">
+                <div class="form-group">
+                    <label for="bid_amount">Your Bid Amount:</label>
+                    <input type="number" class="form-control" id="bid_amount" name="amount" 
+                           min="{{ active_auction.current_price + 1 }}" step="0.01" required>
+                </div>
+                <button type="submit" class="btn btn-primary mt-2">Place Bid</button>
+            </form>
+            {% else %}
+            <p class="mt-3">Please <a href="/login">login</a> to place a bid.</p>
+            {% endif %}
+        </div>
+    </div>
+    {% else %}
+    <div class="alert alert-info">
+        No active auction at the moment. Check back soon!
+    </div>
+    {% endif %}
+
+    <h3 class="mt-4">Auction History</h3>
+    <div class="row">
+        {% for auction in auction_history %}
+        <div class="col-md-4 mb-3">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Plate: {{ auction.plate.plateNumber }} {{ auction.plate.plateLetter }}</h5>
+                    <p class="card-text">
+                        Starting Price: ${{ "%.2f"|format(auction.start_price) }}<br>
+                        Final Price: ${{ "%.2f"|format(auction.current_price) }}<br>
+                        Winner: {{ auction.winner.username if auction.winner else "No winner" }}
+                    </p>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+{% if active_auction %}
+<script>
+function updateCountdown() {
+    const endTime = new Date("{{ active_auction.end_time.isoformat() }}").getTime();
+    const now = new Date().getTime();
+    const distance = endTime - now;
+
+    if (distance < 0) {
+        document.getElementById("countdown").innerHTML = "Auction Ended";
+        // Reload page to update status
+        setTimeout(() => window.location.reload(), 1000);
+        return;
+    }
+
+    const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+    const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+    document.getElementById("countdown").innerHTML = 
+        minutes.toString().padStart(2, '0') + ":" + 
+        seconds.toString().padStart(2, '0');
+}
+
+// Update countdown every second
+setInterval(updateCountdown, 1000);
+updateCountdown(); // Initial call
+</script>
+{% endif %}
+{% endblock %} 
