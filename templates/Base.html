@@ -20,7 +20,19 @@
             <div class="navbar-right">
                 <ul>
                     <li><a href="/addlisting">Add Listing</a></li>
-                    <li><a href="/profile"><img src="{{ url_for('static', path='img/profile.webp') }}" alt="Profile" class="nav-profile"></a></li>
+                    <li><div class="profile-menu-container">
+                        <button class="profile-button" onclick="toggleProfileMenu()">
+                            {{ username }}
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="profile-dropdown" id="profileDropdown">
+                            <a href="#" class="dropdown-item disabled">Profile</a>
+                            <a href="#" class="dropdown-item disabled">Order History</a>
+                            <a href="#" class="dropdown-item disabled">Active Offers</a>
+                            <div class="dropdown-divider"></div>
+                            <a href="/logout" class="dropdown-item">Logout</a>
+                        </div>
+                    </div></li>
                 </ul>
             </div>
         </nav>
@@ -29,5 +41,96 @@
         {% block content %}
         {% endblock %}
     </main>
+    <style>
+    .profile-menu-container {
+        position: relative;
+        display: inline-block;
+    }
+
+    .profile-button {
+        background-color: #007bff;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .profile-button:hover {
+        background-color: #0056b3;
+    }
+
+    .profile-dropdown {
+        display: none;
+        position: absolute;
+        right: 0;
+        top: 100%;
+        background-color: white;
+        min-width: 200px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        border-radius: 4px;
+        z-index: 1000;
+        margin-top: 4px;
+    }
+
+    .dropdown-item {
+        display: block;
+        padding: 12px 20px;
+        text-decoration: none;
+        color: #333;
+        transition: background-color 0.2s;
+    }
+
+    .dropdown-item:hover {
+        background-color: #f8f9fa;
+        color: #007bff;
+    }
+
+    .dropdown-item.disabled {
+        color: #6c757d;
+        cursor: not-allowed;
+        pointer-events: none;
+    }
+
+    .dropdown-divider {
+        height: 1px;
+        background-color: #e9ecef;
+        margin: 4px 0;
+    }
+
+    /* Animation for dropdown */
+    .profile-dropdown.show {
+        display: block;
+        animation: fadeIn 0.2s ease-out;
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    </style>
+    <script>
+    function toggleProfileMenu() {
+        const dropdown = document.getElementById('profileDropdown');
+        dropdown.classList.toggle('show');
+        
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(event) {
+            const isClickInside = document.querySelector('.profile-menu-container').contains(event.target);
+            if (!isClickInside && dropdown.classList.contains('show')) {
+                dropdown.classList.remove('show');
+            }
+        });
+    }
+    </script>
 </body>
 </html>

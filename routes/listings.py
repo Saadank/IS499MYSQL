@@ -1,70 +1,81 @@
-from fastapi import APIRouter, Request, Form, Depends, File, UploadFile, status, Query
+from fastapi import APIRouter, Request, Form, Depends, File, UploadFile, status, Query, HTTPException
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
 from database import get_db
 from dependencies import require_auth
-
-from services.file_service import FileService
-from .schemas import LicensePlateCreate
-import os
-from datetime import datetime
-from services.license_plate_service import LicensePlateService
 from typing import Optional
+from services.license_plate_service import LicensePlateService
 
 router = APIRouter(prefix="", tags=["listings"])
 templates = Jinja2Templates(directory="templates")
-file_service = FileService()
-
-# Create uploads directory if it doesn't exist
-UPLOAD_DIR = "static/uploads"
-os.makedirs(UPLOAD_DIR, exist_ok=True)
-
-# Valid Arabic letters excluding the specified ones
-VALID_LETTERS = [
-    'ا', 'ب', 'ج', 'د', 'ر', 'س', 'ص', 'ط', 'ع', 'ف', 'ق', 'ل', 'م', 'ن', 'ه', 'و', 'ي'
-]
-
-# English letter mappings for Arabic letters
-LETTER_ENGLISH = {
-    'ا': 'A', 'ب': 'B', 'ج': 'J', 'د': 'D', 'ر': 'R', 'س': 'S', 'ص': 'S', 'ط': 'T',
-    'ع': 'A', 'ف': 'F', 'ق': 'Q', 'ل': 'L', 'م': 'M', 'ن': 'N', 'ه': 'H', 'و': 'W', 'ي': 'Y'
-}
 
 @router.get("/addlisting", response_class=HTMLResponse)
 async def add_plate_page(
     request: Request,
-    user_id: int = Depends(require_auth)
+    user_id: int = Depends(require_auth),
+    db: Session = Depends(get_db)
 ):
-    return templates.TemplateResponse("addlisting.html", {
-        "request": request,
-        "username": request.session.get("username")
-    })
+    plate_service = LicensePlateService(db)
+    return templates.TemplateResponse("addlisting.html", plate_service.get_add_listing_data(request))
 
 @router.post("/addlisting")
 async def create_listing(
     request: Request,
-    plateNumber: str = Form(...),
-    plateLetter: str = Form(...),
+    digit1: str = Form(...),
+    digit2: str = Form(...),
+    digit3: str = Form(...),
+    digit4: str = Form(...),
+    letter1: str = Form(...),
+    letter2: str = Form(None),
+    letter3: str = Form(None),
     description: str = Form(None),
-    price: float = Form(...),
+    listing_type: str = Form(...),
+    buy_now_price: int = Form(0),
+    auction_start_price: int = Form(0),
+    minimum_offer_price: int = Form(0),
     image: UploadFile = File(None),
     db: Session = Depends(get_db),
     user_id: int = Depends(require_auth)
 ):
-    plate_service = LicensePlateService(db)
-    
-    # Create the license plate with image
-    plate = await plate_service.create_license_plate(
-        plate_number=plateNumber,
-        plate_letter=plateLetter,
-        description=description,
-        price=price,
-        owner_id=user_id,
-        image=image
-    )
-    
-    return RedirectResponse(url="/plates", status_code=status.HTTP_303_SEE_OTHER)
+    try:
+        plate_service = LicensePlateService(db)
+        
+        # Combine digits into plate number, excluding 'x'
+        plate_number = ""
+        for digit in [digit1, digit2, digit3, digit4]:
+            if digit != 'x':
+                plate_number += digit
+        
+        # Combine letters, excluding empty values
+        plate_letter = letter1
+        if letter2 and letter2 != '':
+            plate_letter += letter2
+        if letter3 and letter3 != '':
+            plate_letter += letter3
+
+        # Create the license plate
+        plate = await plate_service.create_license_plate(
+            plate_number=plate_number,
+            plate_letter=plate_letter,
+            description=description,
+            price=buy_now_price if listing_type == 'buy_now' else 
+                  auction_start_price if listing_type == 'auction' else 
+                  minimum_offer_price,
+            listing_type=listing_type,
+            buy_now_price=buy_now_price,
+            auction_start_price=auction_start_price,
+            minimum_offer_price=minimum_offer_price,
+            owner_id=user_id,
+            image=image
+        )
+        
+        return RedirectResponse(url="/plates", status_code=status.HTTP_303_SEE_OTHER)
+        
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error creating listing: {str(e)}")
 
 @router.get("/plates", response_class=HTMLResponse)
 async def list_plates(
@@ -73,12 +84,7 @@ async def list_plates(
     user_id: int = Depends(require_auth)
 ):
     plate_service = LicensePlateService(db)
-    plates = plate_service.get_license_plates()
-    return templates.TemplateResponse("plates.html", {
-        "request": request,
-        "plates": plates,
-        "username": request.session.get("username")
-    })
+    return templates.TemplateResponse("plates.html", plate_service.get_plates_data(request))
 
 @router.get("/forsale", response_class=HTMLResponse)
 async def for_sale_page(
@@ -94,63 +100,6 @@ async def for_sale_page(
     db: Session = Depends(get_db)
 ):
     plate_service = LicensePlateService(db)
-    
-    # Get plates with filters
-    plates = plate_service.get_license_plates()
-    
-    # Apply filters
-    if any([digit1, digit2, digit3, digit4]):
-        filtered_plates = []
-        for plate in plates:
-            plate_digits = [int(d) for d in plate.plateNumber]
-            # Check if the plate number matches the provided digits up to the length of the plate number
-            matches = True
-            for i, digit in enumerate([digit1, digit2, digit3, digit4]):
-                if digit == 'x':
-                    # If X is selected, the plate should have fewer digits than this position
-                    if i < len(plate_digits):
-                        matches = False
-                        break
-                elif digit is not None:
-                    # If a specific digit is selected, it should match
-                    if i >= len(plate_digits) or plate_digits[i] != int(digit):
-                        matches = False
-                        break
-            if matches:
-                filtered_plates.append(plate)
-        plates = filtered_plates
-
-    if any([letter1, letter2, letter3]):
-        filtered_plates = []
-        for plate in plates:
-            plate_letters = list(plate.plateLetter)
-            if (not letter1 or plate_letters[0] == letter1) and \
-               (not letter2 or len(plate_letters) > 1 and plate_letters[1] == letter2) and \
-               (not letter3 or len(plate_letters) > 2 and plate_letters[2] == letter3):
-                filtered_plates.append(plate)
-        plates = filtered_plates
-    
-    # Apply sorting
-    if sort_by == "newest":
-        plates.sort(key=lambda x: x.created_at, reverse=True)
-    elif sort_by == "oldest":
-        plates.sort(key=lambda x: x.created_at)
-    elif sort_by == "price_high":
-        plates.sort(key=lambda x: x.price, reverse=True)
-    elif sort_by == "price_low":
-        plates.sort(key=lambda x: x.price)
-    
-    return templates.TemplateResponse("forsale.html", {
-        "request": request,
-        "plates": plates,
-        "digit1": digit1,
-        "digit2": digit2,
-        "digit3": digit3,
-        "digit4": digit4,
-        "letter1": letter1,
-        "letter2": letter2,
-        "letter3": letter3,
-        "sort_by": sort_by,
-        "valid_letters": VALID_LETTERS,
-        "letter_english": LETTER_ENGLISH
-    }) 
+    return templates.TemplateResponse("forsale.html", 
+                                    plate_service.get_forsale_data(request, digit1, digit2, digit3, digit4,
+                                                                 letter1, letter2, letter3, sort_by)) 

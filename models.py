@@ -2,6 +2,8 @@ from sqlalchemy import Column, Integer, String, Float, ForeignKey, DateTime, Tex
 from sqlalchemy.orm import relationship
 from database import Base
 from datetime import datetime, timedelta, UTC
+from enum import Enum
+from sqlalchemy import Enum as SQLAlchemyEnum
 
 class User(Base):
     __tablename__ = "users"
@@ -17,27 +19,39 @@ class User(Base):
     created_at = Column(DateTime, default=lambda: datetime.now(UTC))
     
     # Relationship with license plates
-    license_plates = relationship("LicensePlate", back_populates="owner")
+    plates = relationship("LicensePlate", back_populates="owner")
+    offers = relationship("Offer", back_populates="user")
+
+class ListingType(str, Enum):
+    BUY_NOW = "buy_now"
+    AUCTION = "auction"
+    OFFERS = "offers"
 
 class LicensePlate(Base):
     __tablename__ = "license_plates"
 
     plateID = Column(Integer, primary_key=True, index=True)
-    plateNumber = Column(String(4), nullable=False, index=True)
-    plateLetter = Column(String(4), nullable=False)
-    description = Column(Text, nullable=True)
-    price = Column(Float, nullable=False)    
-    image_path = Column(String(255), nullable=True)  # Store the path to the image
-    created_at = Column(DateTime, default=lambda: datetime.now(UTC))
+    plateNumber = Column(String(4), nullable=False)
+    plateLetter = Column(String(3), nullable=False)
+    description = Column(String(500))
+    price = Column(Float, nullable=False)
+    owner_id = Column(Integer, ForeignKey("users.id"))
+    image_path = Column(String(255))
+    created_at = Column(DateTime, default=datetime.utcnow)
+    listing_type = Column(String(20), nullable=False)
+    buy_now_price = Column(Float, nullable=True)
+    auction_start_price = Column(Float, nullable=True)
+    minimum_offer_price = Column(Float, nullable=True)
 
-    # Foreign key to user
-    owner_id = Column(Integer, ForeignKey("users.id"), nullable=False)
-    owner = relationship("User", back_populates="license_plates")
+    # Relationships
+    owner = relationship("User", back_populates="plates")
+    offers = relationship("Offer", back_populates="plate")
 
     __table_args__ = (
-        UniqueConstraint('plateNumber', 'plateLetter', name='unique_plate_combination'),
-        CheckConstraint("plateNumber REGEXP '^[0-9]{4}$'", name='plate_number_format'),
-        CheckConstraint("plateLetter REGEXP '^[A-Za-z]{1,4}$'", name='plate_letter_format'),
+        CheckConstraint(
+            "plateLetter REGEXP '^[ابجدرسصطعفقلمنهوي]{1,3}$'",
+            name='plate_letter_format'
+        ),
     ) 
 
 class Auction(Base):
@@ -68,4 +82,18 @@ class Bid(Base):
     
     # Relationships
     auction = relationship("Auction", back_populates="bids")
-    user = relationship("User", backref="bids") 
+    user = relationship("User", backref="bids")
+
+class Offer(Base):
+    __tablename__ = "offers"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    plate_id = Column(Integer, ForeignKey("license_plates.plateID"))
+    user_id = Column(Integer, ForeignKey("users.id"))
+    offer_amount = Column(Float, nullable=False)
+    status = Column(String(20), default="pending")  # Added length specification
+    created_at = Column(DateTime, default=datetime.utcnow)
+    
+    # Relationships
+    plate = relationship("LicensePlate", back_populates="offers")
+    user = relationship("User", back_populates="offers") 

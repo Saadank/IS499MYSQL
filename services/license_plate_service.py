@@ -1,14 +1,108 @@
 from sqlalchemy.orm import Session
-from typing import List, Optional
+from typing import List, Optional, Dict, Any
 from models import LicensePlate, Auction
 from datetime import datetime, UTC
 from services.file_service import FileService
-from fastapi import UploadFile
+from fastapi import UploadFile, Request
 
 class LicensePlateService:
+    # Valid Arabic letters
+    VALID_LETTERS = [
+        'ا', 'ب', 'ج', 'د', 'ر', 'س', 'ص', 'ط', 'ع', 'ف', 'ق', 'ل', 'م', 'ن', 'ه', 'و', 'ي'
+    ]
+
+    # English letter mappings
+    LETTER_ENGLISH = {
+        'ا': 'A', 'ب': 'B', 'ج': 'J', 'د': 'D', 'ر': 'R', 'س': 'S', 'ص': 'S', 'ط': 'T',
+        'ع': 'A', 'ف': 'F', 'ق': 'Q', 'ل': 'L', 'م': 'M', 'ن': 'N', 'ه': 'H', 'و': 'W', 'ي': 'Y'
+    }
+
     def __init__(self, db: Session):
         self.db = db
         self.file_service = FileService()
+
+    def get_add_listing_data(self, request: Request) -> Dict[str, Any]:
+        return {
+            "request": request,
+            "username": request.session.get("username"),
+            "valid_letters": self.VALID_LETTERS,
+            "numbers": list(range(10)),
+            "letter_english": self.LETTER_ENGLISH
+        }
+
+    async def create_listing(self, digit1: str, digit2: str, digit3: str, digit4: str,
+                           letter1: str, letter2: str, letter3: str,
+                           description: str, price: float, image: Optional[UploadFile],
+                           user_id: int) -> LicensePlate:
+        # Combine digits into plate number, excluding 'x'
+        plate_number = ""
+        for digit in [digit1, digit2, digit3, digit4]:
+            if digit != 'x':
+                plate_number += digit
+        
+        # Combine letters, excluding 'any'
+        plate_letter = letter1 if letter1 != 'any' else ''
+        if letter2 and letter2 != 'any':
+            plate_letter += letter2
+        if letter3 and letter3 != 'any':
+            plate_letter += letter3
+
+        return await self.create_license_plate(
+            plate_number=plate_number,
+            plate_letter=plate_letter,
+            description=description,
+            price=price,
+            listing_type='buy_now',
+            buy_now_price=price,
+            auction_start_price=price,
+            minimum_offer_price=price,
+            owner_id=user_id,
+            image=image
+        )
+
+    def get_plates_data(self, request: Request) -> Dict[str, Any]:
+        return {
+            "request": request,
+            "plates": self.get_license_plates(),
+            "username": request.session.get("username")
+        }
+
+    def get_forsale_data(self, request: Request, digit1: Optional[str], digit2: Optional[str],
+                        digit3: Optional[str], digit4: Optional[str], letter1: Optional[str],
+                        letter2: Optional[str], letter3: Optional[str], sort_by: str) -> Dict[str, Any]:
+        plates = self.get_license_plates(digit1, digit2, digit3, digit4,
+                                       letter1, letter2, letter3, sort_by)
+        
+        return {
+            "request": request,
+            "plates": plates,
+            "digit1": digit1,
+            "digit2": digit2,
+            "digit3": digit3,
+            "digit4": digit4,
+            "letter1": letter1,
+            "letter2": letter2,
+            "letter3": letter3,
+            "sort_by": sort_by,
+            "valid_letters": self.VALID_LETTERS,
+            "letter_english": self.LETTER_ENGLISH
+        }
+
+    def validate_plate_letter(self, plate_letter: str) -> tuple[bool, str]:
+        """
+        Validates the plate letter format.
+        Returns (is_valid, error_message)
+        """
+        if not plate_letter:
+            return False, "Plate letter is required"
+            
+        if len(plate_letter) > 3:
+            return False, "Maximum 3 letters allowed"
+            
+        if not all(letter in self.VALID_LETTERS for letter in plate_letter):
+            return False, "Invalid letters detected. Please use only valid Arabic letters"
+            
+        return True, ""
 
     async def create_license_plate(
         self,
@@ -16,28 +110,90 @@ class LicensePlateService:
         plate_letter: str,
         description: str,
         price: float,
+        listing_type: str,
+        buy_now_price: int,
+        auction_start_price: int,
+        minimum_offer_price: int,
         owner_id: int,
         image: Optional[UploadFile] = None
     ) -> LicensePlate:
+        # Validate plate letter
+        is_valid, error_message = self.validate_plate_letter(plate_letter)
+        if not is_valid:
+            raise ValueError(f"Invalid plate letter: {error_message}")
+
+        # Process image if provided
         image_path = None
         if image:
             image_path = await self.file_service.save_image(image)
 
-        db_plate = LicensePlate(
-            plateNumber=plate_number,
-            plateLetter=plate_letter,
-            description=description,
-            price=price,
-            owner_id=owner_id,
-            image_path=image_path
-        )
-        self.db.add(db_plate)
-        self.db.commit()
-        self.db.refresh(db_plate)
-        return db_plate
+        try:
+            db_plate = LicensePlate(
+                plateNumber=plate_number,
+                plateLetter=plate_letter,
+                description=description,
+                price=price,
+                listing_type=listing_type,
+                buy_now_price=buy_now_price,
+                auction_start_price=auction_start_price,
+                minimum_offer_price=minimum_offer_price,
+                owner_id=owner_id,
+                image_path=image_path
+            )
+            self.db.add(db_plate)
+            self.db.commit()
+            self.db.refresh(db_plate)
+            return db_plate
+        except Exception as e:
+            if image_path:
+                await self.file_service.delete_image(image_path)
+            raise e
 
-    def get_license_plates(self) -> List[LicensePlate]:
-        return self.db.query(LicensePlate).all()
+    def get_license_plates(self, digit1=None, digit2=None, digit3=None, digit4=None,
+                          letter1=None, letter2=None, letter3=None, sort_by="newest") -> List[LicensePlate]:
+        plates = self.db.query(LicensePlate).all()
+        
+        # Apply digit filters
+        if any([digit1, digit2, digit3, digit4]):
+            filtered_plates = []
+            for plate in plates:
+                plate_digits = [int(d) for d in plate.plateNumber]
+                matches = True
+                for i, digit in enumerate([digit1, digit2, digit3, digit4]):
+                    if digit == 'x':
+                        if i < len(plate_digits):
+                            matches = False
+                            break
+                    elif digit is not None:
+                        if i >= len(plate_digits) or plate_digits[i] != int(digit):
+                            matches = False
+                            break
+                if matches:
+                    filtered_plates.append(plate)
+            plates = filtered_plates
+
+        # Apply letter filters
+        if any([letter1, letter2, letter3]):
+            filtered_plates = []
+            for plate in plates:
+                plate_letters = list(plate.plateLetter)
+                if (not letter1 or plate_letters[0] == letter1) and \
+                   (not letter2 or len(plate_letters) > 1 and plate_letters[1] == letter2) and \
+                   (not letter3 or len(plate_letters) > 2 and plate_letters[2] == letter3):
+                    filtered_plates.append(plate)
+            plates = filtered_plates
+        
+        # Apply sorting
+        if sort_by == "newest":
+            plates.sort(key=lambda x: x.created_at, reverse=True)
+        elif sort_by == "oldest":
+            plates.sort(key=lambda x: x.created_at)
+        elif sort_by == "price_high":
+            plates.sort(key=lambda x: x.price, reverse=True)
+        elif sort_by == "price_low":
+            plates.sort(key=lambda x: x.price)
+            
+        return plates
 
     def get_license_plate(self, plate_id: int) -> Optional[LicensePlate]:
         return self.db.query(LicensePlate).filter(LicensePlate.plateID == plate_id).first()

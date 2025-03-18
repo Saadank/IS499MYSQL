@@ -87,4 +87,4 @@ async def signup(
 @router.get("/logout")
 async def logout(request: Request):
     request.session.clear()
-    return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER) 
+    return RedirectResponse(url="/login", status_code=status.HTTP_303_SEE_OTHER) 
