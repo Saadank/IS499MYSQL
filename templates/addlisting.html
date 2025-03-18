@@ -1,43 +1,37 @@
 {% extends 'base.html' %}
 
-{% block title %}Add License Plate{% endblock %}
+{% block title %}Add New License Plate{% endblock %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="{{ url_for('static', path='css/addlisting.css') }}">
 {% endblock %}
 
 {% block content %}
-<h3>Add a New License Plate</h3>
-<form method="post" action="{{ url_for('create_listing') }}" class="addlisting">
-    <div class="form-group">
-        <label for="plate_number">Plate Number (4 digits):</label>
-        <input type="text" 
-               id="plate_number" 
-               name="plate_number" 
-               required 
-               pattern="[0-9]{4}" 
-               maxlength="4" 
-               title="Please enter exactly 4 digits">
-    </div>
-    <div class="form-group">
-        <label for="plate_letter">Plate Letter (1-4 letters):</label>
-        <input type="text" 
-               id="plate_letter" 
-               name="plate_letter" 
-               required 
-               pattern="[A-Za-z]{1,4}" 
-               maxlength="4" 
-               style="text-transform: uppercase;"
-               title="Please enter 1-4 letters only">
-    </div>
-    <div class="form-group">
-        <label for="description">Description (Optional):</label>
-        <textarea id="description" name="description" rows="4"></textarea>
-    </div>
-    <div class="form-group">
-        <label for="price">Price (SAR):</label>
-        <input type="number" id="price" name="price" step="0.01" required min="0">
-    </div>
-    <button type="submit">Add License Plate</button>
-</form>
+<div class="addlisting">
+    <h2>Add New License Plate</h2>
+    <form method="post" enctype="multipart/form-data">
+        <div class="form-group">
+            <label for="plateNumber">Plate Number (4 digits):</label>
+            <input type="text" id="plateNumber" name="plateNumber" pattern="[0-9]{4}" required>
+        </div>
+        <div class="form-group">
+            <label for="plateLetter">Plate Letter (1-4 letters):</label>
+            <input type="text" id="plateLetter" name="plateLetter" pattern="[A-Za-z]{1,4}" required>
+        </div>
+        <div class="form-group">
+            <label for="description">Description:</label>
+            <textarea id="description" name="description" rows="4"></textarea>
+        </div>
+        <div class="form-group">
+            <label for="price">Price (SAR):</label>
+            <input type="number" id="price" name="price" min="0" step="0.01" required>
+        </div>
+        <div class="form-group">
+            <label for="image">License Plate Image:</label>
+            <input type="file" id="image" name="image" accept="image/*">
+            <small class="form-text text-muted">Supported formats: JPG, PNG, GIF</small>
+        </div>
+        <button type="submit">Add License Plate</button>
+    </form>
+</div>
 {% endblock %}

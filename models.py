@@ -27,6 +27,7 @@ class LicensePlate(Base):
     plateLetter = Column(String(4), nullable=False)
     description = Column(Text, nullable=True)
     price = Column(Float, nullable=False)
+    image_path = Column(String(255), nullable=True)  # Store the path to the image
     created_at = Column(DateTime, default=datetime.utcnow)
     
     # Foreign key to user
