@@ -5,12 +5,15 @@ pymysql==1.1.0
 python-dotenv==1.0.0
 pydantic==2.5.1
 python-multipart==0.0.6
-jinja2==3.1.2 3
-pydantic[email] 
+jinja2==3.1.2
+pydantic[email]
 itsdangerous
 starlette
 cryptography==41.0.7
+Pillow==10.1.0
+
 --------------
+
 to turn on the server:
 uvicorn main:app --reload
 and to turn off the server:
@@ -23,4 +26,3 @@ to activate virtual environment:
 
 to deactivate virtual environment:
 deactivate
-

@@ -1,4 +1,5 @@
 from pydantic import BaseModel, EmailStr, constr, confloat
+from typing import Optional
 
 class UserLogin(BaseModel):
     username: constr(min_length=3, max_length=50)
@@ -19,9 +20,11 @@ class LicensePlateCreate(BaseModel):
     plateLetter: constr(min_length=1, max_length=10)
     description: str | None = None
     price: confloat(gt=0)
+    image_path: Optional[str] = None
 
 class LicensePlateUpdate(BaseModel):
     plateNumber: constr(min_length=1, max_length=10) | None = None
     plateLetter: constr(min_length=1, max_length=10) | None = None
     description: str | None = None
-    price: confloat(gt=0) | None = None 
+    price: confloat(gt=0) | None = None
+    image_path: Optional[str] = None 

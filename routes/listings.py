@@ -44,32 +44,27 @@ async def add_plate_page(
 @router.post("/addlisting")
 async def create_listing(
     request: Request,
-    plate_number: str = Form(...),
-    plate_letter: str = Form(...),
+    plateNumber: str = Form(...),
+    plateLetter: str = Form(...),
     description: str = Form(None),
     price: float = Form(...),
+    image: UploadFile = File(None),
     db: Session = Depends(get_db),
     user_id: int = Depends(require_auth)
 ):
-    # Validate input using schema
-    plate_data = LicensePlateCreate(
-        plateNumber=plate_number,
-        plateLetter=plate_letter,
-        description=description,
-        price=price
-    )
-    
-    # Create license plate using service
     plate_service = LicensePlateService(db)
-    plate = plate_service.create_license_plate(
-        plate_number=plate_data.plateNumber,
-        plate_letter=plate_data.plateLetter,
-        description=plate_data.description,
-        price=plate_data.price,
-        owner_id=user_id
+    
+    # Create the license plate with image
+    plate = await plate_service.create_license_plate(
+        plate_number=plateNumber,
+        plate_letter=plateLetter,
+        description=description,
+        price=price,
+        owner_id=user_id,
+        image=image
     )
     
-    return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
+    return RedirectResponse(url="/plates", status_code=status.HTTP_303_SEE_OTHER)
 
 @router.get("/plates", response_class=HTMLResponse)
 async def list_plates(

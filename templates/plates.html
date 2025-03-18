@@ -16,15 +16,18 @@
         <div class="plates-grid">
             {% for plate in plates %}
             <div class="plate-card">
+                {% if plate.image_path %}
+                    <div class="plate-image">
+                        <img src="{{ plate.image_path }}" alt="License Plate {{ plate.plateNumber }}{{ plate.plateLetter }}">
+                    </div>
+                {% endif %}
                 <div class="plate-number">{{ plate.plateNumber }}{{ plate.plateLetter }}</div>
                 <p class="price">{{ "%.2f"|format(plate.price) }} SAR</p>
                 {% if plate.description %}
                     <p class="description">{{ plate.description }}</p>
                 {% endif %}
-                <p class="owner">Owner: {{ plate.owner.username }}</p>
-                {% if plate.owner_id == request.session.get("user_id") %}
-                 
-                {% endif %}
+
+
             </div>
             {% endfor %}
         </div>

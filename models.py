@@ -26,9 +26,10 @@ class LicensePlate(Base):
     plateNumber = Column(String(4), nullable=False, index=True)
     plateLetter = Column(String(4), nullable=False)
     description = Column(Text, nullable=True)
-    price = Column(Float, nullable=False)
+    price = Column(Float, nullable=False)    
+    image_path = Column(String(255), nullable=True)  # Store the path to the image
     created_at = Column(DateTime, default=lambda: datetime.now(UTC))
-    
+
     # Foreign key to user
     owner_id = Column(Integer, ForeignKey("users.id"), nullable=False)
     owner = relationship("User", back_populates="license_plates")
