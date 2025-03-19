@@ -102,4 +102,15 @@ async def for_sale_page(
     plate_service = LicensePlateService(db)
     return templates.TemplateResponse("forsale.html", 
                                     plate_service.get_forsale_data(request, digit1, digit2, digit3, digit4,
-                                                                 letter1, letter2, letter3, sort_by)) 
+                                                                 letter1, letter2, letter3, sort_by))
+
+@router.delete("/plates/{plate_id}")
+async def delete_plate(
+    plate_id: int,
+    user_id: int = Depends(require_auth),
+    db: Session = Depends(get_db)
+):
+    plate_service = LicensePlateService(db)
+    if plate_service.delete_license_plate(plate_id, user_id):
+        return {"message": "Plate removed successfully"}
+    raise HTTPException(status_code=400, detail="Failed to remove plate") 

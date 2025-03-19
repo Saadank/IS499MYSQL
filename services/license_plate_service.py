@@ -243,6 +243,10 @@ class LicensePlateService:
         if plate.image_path:
             self.file_service.delete_image(plate.image_path)
         
+        # Delete associated wishlist items
+        for wishlist_item in plate.wishlist_items:
+            self.db.delete(wishlist_item)
+        
         self.db.delete(plate)
         self.db.commit()
         return True

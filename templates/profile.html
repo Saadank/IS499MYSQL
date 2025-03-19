@@ -1,0 +1,177 @@
+{% extends 'base.html' %}
+
+{% block title %}My Profile{% endblock %}
+
+{% block content %}
+<div class="profile-section">
+    <div class="user-info">
+        <h1>My Profile</h1>
+        <div class="profile-details">
+            <p><strong>Username:</strong> {{ user.username }}</p>
+            <p><strong>Email:</strong> {{ user.email }}</p>
+            <p><strong>Name:</strong> {{ user.firstname }} {{ user.lastname }}</p>
+            <p><strong>ID Number:</strong> {{ user.idnumber }}</p>
+            <p><strong>Address:</strong> {{ user.address }}</p>
+        </div>
+    </div>
+
+    <div class="my-listings">
+        <h2>My Listed Plates</h2>
+        {% if listings %}
+            <div class="plates-grid">
+                {% for plate in listings %}
+                <div class="plate-card" data-plate-id="{{ plate.plateID }}">
+                    {% if plate.image_path %}
+                        <div class="plate-image">
+                            <img src="{{ plate.image_path }}" alt="License Plate {{ plate.plateNumber }}{{ plate.plateLetter }}">
+                        </div>
+                    {% endif %}
+                    <div class="plate-number">{{ plate.plateNumber }}{{ plate.plateLetter }}</div>
+                    <p class="price">{{ "%.2f"|format(plate.price) }} SAR</p>
+                    {% if plate.description %}
+                        <p class="description">{{ plate.description }}</p>
+                    {% endif %}
+                    <div class="plate-actions">
+                        <span class="listing-type">{{ plate.listing_type }}</span>
+                        {% if plate.listing_type == 'buy_now' %}
+                            <p>Buy Now Price: {{ "%.2f"|format(plate.buy_now_price) }} SAR</p>
+                        {% elif plate.listing_type == 'auction' %}
+                            <p>Starting Price: {{ "%.2f"|format(plate.auction_start_price) }} SAR</p>
+                        {% else %}
+                            <p>Minimum Offer: {{ "%.2f"|format(plate.minimum_offer_price) }} SAR</p>
+                        {% endif %}
+                        <button class="remove-plate" data-plate-id="{{ plate.plateID }}">Remove Plate</button>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p>You haven't listed any plates yet.</p>
+            <a href="{{ url_for('add_plate_page') }}" class="button">Add New Plate</a>
+        {% endif %}
+    </div>
+</div>
+
+<style>
+.profile-section {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.user-info {
+    background-color: #f8f9fa;
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 30px;
+}
+
+.profile-details {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.profile-details p {
+    margin: 0;
+    padding: 10px;
+    background-color: white;
+    border-radius: 4px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.my-listings {
+    margin-top: 40px;
+}
+
+.listing-type {
+    display: inline-block;
+    padding: 4px 8px;
+    background-color: #007bff;
+    color: white;
+    border-radius: 4px;
+    font-size: 0.9em;
+    margin-bottom: 10px;
+}
+
+.plate-actions {
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid #eee;
+}
+
+.button {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    text-decoration: none;
+    border-radius: 4px;
+    margin-top: 10px;
+}
+
+.button:hover {
+    background-color: #0056b3;
+}
+
+.remove-plate {
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-top: 10px;
+    width: 100%;
+    transition: background-color 0.2s;
+}
+
+.remove-plate:hover {
+    background-color: #c82333;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const removeButtons = document.querySelectorAll('.remove-plate');
+    
+    removeButtons.forEach(button => {
+        button.addEventListener('click', async function() {
+            const plateId = this.dataset.plateId;
+            
+            if (confirm('Are you sure you want to remove this plate? This action cannot be undone.')) {
+                try {
+                    const response = await fetch(`/plates/${plateId}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    });
+                    
+                    if (response.ok) {
+                        // Remove the plate card from the DOM
+                        const plateCard = this.closest('.plate-card');
+                        plateCard.remove();
+                        
+                        // If no plates left, show empty message
+                        const platesGrid = document.querySelector('.plates-grid');
+                        if (platesGrid && platesGrid.children.length === 0) {
+                            platesGrid.innerHTML = `
+                                <p>You haven't listed any plates yet.</p>
+                                <a href="{{ url_for('add_plate_page') }}" class="button">Add New Plate</a>
+                            `;
+                        }
+                    } else {
+                        alert('Failed to remove plate');
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert('Failed to remove plate');
+                }
+            }
+        });
+    });
+});
+</script>
+{% endblock %} 
