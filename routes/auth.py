@@ -4,6 +4,7 @@ from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
 from database import get_db
 from services.auth_service import AuthService
+from services.session_service import SessionService
 from .schemas import UserLogin, UserSignup
 
 router = APIRouter(prefix="", tags=["auth"])
@@ -11,7 +12,8 @@ templates = Jinja2Templates(directory="templates")
 
 @router.get("/login", response_class=HTMLResponse)
 async def login_page(request: Request):
-    return templates.TemplateResponse("login.html", {"request": request})
+    session_service = SessionService(request)
+    return templates.TemplateResponse("login.html", session_service.get_template_data())
 
 @router.post("/login")
 async def login(
@@ -20,23 +22,18 @@ async def login(
     password: str = Form(...),
     db: Session = Depends(get_db)
 ):
-    # Validate input using schema
-    login_data = UserLogin(username=username, password=password)
-    
     auth_service = AuthService(db)
-    user = auth_service.verify_user(login_data.username, login_data.password)
-    if not user:
-        raise HTTPException(status_code=400, detail="Incorrect username or password")
+    session_service = SessionService(request)
     
-    # Set session
-    request.session["user_id"] = user.id
-    request.session["username"] = user.username
+    user = await auth_service.login_user(username, password)
+    session_service.set_user_session(user.id, user.username)
     
     return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
 
 @router.get("/signup", response_class=HTMLResponse)
 async def signup_page(request: Request):
-    return templates.TemplateResponse("signup.html", {"request": request})
+    session_service = SessionService(request)
+    return templates.TemplateResponse("signup.html", session_service.get_template_data())
 
 @router.post("/signup")
 async def signup(
@@ -51,8 +48,8 @@ async def signup(
     address: str = Form(...),
     db: Session = Depends(get_db)
 ):
-    # Validate input using schema
-    signup_data = UserSignup(
+    auth_service = AuthService(db)
+    await auth_service.register_user(
         username=username,
         email=email,
         password=password,
@@ -62,29 +59,10 @@ async def signup(
         idnumber=idnumber,
         address=address
     )
-    
-    if signup_data.password != signup_data.confirm_password:
-        raise HTTPException(status_code=400, detail="Passwords do not match")
-    
-    auth_service = AuthService(db)
-    if auth_service.get_user_by_username(signup_data.username):
-        raise HTTPException(status_code=400, detail="Username already registered")
-    
-    if auth_service.get_user_by_email(signup_data.email):
-        raise HTTPException(status_code=400, detail="Email already registered")
-    
-    user = auth_service.create_user(
-        username=signup_data.username,
-        email=signup_data.email,
-        password=signup_data.password,
-        firstname=signup_data.firstname,
-        lastname=signup_data.lastname,
-        idnumber=signup_data.idnumber,
-        address=signup_data.address
-    )
     return RedirectResponse(url="/login", status_code=status.HTTP_303_SEE_OTHER)
 
 @router.get("/logout")
 async def logout(request: Request):
-    request.session.clear()
+    session_service = SessionService(request)
+    session_service.clear_session()
     return RedirectResponse(url="/login", status_code=status.HTTP_303_SEE_OTHER) 

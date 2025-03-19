@@ -52,6 +52,7 @@ class LicensePlate(Base):
             "plateLetter REGEXP '^[ابجدرسصطعفقلمنهوي]{1,3}$'",
             name='plate_letter_format'
         ),
+        UniqueConstraint('plateNumber', 'plateLetter', name='unique_plate_number_letter'),
     ) 
 
 class Auction(Base):
