@@ -1,18 +1,11 @@
 {% extends 'base.html' %}
 
-{% block title %}License Plates{% endblock %}
+{% block title %}My Wishlist{% endblock %}
 
 {% block content %}
-<div class="plates-section">
-    <h1>Available License Plates</h1>
+<div class="wishlist-section">
+    <h1>My Wishlist</h1>
     
-    {% if username %}
-        <div class="actions">
-            <a href="{{ url_for('add_plate_page') }}" class="button">Add New Plate</a>
-            <a href="{{ url_for('wishlist_page') }}" class="button">My Wishlist</a>
-        </div>
-    {% endif %}
-
     {% if plates %}
         <div class="plates-grid">
             {% for plate in plates %}
@@ -27,28 +20,26 @@
                 {% if plate.description %}
                     <p class="description">{{ plate.description }}</p>
                 {% endif %}
-                {% if username %}
-                    <div class="plate-actions">
-                        <button class="add-to-wishlist" data-plate-id="{{ plate.plateID }}">Add to Wishlist</button>
-                    </div>
-                {% endif %}
+                <div class="plate-actions">
+                    <button class="remove-from-wishlist" data-plate-id="{{ plate.plateID }}">Remove from Wishlist</button>
+                </div>
             </div>
             {% endfor %}
         </div>
     {% else %}
-        <p>No license plates available.</p>
+        <p>Your wishlist is empty.</p>
     {% endif %}
 </div>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    const addButtons = document.querySelectorAll('.add-to-wishlist');
+    const removeButtons = document.querySelectorAll('.remove-from-wishlist');
     
-    addButtons.forEach(button => {
+    removeButtons.forEach(button => {
         button.addEventListener('click', async function() {
             const plateId = this.dataset.plateId;
             try {
-                const response = await fetch(`/wishlist/add/${plateId}`, {
+                const response = await fetch(`/wishlist/remove/${plateId}`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -56,13 +47,20 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
                 
                 if (response.ok) {
-                    alert('Added to wishlist successfully');
+                    // Remove the plate card from the DOM
+                    this.closest('.plate-card').remove();
+                    
+                    // If no plates left, show empty message
+                    const platesGrid = document.querySelector('.plates-grid');
+                    if (platesGrid && platesGrid.children.length === 0) {
+                        platesGrid.innerHTML = '<p>Your wishlist is empty.</p>';
+                    }
                 } else {
-                    alert('Failed to add to wishlist');
+                    alert('Failed to remove from wishlist');
                 }
             } catch (error) {
                 console.error('Error:', error);
-                alert('Failed to add to wishlist');
+                alert('Failed to remove from wishlist');
             }
         });
     });

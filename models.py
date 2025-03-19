@@ -21,6 +21,7 @@ class User(Base):
     # Relationship with license plates
     plates = relationship("LicensePlate", back_populates="owner")
     offers = relationship("Offer", back_populates="user")
+    wishlist_items = relationship("WishlistItem", back_populates="user")
 
 class ListingType(str, Enum):
     BUY_NOW = "buy_now"
@@ -98,3 +99,20 @@ class Offer(Base):
     # Relationships
     plate = relationship("LicensePlate", back_populates="offers")
     user = relationship("User", back_populates="offers") 
+
+class WishlistItem(Base):
+    __tablename__ = "wishlist_items"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    plate_id = Column(Integer, ForeignKey("license_plates.plateID"), nullable=False)
+    created_at = Column(DateTime, default=lambda: datetime.now(UTC))
+
+    # Relationships
+    user = relationship("User", back_populates="wishlist_items")
+    plate = relationship("LicensePlate", backref="wishlist_items")
+
+    # Ensure unique combination of user and plate
+    __table_args__ = (
+        UniqueConstraint('user_id', 'plate_id', name='unique_user_plate_wishlist'),
+    ) 
