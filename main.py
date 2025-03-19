@@ -4,7 +4,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
 from database import engine, Base, get_db
-from routes import auth, listings, users, auctions
+from routes import auth, listings, users, auctions, wishlist
 from starlette.middleware.sessions import SessionMiddleware
 from services.license_plate_service import LicensePlateService
 from services.auction_service import AuctionService
@@ -34,6 +34,7 @@ app.include_router(auth.router)
 app.include_router(listings.router)
 app.include_router(users.router)
 app.include_router(auctions.router)
+app.include_router(wishlist.router)
 
 async def create_new_auction(db: Session):
     while True:
