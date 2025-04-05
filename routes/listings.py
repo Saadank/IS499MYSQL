@@ -113,4 +113,40 @@ async def delete_plate(
     plate_service = LicensePlateService(db)
     if plate_service.delete_license_plate(plate_id, user_id):
         return {"message": "Plate removed successfully"}
-    raise HTTPException(status_code=400, detail="Failed to remove plate") 
+    raise HTTPException(status_code=400, detail="Failed to remove plate")
+
+@router.get("/plate/{plate_id}", response_class=HTMLResponse)
+async def plate_details(
+    request: Request,
+    plate_id: int,
+    db: Session = Depends(get_db)
+):
+    try:
+        plate_service = LicensePlateService(db)
+        plate_data = plate_service.get_plate_details(plate_id)
+        if not plate_data:
+            return templates.TemplateResponse(
+                "plate_details.html",
+                {
+                    "request": request,
+                    "error": "Plate not found",
+                    "plate": None
+                }
+            )
+        return templates.TemplateResponse(
+            "plate_details.html",
+            {
+                "request": request,
+                "plate": plate_data,
+                "error": None
+            }
+        )
+    except Exception as e:
+        return templates.TemplateResponse(
+            "plate_details.html",
+            {
+                "request": request,
+                "error": f"Error loading plate details: {str(e)}",
+                "plate": None
+            }
+        ) 

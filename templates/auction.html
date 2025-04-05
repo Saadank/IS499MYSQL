@@ -18,7 +18,7 @@
                 <div class="col-md-6">
                     <div class="timer-container text-center">
                         <h4>Time Remaining</h4>
-                        <div id="countdown" class="display-4"></div>
+                        <div id="countdown" class="display-4" data-end-time="{{ active_auction.end_time.isoformat() }}"></div>
                     </div>
                 </div>
             </div>
@@ -63,30 +63,6 @@
 </div>
 
 {% if active_auction %}
-<script>
-function updateCountdown() {
-    const endTime = new Date("{{ active_auction.end_time.isoformat() }}").getTime();
-    const now = new Date().getTime();
-    const distance = endTime - now;
-
-    if (distance < 0) {
-        document.getElementById("countdown").innerHTML = "Auction Ended";
-        // Reload page to update status
-        setTimeout(() => window.location.reload(), 1000);
-        return;
-    }
-
-    const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-    const seconds = Math.floor((distance % (1000 * 60)) / 1000);
-
-    document.getElementById("countdown").innerHTML = 
-        minutes.toString().padStart(2, '0') + ":" + 
-        seconds.toString().padStart(2, '0');
-}
-
-// Update countdown every second
-setInterval(updateCountdown, 1000);
-updateCountdown(); // Initial call
-</script>
+<script src="{{ url_for('static', path='js/auction.js') }}"></script>
 {% endif %}
 {% endblock %} 

@@ -1,0 +1,53 @@
+.navbar {
+    background-color: rgb(53, 53, 235);
+    color: white;
+    padding: 10px;
+    margin: 0px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between; 
+    border-radius: 10px
+}
+
+.navbar ul {
+    list-style-type: none;
+    padding: 0px;
+    margin: 0px;
+    display: flex;
+    align-items: center;
+}
+
+.navbar a {
+    font-weight: bold;
+    text-decoration: none;
+    color: white;
+    padding: 15px;
+    display: block;
+    text-align: center;
+}
+
+.navbar a:hover {
+    background-color: rgb(53, 53, 212);
+}
+
+.navbar li {
+    display: inline;
+}
+
+/* Icon in the left section */
+.nav-icon {
+    width: 30px;
+    height: auto;
+    vertical-align: middle;
+    border-radius: 5px;
+    padding-right: 20px;
+}
+
+/* Profile icon in the right section */
+.nav-profile {
+    width: 30px;
+    height: auto;
+    vertical-align: middle;
+    border-radius: 5px;
+    margin-left: auto; /* Push the profile to the far right */
+} 

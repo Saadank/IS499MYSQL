@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 from typing import List, Optional, Dict, Any
-from models import LicensePlate, Auction
+from models import LicensePlate, Auction, User
 from datetime import datetime, UTC
 from services.file_service import FileService
 from fastapi import UploadFile, Request
@@ -250,6 +250,40 @@ class LicensePlateService:
         self.db.delete(plate)
         self.db.commit()
         return True
+
+    def get_plate_details(self, plate_id: int) -> Optional[Dict[str, Any]]:
+        plate = self.get_license_plate(plate_id)
+        if not plate:
+            return None
+            
+        # Get the seller information
+        seller = self.db.query(User).filter(User.id == plate.owner_id).first()
+        if not seller:
+            return None
+            
+        # Format the plate data
+        plate_data = {
+            'plateID': plate.plateID,
+            'plate_number': plate.plateNumber,
+            'plate_letter': plate.plateLetter,
+            'price': plate.price,
+            'description': plate.description,
+            'image_url': plate.image_path or '/static/images/default_plate.jpg',
+            'listing_type': plate.listing_type,
+            'buy_now_price': plate.buy_now_price,
+            'auction_start_price': plate.auction_start_price,
+            'minimum_offer_price': plate.minimum_offer_price,
+            'seller': {
+                'username': seller.username,
+                'profile_image': getattr(seller, 'profile_image', '/static/images/default_profile.jpg'),
+                'rating': getattr(seller, 'rating', 0.0),
+                'join_date': seller.created_at.strftime('%B %Y'),
+                'email': seller.email,
+                'phone': getattr(seller, 'phone', 'N/A')
+            }
+        }
+        
+        return plate_data
 
     def get_available_plates(self) -> List[LicensePlate]:
         # Get plates that are not currently in an active auction

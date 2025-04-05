@@ -1,3 +1,12 @@
+/* Import base styles */
+@import 'base.css';
+
+/* Import component-specific styles */
+@import 'navbar.css';
+@import 'forms.css';
+@import 'plates.css';
+@import 'search.css';
+
 h1 {
     text-align: center;
 }
