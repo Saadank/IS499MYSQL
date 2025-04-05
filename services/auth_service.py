@@ -2,8 +2,26 @@ from sqlalchemy.orm import Session
 import hashlib
 from typing import Optional
 from models import User
-from fastapi import HTTPException
+from fastapi import HTTPException, Depends
 from routes.schemas import UserLogin, UserSignup
+from fastapi.security import HTTPBasic, HTTPBasicCredentials
+from database import get_db
+
+security = HTTPBasic()
+
+async def get_current_user(
+    credentials: HTTPBasicCredentials = Depends(security),
+    db: Session = Depends(get_db)
+) -> User:
+    auth_service = AuthService(db)
+    user = auth_service.verify_user(credentials.username, credentials.password)
+    if not user:
+        raise HTTPException(
+            status_code=401,
+            detail="Invalid credentials",
+            headers={"WWW-Authenticate": "Basic"},
+        )
+    return user
 
 class AuthService:
     def __init__(self, db: Session):

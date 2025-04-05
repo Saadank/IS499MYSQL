@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+
+{% block title %}Order History{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', path='css/order_history.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="order-history-section">
+    <h1>Order History</h1>
+    
+    {% if orders %}
+        <div class="orders-grid">
+            {% for order in orders %}
+            <div class="order-card">
+                <div class="order-header">
+                    <h3>Order #{{ order.id }}</h3>
+                    <span class="order-date">{{ order.created_at.strftime('%Y-%m-%d %H:%M') }}</span>
+                </div>
+                <div class="plate-details">
+                    <div class="plate-number">{{ order.plate.plateNumber }}{{ order.plate.plateLetter }}</div>
+                    <p class="price">{{ "%.2f"|format(order.price) }} SAR</p>
+                    <p class="status">Status: <span class="status-{{ order.status.lower() }}">{{ order.status }}</span></p>
+                </div>
+                <div class="seller-info">
+                    <p>Seller: {{ order.seller.username }}</p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="no-orders">
+            <p>You haven't made any purchases yet.</p>
+            <a href="{{ url_for('list_plates') }}" class="button">Browse Plates</a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %} 

@@ -4,7 +4,7 @@
 }
 
 .profile-button {
-    background-color: #007bff;
+    background-color: transparent;
     color: white;
     padding: 10px 20px;
     border: none;
@@ -16,7 +16,7 @@
 }
 
 .profile-button:hover {
-    background-color: #0056b3;
+    background-color: rgba(255, 255, 255, 0.1);
 }
 
 .profile-dropdown {
@@ -57,7 +57,7 @@
     margin: 4px 0;
 }
 
-/* Animation for dropdown */
+/* Show dropdown when active */
 .profile-dropdown.show {
     display: block;
     animation: fadeIn 0.2s ease-out;

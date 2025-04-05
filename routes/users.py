@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Request, Depends
+from fastapi import APIRouter, Request, Depends, HTTPException
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
@@ -6,11 +6,13 @@ from database import get_db
 from services.user_service import UserService
 from services.session_service import SessionService
 from dependencies import require_auth
+from services.auth_service import get_current_user
+from models import User
 
-router = APIRouter()
+router = APIRouter(prefix="", tags=["users"])
 templates = Jinja2Templates(directory="templates")
 
-@router.get("/profile", response_class=HTMLResponse)
+@router.get("/profile", response_class=HTMLResponse, name="profile_page")
 async def profile_page(
     request: Request,
     db: Session = Depends(get_db),
@@ -22,4 +24,22 @@ async def profile_page(
     user_data = user_service.get_user_profile_data(user_id)
     template_data = session_service.get_template_data(user_data)
     
-    return templates.TemplateResponse("profile.html", template_data) 
+    return templates.TemplateResponse("profile.html", template_data)
+
+@router.get("/order-history", response_class=HTMLResponse, name="order_history")
+async def order_history(
+    request: Request,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    user_service = UserService(db)
+    orders = user_service.get_user_orders(current_user.id)
+    
+    return templates.TemplateResponse(
+        "order-history.html",
+        {
+            "request": request,
+            "purchases": orders["purchases"],
+            "sales": orders["sales"]
+        }
+    ) 

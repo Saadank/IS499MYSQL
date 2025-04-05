@@ -24,11 +24,10 @@
                     <li><div class="profile-menu-container">
                         <button class="profile-button" onclick="toggleProfileMenu()">
                             {{ username }}
-                            <i class="fas fa-chevron-down"></i>
                         </button>
                         <div class="profile-dropdown" id="profileDropdown">
                             <a href="{{ url_for('profile_page') }}" class="dropdown-item">Profile</a>
-                            <a href="#" class="dropdown-item disabled">Order History</a>
+                            <a href="{{ url_for('order_history') }}" class="dropdown-item">Order History</a>
                             <a href="#" class="dropdown-item disabled">Active Offers</a>
                             <div class="dropdown-divider"></div>
                             <a href="/logout" class="dropdown-item">Logout</a>

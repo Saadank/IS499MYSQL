@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Order History</h2>
+    
+    <!-- Purchases Section -->
+    <div class="mb-5">
+        <h3>My Purchases</h3>
+        {% if purchases %}
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Order ID</th>
+                        <th>Date</th>
+                        <th>Plate Number</th>
+                        <th>Price</th>
+                        <th>Status</th>
+                        <th>Seller</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for order in purchases %}
+                    <tr>
+                        <td>#{{ order.id }}</td>
+                        <td>{{ order.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                        <td>{{ order.plate.plate_number }}</td>
+                        <td>${{ "%.2f"|format(order.price) }}</td>
+                        <td>
+                            <span class="badge {% if order.status == 'completed' %}bg-success{% elif order.status == 'pending' %}bg-warning{% else %}bg-danger{% endif %}">
+                                {{ order.status|title }}
+                            </span>
+                        </td>
+                        <td>{{ order.seller.username }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <p>No purchases found.</p>
+        {% endif %}
+    </div>
+
+    <!-- Sales Section -->
+    <div>
+        <h3>My Sales</h3>
+        {% if sales %}
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Order ID</th>
+                        <th>Date</th>
+                        <th>Plate Number</th>
+                        <th>Price</th>
+                        <th>Status</th>
+                        <th>Buyer</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for order in sales %}
+                    <tr>
+                        <td>#{{ order.id }}</td>
+                        <td>{{ order.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                        <td>{{ order.plate.plate_number }}</td>
+                        <td>${{ "%.2f"|format(order.price) }}</td>
+                        <td>
+                            <span class="badge {% if order.status == 'completed' %}bg-success{% elif order.status == 'pending' %}bg-warning{% else %}bg-danger{% endif %}">
+                                {{ order.status|title }}
+                            </span>
+                        </td>
+                        <td>{{ order.buyer.username }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <p>No sales found.</p>
+        {% endif %}
+    </div>
+</div>
+
+<style>
+    .table th {
+        background-color: #f8f9fa;
+    }
+    .badge {
+        padding: 0.5em 0.75em;
+    }
+</style>
+{% endblock %} 

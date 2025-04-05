@@ -1,9 +1,13 @@
-from sqlalchemy import Column, Integer, String, Float, ForeignKey, DateTime, Text, UniqueConstraint, CheckConstraint, Boolean
+from sqlalchemy import Column, Integer, String, Float, ForeignKey, DateTime, Text, UniqueConstraint, CheckConstraint, Boolean, Enum as SQLAlchemyEnum
 from sqlalchemy.orm import relationship
 from database import Base
 from datetime import datetime, timedelta, UTC
 from enum import Enum
-from sqlalchemy import Enum as SQLAlchemyEnum
+
+class OrderStatus(str, Enum):
+    PENDING = "pending"
+    COMPLETED = "completed"
+    CANCELLED = "cancelled"
 
 class User(Base):
     __tablename__ = "users"
@@ -18,10 +22,12 @@ class User(Base):
     address = Column(String(200))
     created_at = Column(DateTime, default=lambda: datetime.now(UTC))
     
-    # Relationship with license plates
+    # Relationships
     plates = relationship("LicensePlate", back_populates="owner")
     offers = relationship("Offer", back_populates="user")
     wishlist_items = relationship("WishlistItem", back_populates="user")
+    purchases = relationship("Order", foreign_keys="Order.buyer_id", back_populates="buyer")
+    sales = relationship("Order", foreign_keys="Order.seller_id", back_populates="seller")
 
 class ListingType(str, Enum):
     BUY_NOW = "buy_now"
@@ -116,3 +122,20 @@ class WishlistItem(Base):
     __table_args__ = (
         UniqueConstraint('user_id', 'plate_id', name='unique_user_plate_wishlist'),
     ) 
+
+class Order(Base):
+    __tablename__ = "orders"
+
+    id = Column(Integer, primary_key=True, index=True)
+    plate_id = Column(Integer, ForeignKey("license_plates.plateID"), nullable=False)
+    buyer_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    seller_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    price = Column(Float, nullable=False)
+    status = Column(SQLAlchemyEnum(OrderStatus), default=OrderStatus.PENDING)
+    created_at = Column(DateTime, default=lambda: datetime.now(UTC))
+    updated_at = Column(DateTime, default=lambda: datetime.now(UTC), onupdate=lambda: datetime.now(UTC))
+
+    # Relationships
+    plate = relationship("LicensePlate")
+    buyer = relationship("User", foreign_keys=[buyer_id], back_populates="purchases")
+    seller = relationship("User", foreign_keys=[seller_id], back_populates="sales") 

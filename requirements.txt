@@ -3,26 +3,13 @@ uvicorn==0.24.0
 sqlalchemy==2.0.23
 pymysql==1.1.0
 python-dotenv==1.0.0
-pydantic==2.5.1
+pydantic[email]==2.5.1
 python-multipart==0.0.6
 jinja2==3.1.2
-pydantic[email]
-itsdangerous
-starlette
+itsdangerous==2.1.2
+starlette==0.27.0
 cryptography==41.0.7
 Pillow==10.1.0
-
---------------
-
-to turn on the server:
-uvicorn main:app --reload
-and to turn off the server:
-uvicorn main:app --reload --host 0.0.0.0 --port 8000
-
-to turn on virtual environment:
-
-to activate virtual environment:
-.\venv\Scripts\activate
-
-to deactivate virtual environment:
-deactivate
+passlib[bcrypt]==1.7.4
+bcrypt==4.3.0
+email-validator==2.1.0.post1 
