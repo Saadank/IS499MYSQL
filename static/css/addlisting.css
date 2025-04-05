@@ -95,6 +95,7 @@ select.form-control {
 
 /* Add styles for number input */
 input[type="number"] {
+    appearance: textfield;
     -moz-appearance: textfield; /* Firefox */
 }
 
