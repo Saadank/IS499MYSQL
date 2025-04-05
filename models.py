@@ -49,6 +49,9 @@ class LicensePlate(Base):
     buy_now_price = Column(Float, nullable=True)
     auction_start_price = Column(Float, nullable=True)
     minimum_offer_price = Column(Float, nullable=True)
+    city = Column(String(50))
+    transfer_cost = Column(String(50))
+    plate_type = Column(String(20))
 
     # Relationships
     owner = relationship("User", back_populates="plates")

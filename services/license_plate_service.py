@@ -57,6 +57,9 @@ class LicensePlateService:
             auction_start_price=price,
             minimum_offer_price=price,
             owner_id=user_id,
+            city='',
+            transfer_cost='',
+            plate_type='',
             image=image
         )
 
@@ -115,6 +118,9 @@ class LicensePlateService:
         auction_start_price: int,
         minimum_offer_price: int,
         owner_id: int,
+        city: str,
+        transfer_cost: str,
+        plate_type: str,
         image: Optional[UploadFile] = None
     ) -> LicensePlate:
         # Validate plate letter
@@ -138,6 +144,9 @@ class LicensePlateService:
                 auction_start_price=auction_start_price,
                 minimum_offer_price=minimum_offer_price,
                 owner_id=owner_id,
+                city=city,
+                transfer_cost=transfer_cost,
+                plate_type=plate_type,
                 image_path=image_path
             )
             self.db.add(db_plate)
@@ -273,6 +282,7 @@ class LicensePlateService:
             'buy_now_price': plate.buy_now_price,
             'auction_start_price': plate.auction_start_price,
             'minimum_offer_price': plate.minimum_offer_price,
+            'created_at': plate.created_at,
             'seller': {
                 'username': seller.username,
                 'profile_image': getattr(seller, 'profile_image', '/static/images/default_profile.jpg'),

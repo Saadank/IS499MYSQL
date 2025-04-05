@@ -11,62 +11,28 @@
     {% endif %}
 
     {% if plate %}
-        <div class="plate-image-section">
-            {% if plate.image_url %}
-                <img src="{{ url_for('static', path=plate.image_url) }}" alt="License Plate {{ plate.plate_number }}" class="plate-image">
-            {% else %}
-                <div class="no-image">No image available</div>
-            {% endif %}
+        <div class="simple-list">
+            <div>Ad # {{ plate.plateID }}</div>
+            <div>{{ plate.plate_number }}</div>
+            <div>K S A</div>
+            <div>City</div>
+            <div>Publication Date</div>
+            <div>{{ plate.created_at.strftime('%Y-%m-%d') }}</div>
+            <div>Advertisement #</div>
+            <div>{{ plate.plateID }}</div>
+            <div>Price</div>
+            <div>SAR {{ "%.2f"|format(plate.price) }}</div>
+            <div>Transfer Cost</div>
+            <div>{{ plate.transfer_cost }}</div>
+            <div>Plate Type</div>
+            <div>{{ plate.plate_type }}</div>
         </div>
 
-        <div class="plate-info-section">
-            <h1>License Plate: {{ plate.plate_number }}</h1>
-            <div class="price-section">
-                <h2>Price: ${{ "%.2f"|format(plate.price) }}</h2>
+        {% if not username %}
+            <div class="login-notice">
+                Please login to contact the seller
             </div>
-
-            <div class="action-buttons">
-                <button class="buy-now-btn" {% if not username %}disabled{% endif %}>Buy Now</button>
-                <button class="make-offer-btn" {% if not username %}disabled{% endif %}>Make Offer</button>
-                <button class="wishlist-btn" {% if not username %}disabled{% endif %}>Add to Wishlist</button>
-            </div>
-
-            <div class="seller-info">
-                <h3>Seller Information</h3>
-                <div class="seller-profile">
-                    {% if plate.seller.profile_image %}
-                        <img src="{{ url_for('static', path=plate.seller.profile_image) }}" alt="Seller Profile" class="seller-avatar">
-                    {% else %}
-                        <div class="default-avatar">?</div>
-                    {% endif %}
-                    <div class="seller-details">
-                        <p class="seller-name">{{ plate.seller.username }}</p>
-                        <div class="seller-rating">
-                            <span class="stars">
-                                {% for i in range(5) %}
-                                    {% if i < plate.seller.rating|int %}
-                                        ★
-                                    {% else %}
-                                        ☆
-                                    {% endif %}
-                                {% endfor %}
-                            </span>
-                            <span class="rating-value">{{ "%.1f"|format(plate.seller.rating) }}/5.0</span>
-                        </div>
-                        <p class="member-since">Member since: {{ plate.seller.join_date }}</p>
-                    </div>
-                </div>
-                <div class="contact-info">
-                    <h4>Contact Information</h4>
-                    {% if plate.seller.email != 'N/A' %}
-                        <p>Email: {{ plate.seller.email }}</p>
-                    {% endif %}
-                    {% if plate.seller.phone != 'N/A' %}
-                        <p>Phone: {{ plate.seller.phone }}</p>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
+        {% endif %}
     {% else %}
         <div class="no-plate-found">
             <h2>No plate found</h2>

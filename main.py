@@ -8,6 +8,7 @@ from routes import auth, listings, users, auctions, wishlist
 from starlette.middleware.sessions import SessionMiddleware
 from services.license_plate_service import LicensePlateService
 from services.auction_service import AuctionService
+from services.session_service import SessionService
 import asyncio
 from datetime import datetime, timedelta
 
@@ -66,12 +67,12 @@ async def startup_event():
 
 @app.get("/", response_class=HTMLResponse)
 async def home(request: Request, db: Session = Depends(get_db)):
+    session_service = SessionService(request)
     plate_service = LicensePlateService(db)
     plates = plate_service.get_license_plates()
     
-    return templates.TemplateResponse("landingpage.html", {
-        "request": request,
-        "plates": plates,
-        "user_id": request.session.get("user_id"),
-        "username": request.session.get("username")
-    }) 
+    template_data = session_service.get_template_data({
+        "plates": plates
+    })
+    
+    return templates.TemplateResponse("landingpage.html", template_data) 

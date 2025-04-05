@@ -36,6 +36,9 @@ async def create_listing(
     buy_now_price: int = Form(0),
     auction_start_price: int = Form(0),
     minimum_offer_price: int = Form(0),
+    city: str = Form(...),
+    transfer_cost: str = Form(...),
+    plate_type: str = Form(...),
     image: UploadFile = File(None),
     db: Session = Depends(get_db),
     user_id: int = Depends(require_auth)
@@ -69,6 +72,9 @@ async def create_listing(
             auction_start_price=auction_start_price,
             minimum_offer_price=minimum_offer_price,
             owner_id=user_id,
+            city=city,
+            transfer_cost=transfer_cost,
+            plate_type=plate_type,
             image=image
         )
         
@@ -99,7 +105,8 @@ async def for_sale_page(
     letter2: Optional[str] = Query(None),
     letter3: Optional[str] = Query(None),
     sort_by: Optional[str] = Query("newest"),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
 ):
     session_service = SessionService(request)
     plate_service = LicensePlateService(db)
