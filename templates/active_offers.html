@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+
+{% block title %}Active Offers{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Active Offers</h2>
+    
+    <!-- Offers You've Made -->
+    <div class="mb-5">
+        <h3>Offers You've Made</h3>
+        {% if sent_offers %}
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Plate Number</th>
+                        <th>Your Offer</th>
+                        <th>Date</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for offer in sent_offers %}
+                    <tr>
+                        <td>{{ offer.plate.plateNumber }}{{ offer.plate.plateLetter }}</td>
+                        <td>${{ "%.2f"|format(offer.amount) }}</td>
+                        <td>{{ offer.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                        <td>
+                            <span class="badge {% if offer.status == 'pending' %}bg-warning{% elif offer.status == 'accepted' %}bg-success{% else %}bg-danger{% endif %}">
+                                {{ offer.status|title }}
+                            </span>
+                        </td>
+                        <td>
+                            {% if offer.status == 'pending' %}
+                            <button class="btn btn-sm btn-danger" onclick="withdrawOffer({{ offer.id }})">Withdraw</button>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <p>You haven't made any offers yet.</p>
+        {% endif %}
+    </div>
+
+    <!-- Offers You've Received -->
+    <div>
+        <h3>Offers You've Received</h3>
+        {% if received_offers %}
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Plate Number</th>
+                        <th>Offer Amount</th>
+                        <th>From</th>
+                        <th>Date</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for offer in received_offers %}
+                    <tr>
+                        <td>{{ offer.plate.plateNumber }}{{ offer.plate.plateLetter }}</td>
+                        <td>${{ "%.2f"|format(offer.amount) }}</td>
+                        <td>{{ offer.user.username }}</td>
+                        <td>{{ offer.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                        <td>
+                            <span class="badge {% if offer.status == 'pending' %}bg-warning{% elif offer.status == 'accepted' %}bg-success{% else %}bg-danger{% endif %}">
+                                {{ offer.status|title }}
+                            </span>
+                        </td>
+                        <td>
+                            {% if offer.status == 'pending' %}
+                            <button class="btn btn-sm btn-success me-2" onclick="acceptOffer({{ offer.id }})">Accept</button>
+                            <button class="btn btn-sm btn-danger" onclick="rejectOffer({{ offer.id }})">Reject</button>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <p>You haven't received any offers yet.</p>
+        {% endif %}
+    </div>
+</div>
+
+<script src="{{ url_for('static', path='js/active_offers.js') }}"></script>
+{% endblock %} 

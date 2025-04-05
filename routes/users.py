@@ -9,7 +9,7 @@ from dependencies import require_auth
 from services.auth_service import get_current_user
 from models import User
 
-router = APIRouter(prefix="", tags=["users"])
+router = APIRouter(prefix="/users", tags=["users"])
 templates = Jinja2Templates(directory="templates")
 
 @router.get("/profile", response_class=HTMLResponse, name="profile_page")
@@ -41,4 +41,23 @@ async def order_history(
         "sales": orders["sales"]
     })
     
-    return templates.TemplateResponse("order-history.html", template_data) 
+    return templates.TemplateResponse("order-history.html", template_data)
+
+@router.get("/active-offers", response_class=HTMLResponse, name="active_offers")
+async def active_offers(
+    request: Request,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    session_service = SessionService(request)
+    user_service = UserService(db)
+    
+    # Get both sent and received offers
+    offers = user_service.get_user_offers(current_user.id)
+    
+    template_data = session_service.get_template_data({
+        "sent_offers": offers["sent"],
+        "received_offers": offers["received"]
+    })
+    
+    return templates.TemplateResponse("active_offers.html", template_data) 
