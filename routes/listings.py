@@ -3,10 +3,11 @@ from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
 from database import get_db
-from dependencies import require_auth
+from dependencies import require_auth, get_current_user
 from typing import Optional
 from services.license_plate_service import LicensePlateService
 from services.session_service import SessionService
+from models import User
 
 router = APIRouter(prefix="", tags=["listings"])
 templates = Jinja2Templates(directory="templates")
@@ -125,34 +126,32 @@ async def delete_plate(
 async def plate_details(
     request: Request,
     plate_id: int,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
 ):
     try:
+        session_service = SessionService(request)
         plate_service = LicensePlateService(db)
         plate_data = plate_service.get_plate_details(plate_id)
+        
         if not plate_data:
-            return templates.TemplateResponse(
-                "plate_details.html",
-                {
-                    "request": request,
-                    "error": "Plate not found",
-                    "plate": None
-                }
-            )
-        return templates.TemplateResponse(
-            "plate_details.html",
-            {
-                "request": request,
-                "plate": plate_data,
-                "error": None
-            }
-        )
+            template_data = session_service.get_template_data({
+                "error": "Plate not found",
+                "plate": None,
+                "current_user": current_user
+            })
+            return templates.TemplateResponse("plate_details.html", template_data)
+            
+        template_data = session_service.get_template_data({
+            "plate": plate_data,
+            "error": None,
+            "current_user": current_user
+        })
+        return templates.TemplateResponse("plate_details.html", template_data)
     except Exception as e:
-        return templates.TemplateResponse(
-            "plate_details.html",
-            {
-                "request": request,
-                "error": f"Error loading plate details: {str(e)}",
-                "plate": None
-            }
-        ) 
+        template_data = session_service.get_template_data({
+            "error": f"Error loading plate details: {str(e)}",
+            "plate": None,
+            "current_user": current_user
+        })
+        return templates.TemplateResponse("plate_details.html", template_data) 
