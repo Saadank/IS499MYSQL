@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session
 from database import get_db
 from services.auction_service import AuctionService
 from services.license_plate_service import LicensePlateService
+from services.session_service import SessionService
 from datetime import datetime
 
 router = APIRouter(prefix="/auctions", tags=["auctions"])
@@ -12,6 +13,7 @@ templates = Jinja2Templates(directory="templates")
 
 @router.get("/", response_class=HTMLResponse)
 async def auction_page(request: Request, db: Session = Depends(get_db)):
+    session_service = SessionService(request)
     auction_service = AuctionService(db)
     plate_service = LicensePlateService(db)
     
@@ -25,14 +27,15 @@ async def auction_page(request: Request, db: Session = Depends(get_db)):
     
     auction_history = auction_service.get_auction_history()
     
-    return templates.TemplateResponse("auction.html", {
-        "request": request,
+    template_data = session_service.get_template_data({
         "active_auction": active_auction,
         "plate": plate,
         "time_left": time_left,
         "auction_history": auction_history,
         "user_id": request.session.get("user_id")
     })
+    
+    return templates.TemplateResponse("auction.html", template_data)
 
 @router.post("/bid/{auction_id}")
 async def place_bid(

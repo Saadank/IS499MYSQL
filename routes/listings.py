@@ -6,6 +6,7 @@ from database import get_db
 from dependencies import require_auth
 from typing import Optional
 from services.license_plate_service import LicensePlateService
+from services.session_service import SessionService
 
 router = APIRouter(prefix="", tags=["listings"])
 templates = Jinja2Templates(directory="templates")
@@ -99,10 +100,15 @@ async def for_sale_page(
     sort_by: Optional[str] = Query("newest"),
     db: Session = Depends(get_db)
 ):
+    session_service = SessionService(request)
     plate_service = LicensePlateService(db)
-    return templates.TemplateResponse("forsale.html", 
-                                    plate_service.get_forsale_data(request, digit1, digit2, digit3, digit4,
-                                                                 letter1, letter2, letter3, sort_by))
+    
+    plate_data = plate_service.get_forsale_data(request, digit1, digit2, digit3, digit4,
+                                               letter1, letter2, letter3, sort_by)
+    
+    template_data = session_service.get_template_data(plate_data)
+    
+    return templates.TemplateResponse("forsale.html", template_data)
 
 @router.delete("/plates/{plate_id}")
 async def delete_plate(

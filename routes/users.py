@@ -32,14 +32,13 @@ async def order_history(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
+    session_service = SessionService(request)
     user_service = UserService(db)
     orders = user_service.get_user_orders(current_user.id)
     
-    return templates.TemplateResponse(
-        "order-history.html",
-        {
-            "request": request,
-            "purchases": orders["purchases"],
-            "sales": orders["sales"]
-        }
-    ) 
+    template_data = session_service.get_template_data({
+        "purchases": orders["purchases"],
+        "sales": orders["sales"]
+    })
+    
+    return templates.TemplateResponse("order-history.html", template_data) 
