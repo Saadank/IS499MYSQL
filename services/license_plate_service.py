@@ -7,14 +7,13 @@ from fastapi import UploadFile, Request
 
 class LicensePlateService:
     # Valid Arabic letters
-    VALID_LETTERS = [
-        'ا', 'ب', 'ج', 'د', 'ر', 'س', 'ص', 'ط', 'ع', 'ف', 'ق', 'ل', 'م', 'ن', 'ه', 'و', 'ي'
-    ]
+    VALID_LETTERS = ['أ', 'ب', 'د', 'ع', 'ق', 'ه', 'ح', 'ك', 'ل', 'ن', 'ر', 'س', 'ط', 'و', 'ى', 'ص', 'م']
 
     # English letter mappings
     LETTER_ENGLISH = {
-        'ا': 'A', 'ب': 'B', 'ج': 'J', 'د': 'D', 'ر': 'R', 'س': 'S', 'ص': 'S', 'ط': 'T',
-        'ع': 'A', 'ف': 'F', 'ق': 'Q', 'ل': 'L', 'م': 'M', 'ن': 'N', 'ه': 'H', 'و': 'W', 'ي': 'Y'
+        'أ': 'A', 'ب': 'B', 'د': 'D', 'ع': 'E', 'ق': 'G', 'ه': 'H', 'ح': 'J', 
+        'ك': 'K', 'ل': 'L', 'ن': 'N', 'ر': 'R', 'س': 'S', 'ط': 'T', 'و': 'U', 
+        'ى': 'V', 'ص': 'X', 'م': 'Z'
     }
 
     def __init__(self, db: Session):
@@ -255,6 +254,10 @@ class LicensePlateService:
         # Delete associated wishlist items
         for wishlist_item in plate.wishlist_items:
             self.db.delete(wishlist_item)
+            
+        # Delete associated auctions
+        for auction in plate.auctions:
+            self.db.delete(auction)
         
         self.db.delete(plate)
         self.db.commit()
@@ -283,6 +286,9 @@ class LicensePlateService:
             'auction_start_price': plate.auction_start_price,
             'minimum_offer_price': plate.minimum_offer_price,
             'created_at': plate.created_at,
+            'city': plate.city,
+            'transfer_cost': plate.transfer_cost,
+            'plate_type': plate.plate_type,
             'seller': {
                 'username': seller.username,
                 'profile_image': getattr(seller, 'profile_image', '/static/images/default_profile.jpg'),

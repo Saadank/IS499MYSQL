@@ -1,14 +1,13 @@
 from fastapi import APIRouter, Request, Form, Depends, HTTPException, status
 from fastapi.responses import HTMLResponse, RedirectResponse
-from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
 from database import get_db
 from services.auth_service import AuthService
 from services.session_service import SessionService
 from .schemas import UserLogin, UserSignup
+from utils.template_config import templates
 
 router = APIRouter(prefix="", tags=["auth"])
-templates = Jinja2Templates(directory="templates")
 
 @router.get("/login", response_class=HTMLResponse)
 async def login_page(request: Request):

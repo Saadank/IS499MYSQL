@@ -12,57 +12,69 @@
                 <div class="number-dropdowns">
                     <select name="digit1" class="digit-select">
                         <option value="">Any</option>
-                        <option value="x" {% if digit1 == 'x' %}selected{% endif %}>X</option>
                         {% for i in range(10) %}
-                        <option value="{{ i }}" {% if digit1 == i %}selected{% endif %}>{{ i }}</option>
+                        <option value="{{ i }}" {% if digit1 == i|string %}selected{% endif %}>{{ i }}</option>
                         {% endfor %}
                     </select>
                     <select name="digit2" class="digit-select">
                         <option value="">Any</option>
-                        <option value="x" {% if digit2 == 'x' %}selected{% endif %}>X</option>
                         {% for i in range(10) %}
-                        <option value="{{ i }}" {% if digit2 == i %}selected{% endif %}>{{ i }}</option>
+                        <option value="{{ i }}" {% if digit2 == i|string %}selected{% endif %}>{{ i }}</option>
                         {% endfor %}
                     </select>
                     <select name="digit3" class="digit-select">
                         <option value="">Any</option>
-                        <option value="x" {% if digit3 == 'x' %}selected{% endif %}>X</option>
                         {% for i in range(10) %}
-                        <option value="{{ i }}" {% if digit3 == i %}selected{% endif %}>{{ i }}</option>
+                        <option value="{{ i }}" {% if digit3 == i|string %}selected{% endif %}>{{ i }}</option>
                         {% endfor %}
                     </select>
                     <select name="digit4" class="digit-select">
                         <option value="">Any</option>
-                        <option value="x" {% if digit4 == 'x' %}selected{% endif %}>X</option>
                         {% for i in range(10) %}
-                        <option value="{{ i }}" {% if digit4 == i %}selected{% endif %}>{{ i }}</option>
+                        <option value="{{ i }}" {% if digit4 == i|string %}selected{% endif %}>{{ i }}</option>
                         {% endfor %}
                     </select>
                 </div>
             </div>
 
             <div class="search-group">
-                <label>Plate Letter:</label>
+                <label>Plate Letters:</label>
                 <div class="letter-dropdowns">
                     <select name="letter1" class="letter-select">
                         <option value="">Any</option>
                         {% for letter in valid_letters %}
-                        <option value="{{ letter }}" {% if letter1 == letter %}selected{% endif %}>{{ letter }} ({{ letter_english[letter] }})</option>
+                        <option value="{{ letter }}" {% if letter1 == letter %}selected{% endif %}>
+                            {{ letter }} ({{ letter_english[letter] }})
+                        </option>
                         {% endfor %}
                     </select>
                     <select name="letter2" class="letter-select">
                         <option value="">Any</option>
                         {% for letter in valid_letters %}
-                        <option value="{{ letter }}" {% if letter2 == letter %}selected{% endif %}>{{ letter }} ({{ letter_english[letter] }})</option>
+                        <option value="{{ letter }}" {% if letter2 == letter %}selected{% endif %}>
+                            {{ letter }} ({{ letter_english[letter] }})
+                        </option>
                         {% endfor %}
                     </select>
                     <select name="letter3" class="letter-select">
                         <option value="">Any</option>
                         {% for letter in valid_letters %}
-                        <option value="{{ letter }}" {% if letter3 == letter %}selected{% endif %}>{{ letter }} ({{ letter_english[letter] }})</option>
+                        <option value="{{ letter }}" {% if letter3 == letter %}selected{% endif %}>
+                            {{ letter }} ({{ letter_english[letter] }})
+                        </option>
                         {% endfor %}
                     </select>
                 </div>
+            </div>
+
+            <div class="sort-container">
+                <label for="sort_by">Sort By:</label>
+                <select name="sort_by" id="sort_by">
+                    <option value="newest" {% if sort_by == 'newest' %}selected{% endif %}>Newest First</option>
+                    <option value="oldest" {% if sort_by == 'oldest' %}selected{% endif %}>Oldest First</option>
+                    <option value="price_high" {% if sort_by == 'price_high' %}selected{% endif %}>Most Expensive</option>
+                    <option value="price_low" {% if sort_by == 'price_low' %}selected{% endif %}>Cheapest</option>
+                </select>
             </div>
 
             <button type="submit" class="search-button">Search</button>
@@ -71,22 +83,13 @@
 
     <div class="plates-section">
         <div class="plates-grid">
-            <div class="sort-container">
-                <label for="sort_by">Sort By:</label>
-                <select name="sort_by" id="sort_by" onchange="window.location.href=this.value">
-                    <option value="/forsale?sort_by=newest" {% if sort_by == 'newest' %}selected{% endif %}>Newest First</option>
-                    <option value="/forsale?sort_by=oldest" {% if sort_by == 'oldest' %}selected{% endif %}>Oldest First</option>
-                    <option value="/forsale?sort_by=price_high" {% if sort_by == 'price_high' %}selected{% endif %}>Most Expensive</option>
-                    <option value="/forsale?sort_by=price_low" {% if sort_by == 'price_low' %}selected{% endif %}>Cheapest</option>
-                </select>
-            </div>
             {% for plate in plates %}
             <div class="plate-card">
                 <h3>{{ plate.plateNumber }} {{ plate.plateLetter }}</h3>
-                <p class="price">${{ "%.2f"|format(plate.price) }}</p>
+                <p class="price">SAR {{ "%.2f"|format(plate.price) }}</p>
                 <p class="description">{{ plate.description }}</p>
                 <p class="date">Listed: {{ plate.created_at.strftime('%Y-%m-%d') }}</p>
-                <a href="{{ url_for('plate_details', plate_id=plate.plateID) }}" class="view-button">View Details</a>
+                <a href="/plate/{{ plate.plateID }}" class="view-button">View Details</a>
             </div>
             {% else %}
             <p class="no-results">No plates found matching your criteria.</p>

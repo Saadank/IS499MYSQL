@@ -1,8 +1,7 @@
 .plate-details-container {
-    max-width: 400px;
+    max-width: 800px;
     margin: 2rem auto;
     padding: 20px;
-    font-family: Arial, sans-serif;
 }
 
 .alert {
@@ -32,13 +31,25 @@
     margin-bottom: 2rem;
 }
 
+.plate-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+.ad-number {
+    font-size: 1.2rem;
+    color: #666;
+}
+
 .wishlist-btn {
     background: none;
     border: none;
-    font-size: 1.5rem;
     cursor: pointer;
-    color: #666;
     padding: 0.5rem;
+    font-size: 1.5rem;
+    transition: transform 0.2s;
 }
 
 .wishlist-btn:disabled {
@@ -46,93 +57,144 @@
     cursor: not-allowed;
 }
 
-.ad-number {
-    font-size: 1rem;
+.wishlist-btn:hover {
+    transform: scale(1.1);
+}
+
+.wishlist-btn i {
     color: #666;
-    direction: rtl;
+    transition: color 0.2s;
+}
+
+.wishlist-btn i.fas {
+    color: #ff0000;
 }
 
 /* Plate Display */
 .plate-display {
-    margin: 2rem 0;
+    border: 2px solid #000;
+    margin: 2rem auto;
+    padding: 1rem 2.5rem 1rem 1rem;
     display: flex;
+    position: relative;
+    background: white;
+    max-width: 600px;
+}
+
+.plate-section {
+    display: flex;
+    padding: 0.5rem;
+}
+
+.plate-section.numbers {
+    flex: 2;
     justify-content: center;
 }
 
-.plate-frame {
-    background: white;
-    border: 2px solid #000;
-    border-radius: 8px;
-    padding: 20px;
-    display: flex;
-    align-items: center;
-    gap: 20px;
-    min-width: 400px;
-    position: relative;
-}
-
-.plate-left {
-    flex: 2;
-    text-align: center;
-}
-
-.plate-right {
+.plate-section.letters {
     flex: 1;
-    text-align: center;
-    border-right: 2px solid #000;
-    padding-right: 20px;
-    position: relative;
+    justify-content: center;
+    border-left: 2px solid #000;
+    margin-right: -1px; /* To avoid double border with KSA label */
 }
 
-.plate-number {
+.number-section, .letter-section {
+    width: 100%;
+}
+
+.arabic-row, .english-row {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.25rem 0;
+}
+
+.arabic-row {
+    border-bottom: 1px solid #000;
+    margin-bottom: 0.25rem;
+}
+
+.plate-digit, .plate-letter {
     font-size: 2.5rem;
     font-weight: bold;
-    text-align: center;
-    margin: 1rem 0;
-    color: #333;
+    padding: 0.25rem;
+    color: #000;
 }
 
-.plate-letters {
-    font-size: 2.5rem;
-    font-weight: bold;
-    margin-bottom: 10px;
+.arabic-row .plate-digit,
+.arabic-row .plate-letter {
+    font-family: "Traditional Arabic", "Arial", sans-serif;
+    font-size: 2.8rem;
 }
 
-.plate-country {
+.english-row .plate-digit,
+.english-row .plate-letter {
+    font-family: "Arial", sans-serif;
+    font-size: 2rem;
+}
+
+.ksa-label {
     position: absolute;
-    right: -25px;
-    top: 50%;
-    transform: translateY(-50%);
+    right: 0;
+    top: 0;
+    bottom: 0;
+    width: 2rem;
     display: flex;
     flex-direction: column;
-    font-size: 0.8rem;
+    justify-content: center;
+    align-items: center;
+    border-left: 2px solid #000;
+    background: white;
     font-weight: bold;
-    gap: 2px;
+}
+
+.ksa-label span {
+    display: block;
+    font-size: 0.9rem;
+    margin: 0.15rem 0;
+}
+
+.ksa-label .arabic-a {
+    font-family: "Traditional Arabic", "Arial", sans-serif;
+    font-size: 1.2rem;
+    margin-top: 0.3rem;
 }
 
 /* Details Grid */
 .details-grid {
+    margin-top: 2rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.grid-row {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 15px;
-    margin: 2rem 0;
+    gap: 1px;
+    background: #ddd;
 }
 
-.detail-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0.5rem 0;
-    border-bottom: 1px solid #eee;
+.grid-row:not(:last-child) {
+    border-bottom: 1px solid #ddd;
 }
 
-.detail-label {
+.grid-item {
+    background: #f5f5f5;
+    padding: 1rem;
+    text-align: center;
+}
+
+.item-label {
+    color: #666;
+    font-size: 0.9rem;
+    margin-bottom: 0.5rem;
+}
+
+.item-value {
     font-weight: bold;
     color: #333;
-}
-
-.detail-value {
-    color: #666;
+    font-size: 1rem;
 }
 
 .login-notice {
@@ -164,21 +226,9 @@
 }
 
 @media (max-width: 768px) {
-    .plate-frame {
-        min-width: 300px;
-        padding: 15px;
-    }
-
-    .plate-number {
-        font-size: 2.5rem;
-    }
-
-    .plate-letters {
-        font-size: 2rem;
-    }
-
     .details-grid {
         grid-template-columns: repeat(2, 1fr);
+        grid-template-rows: repeat(4, auto);
     }
 }
 
@@ -187,17 +237,13 @@
         grid-template-columns: 1fr;
     }
 
-    .plate-frame {
+    .plate-display {
         min-width: 250px;
         padding: 10px;
     }
 
-    .plate-number {
+    .plate-digit, .plate-letter {
         font-size: 2rem;
-    }
-
-    .plate-letters {
-        font-size: 1.8rem;
     }
 }
 
@@ -276,21 +322,24 @@
 }
 
 .wishlist-button {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 2rem;
+    text-align: right;
+    margin-bottom: 1rem;
 }
 
 .wishlist-button button {
     background: none;
     border: none;
-    font-size: 1.5rem;
     cursor: pointer;
-    color: #666;
+    font-size: 2rem;
+    padding: 0.5rem;
+    transition: all 0.2s ease;
 }
 
-.wishlist-button button:disabled {
+.wishlist-button button:hover {
+    transform: scale(1.1);
+}
+
+.wishlist-button button[disabled] {
     opacity: 0.5;
     cursor: not-allowed;
 }
@@ -309,18 +358,6 @@
     letter-spacing: 2px;
 }
 
-.details-list {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-}
-
-@media (max-width: 768px) {
-    .plate-details-container {
-        grid-template-columns: 1fr;
-    }
-}
-
 .simple-list {
     display: flex;
     flex-direction: column;
@@ -331,4 +368,86 @@
     color: #333;
     font-size: 1rem;
     line-height: 1.5;
+}
+
+.plate-image {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.plate-image img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+}
+
+.default-plate {
+    width: 300px;
+    height: 150px;
+    margin: 0 auto;
+    background: #f5f5f5;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.default-plate span {
+    font-size: 2rem;
+    color: #333;
+    font-weight: bold;
+}
+
+.seller-section {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.seller-name {
+    font-size: 1.2rem;
+    font-weight: 500;
+    color: #333;
+    display: block;
+    margin-bottom: 0.5rem;
+}
+
+.seller-rating i {
+    margin: 0 2px;
+}
+
+.details-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 0 auto;
+}
+
+.details-table tr {
+    border-bottom: 1px solid #eee;
+}
+
+.details-table tr:last-child {
+    border-bottom: none;
+}
+
+.details-table td {
+    padding: 12px 8px;
+    color: #333;
+}
+
+.details-table td:first-child {
+    font-weight: 500;
+    width: 40%;
+}
+
+.error {
+    color: red;
+    text-align: center;
+    padding: 2rem;
+}
+
+.loading {
+    text-align: center;
+    padding: 2rem;
+    color: #666;
 } 

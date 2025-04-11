@@ -1,6 +1,5 @@
 from fastapi import APIRouter, Request, Depends, HTTPException
 from fastapi.responses import HTMLResponse
-from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
 from database import get_db
 from services.user_service import UserService
@@ -8,9 +7,9 @@ from services.session_service import SessionService
 from dependencies import require_auth
 from services.auth_service import get_current_user
 from models import User
+from utils.template_config import templates
 
 router = APIRouter(prefix="/users", tags=["users"])
-templates = Jinja2Templates(directory="templates")
 
 @router.get("/profile", response_class=HTMLResponse, name="profile_page")
 async def profile_page(

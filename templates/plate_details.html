@@ -1,44 +1,94 @@
-{% extends "base.html" %}
+{% extends "Base.html" %}
 
-{% block head %}
+{% block extra_css %}
 <link rel="stylesheet" href="{{ url_for('static', path='css/plate_details.css') }}">
 {% endblock %}
 
 {% block content %}
 <div class="plate-details-container">
     {% if error %}
-        <div class="alert alert-danger">{{ error }}</div>
-    {% endif %}
+        <div class="error">{{ error }}</div>
+    {% elif plate %}
+        <div class="wishlist-button">
+            <button title="Add to Wishlist" data-plate-id="{{ plate.plateID }}">♡</button>
+        </div>
 
-    {% if plate %}
-        <div class="simple-list">
-            <div>Ad # {{ plate.plateID }}</div>
-            <div>{{ plate.plate_number }}</div>
-            <div>K S A</div>
-            <div>City</div>
-            <div>Publication Date</div>
-            <div>{{ plate.created_at.strftime('%Y-%m-%d') }}</div>
-            <div>Advertisement #</div>
-            <div>{{ plate.plateID }}</div>
-            <div>Price</div>
-            <div>SAR {{ "%.2f"|format(plate.price) }}</div>
-            <div>Transfer Cost</div>
-            <div>{{ plate.transfer_cost }}</div>
-            <div>Plate Type</div>
-            <div>{{ plate.plate_type }}</div>
+        <div class="plate-display">
+            <div class="plate-section numbers">
+                <div class="number-section">
+                    <div class="arabic-row">
+                        {% for digit in plate.plate_number %}
+                        <div class="plate-digit">{{ digit|arabic_number }}</div>
+                        {% endfor %}
+                    </div>
+                    <div class="english-row">
+                        {% for digit in plate.plate_number %}
+                        <div class="plate-digit">{{ digit }}</div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            <div class="plate-section letters">
+                <div class="letter-section">
+                    <div class="arabic-row">
+                        {% for letter in plate.plate_letter %}
+                        <div class="plate-letter">{{ letter|arabic_letter }}</div>
+                        {% endfor %}
+                    </div>
+                    <div class="english-row">
+                        {% for letter in plate.plate_letter %}
+                        <div class="plate-letter">{{ letter|english_letter }}</div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            <div class="ksa-label">
+                <span>K</span>
+                <span>S</span>
+                <span class="arabic-a">ا</span>
+            </div>
+        </div>
+
+        <div class="details-grid">
+            <div class="grid-row">
+                <div class="grid-item">
+                    <div class="item-label">Plate Type</div>
+                    <div class="item-value">{{ plate.plate_type }}</div>
+                </div>
+                <div class="grid-item">
+                    <div class="item-label">Publication Date</div>
+                    <div class="item-value">{{ plate.created_at.strftime('%Y-%m-%d') }}</div>
+                </div>
+                <div class="grid-item">
+                    <div class="item-label">Price</div>
+                    <div class="item-value">SAR {{ "%.2f"|format(plate.price) }}</div>
+                </div>
+            </div>
+            <div class="grid-row">
+                <div class="grid-item">
+                    <div class="item-label">City</div>
+                    <div class="item-value">{{ plate.city }}</div>
+                </div>
+                <div class="grid-item">
+                    <div class="item-label">Transfer Cost</div>
+                    <div class="item-value">{{ plate.transfer_cost }}</div>
+                </div>
+                <div class="grid-item">
+                    <div class="item-label">Type</div>
+                    <div class="item-value">{{ plate.plate_type }}</div>
+                </div>
+            </div>
         </div>
 
         {% if not username %}
-            <div class="login-notice">
+            <div style="text-align: center; margin-top: 2rem; color: #666;">
                 Please login to contact the seller
             </div>
         {% endif %}
     {% else %}
-        <div class="no-plate-found">
-            <h2>No plate found</h2>
-            <p>The requested license plate could not be found.</p>
-            <a href="/forsale" class="btn btn-primary">Back to For Sale</a>
-        </div>
+        <div class="loading">Loading plate details...</div>
     {% endif %}
 </div>
+
+<script src="{{ url_for('static', path='js/plate_details.js') }}"></script>
 {% endblock %} 
