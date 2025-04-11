@@ -101,7 +101,7 @@ async def for_sale_page(
     letter3: Optional[str] = Query(None),
     sort_by: Optional[str] = Query("newest"),
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user)
+    user_id: Optional[int] = Depends(get_current_user)
 ):
     session_service = SessionService(request)
     plate_service = LicensePlateService(db)
@@ -129,7 +129,7 @@ async def view_plate_details(
     request: Request,
     plate_id: int,
     db: Session = Depends(get_db),
-    current_user: Optional[User] = Depends(get_current_user)
+    user_id: Optional[int] = Depends(get_current_user)
 ):
     session_service = SessionService(request)
     plate_service = LicensePlateService(db)
@@ -145,8 +145,8 @@ async def view_plate_details(
     
     # Check if plate is in user's wishlist
     is_in_wishlist = False
-    if current_user:
-        is_in_wishlist = wishlist_service.is_in_wishlist(current_user.id, plate_id)
+    if user_id:
+        is_in_wishlist = wishlist_service.is_in_wishlist(user_id, plate_id)
     
     template_data = session_service.get_template_data({
         "plate": plate,

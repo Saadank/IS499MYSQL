@@ -379,3 +379,122 @@ h1 {
     font-size: 14px;
     background-color: white;
 }
+
+.mini-plate-preview {
+    border: 2px solid #000;
+    margin: 0.5rem auto;
+    padding: 0.5rem 1.5rem 0.5rem 0.5rem;
+    display: flex;
+    position: relative;
+    background: white;
+    max-width: 180px;
+    font-family: Arial, sans-serif;
+}
+
+.mini-plate-numbers {
+    flex: 2;
+    padding: 0.25rem;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.mini-plate-letters {
+    flex: 1;
+    padding: 0.25rem;
+    border-left: 2px solid #000;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.mini-plate-preview .arabic-row {
+    border-bottom: 1px solid #000;
+    margin-bottom: 0.15rem;
+    font-family: "Traditional Arabic", Arial, sans-serif;
+    font-size: 1.2rem;
+    font-weight: bold;
+    line-height: 1.2;
+}
+
+.mini-plate-preview .english-row {
+    font-size: 1rem;
+    font-weight: bold;
+    line-height: 1.2;
+}
+
+.mini-ksa {
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    width: 1.2rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    border-left: 2px solid #000;
+    background: white;
+    font-weight: bold;
+    font-size: 0.7rem;
+}
+
+.mini-ksa span {
+    display: block;
+    margin: 0.1rem 0;
+    line-height: 1;
+}
+
+.plate-card {
+    background: #fff;
+    border-radius: 8px;
+    padding: 1rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    transition: transform 0.2s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.plate-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+.plate-card .price {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #2c3e50;
+    margin: 0.5rem 0;
+}
+
+.plate-card .description {
+    color: #666;
+    margin: 0.5rem 0;
+    text-align: center;
+}
+
+.plate-card .date {
+    color: #999;
+    font-size: 0.9rem;
+    margin: 0.5rem 0;
+}
+
+.view-button {
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    background: #3498db;
+    color: white;
+    text-decoration: none;
+    border-radius: 4px;
+    transition: background 0.2s;
+    margin-top: auto;
+}
+
+.view-button:hover {
+    background: #2980b9;
+    text-decoration: none;
+    color: white;
+}
