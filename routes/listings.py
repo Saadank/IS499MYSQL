@@ -8,6 +8,7 @@ from services.license_plate_service import LicensePlateService
 from services.session_service import SessionService
 from models import User
 from utils.template_config import templates
+from services.wishlist_service import WishlistService
 
 router = APIRouter(prefix="", tags=["listings"])
 
@@ -132,6 +133,8 @@ async def view_plate_details(
 ):
     session_service = SessionService(request)
     plate_service = LicensePlateService(db)
+    wishlist_service = WishlistService(db)
+    
     plate = plate_service.get_plate_details(plate_id)
     
     if not plate:
@@ -140,8 +143,14 @@ async def view_plate_details(
         })
         return templates.TemplateResponse("plate_details.html", template_data)
     
+    # Check if plate is in user's wishlist
+    is_in_wishlist = False
+    if current_user:
+        is_in_wishlist = wishlist_service.is_in_wishlist(current_user.id, plate_id)
+    
     template_data = session_service.get_template_data({
-        "plate": plate
+        "plate": plate,
+        "is_in_wishlist": is_in_wishlist
     })
     
     return templates.TemplateResponse("plate_details.html", template_data) 
