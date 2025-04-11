@@ -32,7 +32,12 @@ class LicensePlateService:
     async def create_listing(self, digit1: str, digit2: str, digit3: str, digit4: str,
                            letter1: str, letter2: str, letter3: str,
                            description: str, price: float, image: Optional[UploadFile],
-                           user_id: int) -> LicensePlate:
+                           user_id: int, listing_type: str = 'buy_now',
+                           buy_now_price: Optional[float] = None,
+                           auction_start_price: Optional[float] = None,
+                           minimum_offer_price: Optional[float] = None,
+                           city: str = '', transfer_cost: str = '',
+                           plate_type: str = '') -> LicensePlate:
         # Combine digits into plate number, excluding 'x'
         plate_number = ""
         for digit in [digit1, digit2, digit3, digit4]:
@@ -46,19 +51,33 @@ class LicensePlateService:
         if letter3 and letter3 != 'any':
             plate_letter += letter3
 
+        # Set appropriate prices based on listing type
+        if listing_type == 'buy_now':
+            buy_now_price = price
+            auction_start_price = None
+            minimum_offer_price = None
+        elif listing_type == 'auction':
+            buy_now_price = None
+            auction_start_price = price
+            minimum_offer_price = None
+        else:  # offers
+            buy_now_price = None
+            auction_start_price = None
+            minimum_offer_price = price
+
         return await self.create_license_plate(
             plate_number=plate_number,
             plate_letter=plate_letter,
             description=description,
             price=price,
-            listing_type='buy_now',
-            buy_now_price=price,
-            auction_start_price=price,
-            minimum_offer_price=price,
+            listing_type=listing_type,
+            buy_now_price=buy_now_price,
+            auction_start_price=auction_start_price,
+            minimum_offer_price=minimum_offer_price,
             owner_id=user_id,
-            city='',
-            transfer_cost='',
-            plate_type='',
+            city=city,
+            transfer_cost=transfer_cost,
+            plate_type=plate_type,
             image=image
         )
 

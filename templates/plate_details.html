@@ -10,7 +10,9 @@
         <div class="error">{{ error }}</div>
     {% elif plate %}
         <div class="wishlist-button">
-            <button title="Add to Wishlist" data-plate-id="{{ plate.plateID }}">♡</button>
+            <button title="Add to Wishlist" data-plate-id="{{ plate.plateID }}" style="color: {% if is_in_wishlist %}red{% else %}black{% endif %}">
+                {% if is_in_wishlist %}♥{% else %}♡{% endif %}
+            </button>
         </div>
 
         <div class="plate-display">
@@ -45,7 +47,7 @@
             <div class="ksa-label">
                 <span>K</span>
                 <span>S</span>
-                <span class="arabic-a">ا</span>
+                <span >A</span>
             </div>
         </div>
 

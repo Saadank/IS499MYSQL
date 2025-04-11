@@ -45,36 +45,31 @@ async def create_listing(
     try:
         plate_service = LicensePlateService(db)
         
-        # Combine digits into plate number, excluding 'x'
-        plate_number = ""
-        for digit in [digit1, digit2, digit3, digit4]:
-            if digit != 'x':
-                plate_number += digit
-        
-        # Combine letters, excluding empty values
-        plate_letter = letter1
-        if letter2 and letter2 != '':
-            plate_letter += letter2
-        if letter3 and letter3 != '':
-            plate_letter += letter3
+        # Calculate the price based on listing type
+        price = buy_now_price if listing_type == 'buy_now' else \
+               auction_start_price if listing_type == 'auction' else \
+               minimum_offer_price
 
         # Create the license plate
-        plate = await plate_service.create_license_plate(
-            plate_number=plate_number,
-            plate_letter=plate_letter,
+        plate = await plate_service.create_listing(
+            digit1=digit1,
+            digit2=digit2,
+            digit3=digit3,
+            digit4=digit4,
+            letter1=letter1,
+            letter2=letter2,
+            letter3=letter3,
             description=description,
-            price=buy_now_price if listing_type == 'buy_now' else 
-                  auction_start_price if listing_type == 'auction' else 
-                  minimum_offer_price,
+            price=price,
+            image=image,
+            user_id=user_id,
             listing_type=listing_type,
             buy_now_price=buy_now_price,
             auction_start_price=auction_start_price,
             minimum_offer_price=minimum_offer_price,
-            owner_id=user_id,
             city=city,
             transfer_cost=transfer_cost,
-            plate_type=plate_type,
-            image=image
+            plate_type=plate_type
         )
         
         return RedirectResponse(url="/plates", status_code=status.HTTP_303_SEE_OTHER)

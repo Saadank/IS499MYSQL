@@ -116,9 +116,9 @@
         <div class="form-group">
             <label>Listing Type:</label>
             <div class="listing-type-buttons">
-                <button type="button" class="btn btn-outline-primary" onclick="selectListingType('buy_now')">Buy It Now</button>
-                <button type="button" class="btn btn-outline-primary" onclick="selectListingType('auction')">Auction</button>
-                <button type="button" class="btn btn-outline-primary" onclick="selectListingType('offers')">Offers</button>
+                <button type="button" class="btn btn-outline-primary" onclick="selectListingType('buy_now', event)">Buy It Now</button>
+                <button type="button" class="btn btn-outline-primary" onclick="selectListingType('auction', event)">Auction</button>
+                <button type="button" class="btn btn-outline-primary" onclick="selectListingType('offers', event)">Offers</button>
             </div>
             <input type="hidden" name="listing_type" id="listing_type" required>
         </div>
@@ -131,9 +131,8 @@
                    id="buyNowPrice" 
                    class="form-control" 
                    min="1" 
-                   step="1" 
-                   value="0"
-                   disabled>
+                   step="1"
+                   value="0">
         </div>
 
         <!-- Auction Price Section -->
@@ -145,8 +144,7 @@
                    class="form-control" 
                    min="1" 
                    step="1"
-                   value="0"
-                   disabled>
+                   value="0">
         </div>
 
         <!-- Offers Price Section -->
@@ -158,8 +156,7 @@
                    class="form-control" 
                    min="1" 
                    step="1"
-                   value="0"
-                   disabled>
+                   value="0">
         </div>
 
         <!-- Image Upload -->

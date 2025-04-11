@@ -4,9 +4,11 @@ document.addEventListener('DOMContentLoaded', function() {
     if (wishlistButton) {
         wishlistButton.addEventListener('click', async function() {
             const plateId = this.dataset.plateId;
+            const isInWishlist = this.textContent === '♥';
             
             try {
-                const response = await fetch(`/api/wishlist/${plateId}`, {
+                const endpoint = isInWishlist ? `/wishlist/remove/${plateId}` : `/wishlist/add/${plateId}`;
+                const response = await fetch(endpoint, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -14,14 +16,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
                 
                 if (response.ok) {
-                    // Toggle the heart icon
-                    if (this.textContent === '♡') {
-                        this.textContent = '♥';
-                        this.style.color = 'red';
-                    } else {
-                        this.textContent = '♡';
-                        this.style.color = 'black';
-                    }
+                    // Toggle heart icon
+                    this.textContent = isInWishlist ? '♡' : '♥';
+                    this.style.color = isInWishlist ? 'black' : 'red';
                 } else {
                     const data = await response.json();
                     if (response.status === 401) {
