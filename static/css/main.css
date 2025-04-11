@@ -383,12 +383,14 @@ h1 {
 .mini-plate-preview {
     border: 2px solid #000;
     margin: 0.5rem auto;
-    padding: 0.5rem 1.5rem 0.5rem 0.5rem;
+    padding: 0.75rem 1.75rem 0.75rem 0.75rem;
     display: flex;
     position: relative;
     background: white;
-    max-width: 180px;
-    font-family: Arial, sans-serif;
+    max-width: 200px;
+    font-family: "Segoe UI", Arial, sans-serif;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    border-radius: 4px;
 }
 
 .mini-plate-numbers {
@@ -398,6 +400,7 @@ h1 {
     display: flex;
     flex-direction: column;
     justify-content: center;
+    gap: 4px;
 }
 
 .mini-plate-letters {
@@ -408,21 +411,26 @@ h1 {
     display: flex;
     flex-direction: column;
     justify-content: center;
+    gap: 4px;
 }
 
 .mini-plate-preview .arabic-row {
-    border-bottom: 1px solid #000;
-    margin-bottom: 0.15rem;
-    font-family: "Traditional Arabic", Arial, sans-serif;
-    font-size: 1.2rem;
+    border-bottom: 1px solid rgba(0,0,0,0.2);
+    padding-bottom: 4px;
+    margin-bottom: 2px;
+    font-family: "Traditional Arabic", "Segoe UI", Arial, sans-serif;
+    font-size: 1.4rem;
     font-weight: bold;
-    line-height: 1.2;
+    line-height: 1;
+    color: #333;
 }
 
 .mini-plate-preview .english-row {
-    font-size: 1rem;
-    font-weight: bold;
-    line-height: 1.2;
+    font-size: 1.2rem;
+    font-weight: 600;
+    line-height: 1;
+    color: #444;
+    padding-top: 2px;
 }
 
 .mini-ksa {
@@ -430,71 +438,77 @@ h1 {
     right: 0;
     top: 0;
     bottom: 0;
-    width: 1.2rem;
+    width: 1.5rem;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     border-left: 2px solid #000;
     background: white;
-    font-weight: bold;
+    font-weight: 600;
     font-size: 0.7rem;
+    gap: 2px;
 }
 
 .mini-ksa span {
     display: block;
-    margin: 0.1rem 0;
     line-height: 1;
+    color: #333;
 }
 
 .plate-card {
     background: #fff;
-    border-radius: 8px;
-    padding: 1rem;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    transition: transform 0.2s;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    transition: all 0.3s ease;
     display: flex;
     flex-direction: column;
     align-items: center;
+    gap: 0.75rem;
 }
 
 .plate-card:hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.12);
 }
 
 .plate-card .price {
-    font-size: 1.2rem;
-    font-weight: bold;
+    font-size: 1.3rem;
+    font-weight: 600;
     color: #2c3e50;
-    margin: 0.5rem 0;
+    margin: 0;
 }
 
 .plate-card .description {
     color: #666;
-    margin: 0.5rem 0;
+    margin: 0;
     text-align: center;
+    font-size: 0.95rem;
 }
 
 .plate-card .date {
-    color: #999;
-    font-size: 0.9rem;
-    margin: 0.5rem 0;
+    color: #888;
+    font-size: 0.85rem;
+    margin: 0;
+    font-weight: 500;
 }
 
 .view-button {
     display: inline-block;
-    padding: 0.5rem 1rem;
-    background: #3498db;
+    padding: 0.6rem 1.2rem;
+    background: #4361ee;
     color: white;
     text-decoration: none;
-    border-radius: 4px;
-    transition: background 0.2s;
-    margin-top: auto;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+    margin-top: 0.5rem;
+    font-weight: 500;
+    font-size: 0.95rem;
 }
 
 .view-button:hover {
-    background: #2980b9;
-    text-decoration: none;
-    color: white;
+    background: #3a53d3;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 6px rgba(67, 97, 238, 0.3);
 }

@@ -20,7 +20,7 @@
                 <div class="number-section">
                     <div class="arabic-row">
                         {% for digit in plate.plate_number %}
-                        <div class="plate-digit">{{ digit|arabic_number }}</div>
+                        <div class="plate-digit">{{ digit|arabic_numbers }}</div>
                         {% endfor %}
                     </div>
                     <div class="english-row">
@@ -34,12 +34,12 @@
                 <div class="letter-section">
                     <div class="arabic-row">
                         {% for letter in plate.plate_letter %}
-                        <div class="plate-letter">{{ letter|arabic_letter }}</div>
+                        <div class="plate-letter">{{ letter|arabic_letters }}</div>
                         {% endfor %}
                     </div>
                     <div class="english-row">
                         {% for letter in plate.plate_letter %}
-                        <div class="plate-letter">{{ letter|english_letter }}</div>
+                        <div class="plate-letter">{{ letter }}</div>
                         {% endfor %}
                     </div>
                 </div>

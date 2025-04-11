@@ -87,11 +87,11 @@
             <div class="plate-card">
                 <div class="mini-plate-preview">
                     <div class="mini-plate-numbers">
-                        <div class="arabic-row">{{ plate.plateNumber }}</div>
+                        <div class="arabic-row">{{ plate.plateNumber|arabic_numbers }}</div>
                         <div class="english-row">{{ plate.plateNumber }}</div>
                     </div>
                     <div class="mini-plate-letters">
-                        <div class="arabic-row">{{ plate.plateLetter }}</div>
+                        <div class="arabic-row">{{ plate.plateLetter|arabic_letters }}</div>
                         <div class="english-row">{{ plate.plateLetter }}</div>
                     </div>
                     <div class="mini-ksa">
@@ -101,7 +101,9 @@
                     </div>
                 </div>
                 <p class="price">SAR {{ "%.2f"|format(plate.price) }}</p>
-                <p class="description">{{ plate.description }}</p>
+                {% if plate.description %}
+                    <p class="description">{{ plate.description }}</p>
+                {% endif %}
                 <p class="date">Listed: {{ plate.created_at.strftime('%Y-%m-%d') }}</p>
                 <a href="/plate/{{ plate.plateID }}" class="view-button">View Details</a>
             </div>
