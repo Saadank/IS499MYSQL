@@ -14,7 +14,7 @@
             <p><strong>Username:</strong> {{ user.username }}</p>
             <p><strong>Email:</strong> {{ user.email }}</p>
             <p><strong>Name:</strong> {{ user.firstname }} {{ user.lastname }}</p>
-            <p><strong>ID Number:</strong> {{ user.idnumber }}</p>
+            <p><strong>ID Number:</strong> {% if user.idnumber %}•••••{{ user.idnumber[-2:] }}{% endif %}</p>
             <p><strong>Address:</strong> {{ user.address }}</p>
         </div>
     </div>
