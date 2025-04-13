@@ -34,12 +34,12 @@
                 <div class="letter-section">
                     <div class="arabic-row">
                         {% for letter in plate.plate_letter %}
-                        <div class="plate-letter">{{ letter|arabic_letters }}</div>
+                        <div class="plate-letter">{{ letter }}</div>
                         {% endfor %}
                     </div>
                     <div class="english-row">
                         {% for letter in plate.plate_letter %}
-                        <div class="plate-letter">{{ letter }}</div>
+                        <div class="plate-letter">{{ letter_english[letter] }}</div>
                         {% endfor %}
                     </div>
                 </div>

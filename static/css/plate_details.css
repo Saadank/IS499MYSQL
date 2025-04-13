@@ -119,12 +119,14 @@
     font-weight: bold;
     padding: 0.25rem;
     color: #000;
+    margin: 0 0.5rem;
 }
 
 .arabic-row .plate-digit,
 .arabic-row .plate-letter {
     font-family: "Traditional Arabic", "Arial", sans-serif;
     font-size: 2.8rem;
+    letter-spacing: 0.5rem;
 }
 
 .english-row .plate-digit,

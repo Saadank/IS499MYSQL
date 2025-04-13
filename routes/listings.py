@@ -110,6 +110,7 @@ async def for_sale_page(
                                                letter1, letter2, letter3, sort_by)
     
     template_data = session_service.get_template_data(plate_data)
+    template_data["letter_english"] = plate_service.LETTER_ENGLISH
     
     return templates.TemplateResponse("forsale.html", template_data)
 
@@ -150,7 +151,8 @@ async def view_plate_details(
     
     template_data = session_service.get_template_data({
         "plate": plate,
-        "is_in_wishlist": is_in_wishlist
+        "is_in_wishlist": is_in_wishlist,
+        "letter_english": plate_service.LETTER_ENGLISH
     })
     
     return templates.TemplateResponse("plate_details.html", template_data) 
