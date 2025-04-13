@@ -121,7 +121,7 @@ async def delete_plate(
     db: Session = Depends(get_db)
 ):
     plate_service = LicensePlateService(db)
-    if plate_service.delete_license_plate(plate_id, user_id):
+    if await plate_service.delete_license_plate(plate_id, user_id):
         return {"message": "Plate removed successfully"}
     raise HTTPException(status_code=400, detail="Failed to remove plate")
 

@@ -233,14 +233,22 @@ h1 {
 }
 
 .plate-card {
-    background-color: white;
-    border-radius: 8px;
-    padding: 20px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    text-align: center;
-    flex: 1;
-    min-width: 250px;
+    background: #fff;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+    min-width: 280px;
     max-width: 350px;
+}
+
+.plate-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.12);
 }
 
 .plate-image {
@@ -278,13 +286,16 @@ h1 {
 
 .plate-card .description {
     color: #666;
-    margin: 10px 0;
+    margin: 0;
+    text-align: center;
+    font-size: 0.95rem;
 }
 
 .plate-card .date {
-    color: #999;
-    font-size: 0.9em;
-    margin: 10px 0;
+    color: #888;
+    font-size: 0.85rem;
+    margin: 0;
+    font-weight: 500;
 }
 
 .owner {
@@ -315,16 +326,23 @@ h1 {
 
 .view-button {
     display: inline-block;
-    background-color: rgb(53, 53, 235);
+    padding: 0.6rem 1.2rem;
+    background: #4361ee;
     color: white;
-    padding: 8px 16px;
-    border-radius: 5px;
     text-decoration: none;
-    margin-top: 10px;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+    margin-top: 0.5rem;
+    font-weight: 500;
+    font-size: 0.95rem;
+    width: 100%;
+    text-align: center;
 }
 
 .view-button:hover {
-    background-color: rgb(41, 41, 200);
+    background: #3a53d3;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 6px rgba(67, 97, 238, 0.3);
 }
 
 .no-results {
@@ -343,7 +361,7 @@ h1 {
 }
 
 .digit-select, .letter-select {
-    width: 60px;
+    width: 80px;
     padding: 8px;
     border: 1px solid #ccc;
     border-radius: 5px;
@@ -460,61 +478,4 @@ h1 {
 .mini-ksa span {
     line-height: 1;
     color: #333;
-}
-
-.plate-card {
-    background: #fff;
-    border-radius: 12px;
-    padding: 1.5rem;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-    transition: all 0.3s ease;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.75rem;
-}
-
-.plate-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.12);
-}
-
-.plate-card .price {
-    font-size: 1.3rem;
-    font-weight: 600;
-    color: #2c3e50;
-    margin: 0;
-}
-
-.plate-card .description {
-    color: #666;
-    margin: 0;
-    text-align: center;
-    font-size: 0.95rem;
-}
-
-.plate-card .date {
-    color: #888;
-    font-size: 0.85rem;
-    margin: 0;
-    font-weight: 500;
-}
-
-.view-button {
-    display: inline-block;
-    padding: 0.6rem 1.2rem;
-    background: #4361ee;
-    color: white;
-    text-decoration: none;
-    border-radius: 6px;
-    transition: all 0.2s ease;
-    margin-top: 0.5rem;
-    font-weight: 500;
-    font-size: 0.95rem;
-}
-
-.view-button:hover {
-    background: #3a53d3;
-    transform: translateY(-1px);
-    box-shadow: 0 2px 6px rgba(67, 97, 238, 0.3);
 }

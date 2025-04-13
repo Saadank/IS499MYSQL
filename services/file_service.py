@@ -2,6 +2,7 @@ import os
 from fastapi import UploadFile
 import uuid
 from datetime import datetime
+import aiofiles
 
 class FileService:
     def __init__(self):
@@ -17,14 +18,14 @@ class FileService:
         file_path = os.path.join(self.upload_dir, unique_filename)
         
         # Save the file
-        with open(file_path, "wb") as buffer:
-            content = await file.read()
-            buffer.write(content)
+        content = await file.read()
+        async with aiofiles.open(file_path, "wb") as buffer:
+            await buffer.write(content)
         
         # Return the relative path for database storage
         return f"/static/uploads/license_plates/{unique_filename}"
 
-    def delete_image(self, image_path: str) -> bool:
+    async def delete_image(self, image_path: str) -> bool:
         if not image_path:
             return True
             
