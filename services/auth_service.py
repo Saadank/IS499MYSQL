@@ -6,6 +6,7 @@ from fastapi import HTTPException, Depends, Request
 from routes.schemas import UserLogin, UserSignup
 from database import get_db
 from services.session_service import SessionService
+from services.email_service import EmailService
 
 async def get_current_user(
     request: Request,
@@ -85,7 +86,7 @@ class AuthService:
             raise HTTPException(status_code=400, detail="Email already registered")
         
         # Create user
-        return self.create_user(
+        user = self.create_user(
             username=signup_data.username,
             email=signup_data.email,
             password=signup_data.password,
@@ -94,6 +95,12 @@ class AuthService:
             idnumber=signup_data.idnumber,
             address=signup_data.address
         )
+
+        # Send welcome email
+        email_service = EmailService()
+        email_service.send_welcome_email(user.email, user.username)
+        
+        return user
 
     def create_user(self, username: str, email: str, password: str, firstname: str, lastname: str, idnumber: str, address: str) -> User:
         hashed_password = hashlib.sha256(password.encode()).hexdigest()
