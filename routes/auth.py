@@ -10,9 +10,10 @@ from utils.template_config import templates
 router = APIRouter(prefix="", tags=["auth"])
 
 @router.get("/login", response_class=HTMLResponse)
-async def login_page(request: Request):
+async def login_page(request: Request, error: str = None):
     session_service = SessionService(request)
-    return templates.TemplateResponse("login.html", session_service.get_template_data())
+    template_data = session_service.get_template_data({"error": error})
+    return templates.TemplateResponse("login.html", template_data)
 
 @router.post("/login")
 async def login(
@@ -24,10 +25,15 @@ async def login(
     auth_service = AuthService(db)
     session_service = SessionService(request)
     
-    user = await auth_service.login_user(username, password)
-    session_service.set_user_session(user.id, user.username)
-    
-    return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
+    try:
+        # Validate input using schema
+        login_data = UserLogin(username=username, password=password)
+        user = await auth_service.login_user(username, password)
+        session_service.set_user_session(user.id, user.username)
+        return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
+    except Exception as e:
+        # Show generic error message for all validation and authentication errors
+        return RedirectResponse(url="/login?error=Incorrect username or password", status_code=status.HTTP_303_SEE_OTHER)
 
 @router.get("/signup", response_class=HTMLResponse)
 async def signup_page(request: Request):

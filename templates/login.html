@@ -3,6 +3,11 @@
 
 {% block content %}
 <h2>Log In</h2>
+{% if error %}
+<div class="error-message">
+    {{ error }}
+</div>
+{% endif %}
 <form method="post" class="login-form">
     <div class="form-group">
         <label for="username">Username:</label>
