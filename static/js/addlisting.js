@@ -1,4 +1,4 @@
-function selectListingType(type) {
+function selectListingType(type, event) {
     console.log('Selected listing type:', type);
     
     // Update hidden input
@@ -10,7 +10,7 @@ function selectListingType(type) {
     });
     event.target.classList.add('active');
     
-    // Show/hide price sections and enable/disable inputs
+    // Show/hide price sections
     const buyNowSection = document.getElementById('buyNowSection');
     const auctionSection = document.getElementById('auctionSection');
     const offersSection = document.getElementById('offersSection');
@@ -18,35 +18,66 @@ function selectListingType(type) {
     const auctionInput = document.getElementById('auctionStartPrice');
     const offersInput = document.getElementById('minimumOfferPrice');
     
-    // Disable and hide all sections first
+    // Hide all sections first
     buyNowSection.style.display = 'none';
     auctionSection.style.display = 'none';
     offersSection.style.display = 'none';
-    buyNowInput.disabled = true;
-    auctionInput.disabled = true;
-    offersInput.disabled = true;
     
     // Reset all price inputs
     buyNowInput.value = '0';
     auctionInput.value = '0';
     offersInput.value = '0';
     
-    // Show and enable selected type
+    // Show selected type and set focus
     switch(type) {
         case 'buy_now':
             buyNowSection.style.display = 'block';
-            buyNowInput.disabled = false;
             buyNowInput.value = '';
+            buyNowInput.focus();
             break;
         case 'auction':
             auctionSection.style.display = 'block';
-            auctionInput.disabled = false;
             auctionInput.value = '';
+            auctionInput.focus();
             break;
         case 'offers':
             offersSection.style.display = 'block';
-            offersInput.disabled = false;
             offersInput.value = '';
+            offersInput.focus();
             break;
     }
-} 
+}
+
+// Add form submission handler
+document.getElementById('listingForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const listingType = document.getElementById('listing_type').value;
+    if (!listingType) {
+        alert('Please select a listing type');
+        return;
+    }
+
+    // Get the appropriate price input based on listing type
+    let priceInput;
+    switch(listingType) {
+        case 'buy_now':
+            priceInput = document.getElementById('buyNowPrice');
+            break;
+        case 'auction':
+            priceInput = document.getElementById('auctionStartPrice');
+            break;
+        case 'offers':
+            priceInput = document.getElementById('minimumOfferPrice');
+            break;
+    }
+
+    // Validate price
+    if (!priceInput || !priceInput.value || priceInput.value <= 0) {
+        alert('Please enter a valid price');
+        return;
+    }
+
+    // If all validations pass, submit the form
+    this.submit();
+}); 

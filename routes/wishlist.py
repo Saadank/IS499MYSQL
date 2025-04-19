@@ -1,13 +1,12 @@
 from fastapi import APIRouter, Request, Depends, HTTPException, status
 from fastapi.responses import HTMLResponse, RedirectResponse
-from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
 from database import get_db
 from dependencies import require_auth
 from services.wishlist_service import WishlistService
+from utils.template_config import templates
 
 router = APIRouter(prefix="", tags=["wishlist"])
-templates = Jinja2Templates(directory="templates")
 
 @router.get("/wishlist", response_class=HTMLResponse)
 async def wishlist_page(

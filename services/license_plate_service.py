@@ -7,14 +7,13 @@ from fastapi import UploadFile, Request
 
 class LicensePlateService:
     # Valid Arabic letters
-    VALID_LETTERS = [
-        'ا', 'ب', 'ج', 'د', 'ر', 'س', 'ص', 'ط', 'ع', 'ف', 'ق', 'ل', 'م', 'ن', 'ه', 'و', 'ي'
-    ]
+    VALID_LETTERS = ['أ', 'ب', 'د', 'ع', 'ق', 'ه', 'ح', 'ك', 'ل', 'ن', 'ر', 'س', 'ط', 'و', 'ى', 'ص', 'م']
 
     # English letter mappings
     LETTER_ENGLISH = {
-        'ا': 'A', 'ب': 'B', 'ج': 'J', 'د': 'D', 'ر': 'R', 'س': 'S', 'ص': 'S', 'ط': 'T',
-        'ع': 'A', 'ف': 'F', 'ق': 'Q', 'ل': 'L', 'م': 'M', 'ن': 'N', 'ه': 'H', 'و': 'W', 'ي': 'Y'
+        'أ': 'A', 'ب': 'B', 'د': 'D', 'ع': 'E', 'ق': 'G', 'ه': 'H', 'ح': 'J', 
+        'ك': 'K', 'ل': 'L', 'ن': 'N', 'ر': 'R', 'س': 'S', 'ط': 'T', 'و': 'U', 
+        'ى': 'V', 'ص': 'X', 'م': 'Z'
     }
 
     def __init__(self, db: Session):
@@ -33,7 +32,12 @@ class LicensePlateService:
     async def create_listing(self, digit1: str, digit2: str, digit3: str, digit4: str,
                            letter1: str, letter2: str, letter3: str,
                            description: str, price: float, image: Optional[UploadFile],
-                           user_id: int) -> LicensePlate:
+                           user_id: int, listing_type: str = 'buy_now',
+                           buy_now_price: Optional[float] = None,
+                           auction_start_price: Optional[float] = None,
+                           minimum_offer_price: Optional[float] = None,
+                           city: str = '', transfer_cost: str = '',
+                           plate_type: str = '') -> LicensePlate:
         # Combine digits into plate number, excluding 'x'
         plate_number = ""
         for digit in [digit1, digit2, digit3, digit4]:
@@ -47,16 +51,33 @@ class LicensePlateService:
         if letter3 and letter3 != 'any':
             plate_letter += letter3
 
+        # Set appropriate prices based on listing type
+        if listing_type == 'buy_now':
+            buy_now_price = price
+            auction_start_price = None
+            minimum_offer_price = None
+        elif listing_type == 'auction':
+            buy_now_price = None
+            auction_start_price = price
+            minimum_offer_price = None
+        else:  # offers
+            buy_now_price = None
+            auction_start_price = None
+            minimum_offer_price = price
+
         return await self.create_license_plate(
             plate_number=plate_number,
             plate_letter=plate_letter,
             description=description,
             price=price,
-            listing_type='buy_now',
-            buy_now_price=price,
-            auction_start_price=price,
-            minimum_offer_price=price,
+            listing_type=listing_type,
+            buy_now_price=buy_now_price,
+            auction_start_price=auction_start_price,
+            minimum_offer_price=minimum_offer_price,
             owner_id=user_id,
+            city=city,
+            transfer_cost=transfer_cost,
+            plate_type=plate_type,
             image=image
         )
 
@@ -115,6 +136,9 @@ class LicensePlateService:
         auction_start_price: int,
         minimum_offer_price: int,
         owner_id: int,
+        city: str,
+        transfer_cost: str,
+        plate_type: str,
         image: Optional[UploadFile] = None
     ) -> LicensePlate:
         # Validate plate letter
@@ -138,6 +162,9 @@ class LicensePlateService:
                 auction_start_price=auction_start_price,
                 minimum_offer_price=minimum_offer_price,
                 owner_id=owner_id,
+                city=city,
+                transfer_cost=transfer_cost,
+                plate_type=plate_type,
                 image_path=image_path
             )
             self.db.add(db_plate)
@@ -246,6 +273,10 @@ class LicensePlateService:
         # Delete associated wishlist items
         for wishlist_item in plate.wishlist_items:
             self.db.delete(wishlist_item)
+            
+        # Delete associated auctions
+        for auction in plate.auctions:
+            self.db.delete(auction)
         
         self.db.delete(plate)
         self.db.commit()
@@ -273,6 +304,10 @@ class LicensePlateService:
             'buy_now_price': plate.buy_now_price,
             'auction_start_price': plate.auction_start_price,
             'minimum_offer_price': plate.minimum_offer_price,
+            'created_at': plate.created_at,
+            'city': plate.city,
+            'transfer_cost': plate.transfer_cost,
+            'plate_type': plate.plate_type,
             'seller': {
                 'username': seller.username,
                 'profile_image': getattr(seller, 'profile_image', '/static/images/default_profile.jpg'),

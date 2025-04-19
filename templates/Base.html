@@ -28,7 +28,8 @@
                         <div class="profile-dropdown" id="profileDropdown">
                             <a href="{{ url_for('profile_page') }}" class="dropdown-item">Profile</a>
                             <a href="{{ url_for('order_history') }}" class="dropdown-item">Order History</a>
-                            <a href="#" class="dropdown-item disabled">Active Offers</a>
+                            <a href="{{ url_for('active_offers') }}" class="dropdown-item">Active Offers</a>
+                            <a href="/wishlist" class="dropdown-item">My Wishlist</a>
                             <div class="dropdown-divider"></div>
                             <a href="/logout" class="dropdown-item">Logout</a>
                         </div>

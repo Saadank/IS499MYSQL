@@ -71,13 +71,54 @@
             <textarea name="description" class="form-control"></textarea>
         </div>
 
+        <!-- City -->
+        <div class="form-group">
+            <label>City:</label>
+            <select name="city" class="form-control" required>
+                <option value="">Select City</option>
+                <option value="Dammam">Dammam</option>
+                <option value="Riyadh">Riyadh</option>
+                <option value="Jeddah">Jeddah</option>
+                <option value="Mecca">Mecca</option>
+                <option value="Medina">Medina</option>
+            </select>
+        </div>
+
+        <!-- Transfer Cost -->
+        <div class="form-group">
+            <label>Transfer Cost:</label>
+            <select name="transfer_cost" class="form-control" required>
+                <option value="">Select Transfer Cost</option>
+                <option value="Buyer Responsibility">Buyer Responsibility</option>
+                <option value="Seller Responsibility">Seller Responsibility</option>
+                <option value="Shared">Shared</option>
+            </select>
+        </div>
+
+        <!-- Plate Type -->
+        <div class="form-group">
+            <label>Plate Type:</label>
+            <select name="plate_type" class="form-control" required>
+                <option value="">Select Plate Type</option>
+                <option value="Private">Private</option>
+                <option value="Commercial">Commercial</option>
+                <option value="Transport">Transport</option>
+            </select>
+        </div>
+
+        <!-- Price -->
+        <div class="form-group">
+            <label>Price (SAR):</label>
+            <input type="number" name="price" class="form-control" required min="0" step="0.01">
+        </div>
+
         <!-- Listing Type Selection -->
         <div class="form-group">
             <label>Listing Type:</label>
             <div class="listing-type-buttons">
-                <button type="button" class="btn btn-outline-primary" onclick="selectListingType('buy_now')">Buy It Now</button>
-                <button type="button" class="btn btn-outline-primary" onclick="selectListingType('auction')">Auction</button>
-                <button type="button" class="btn btn-outline-primary" onclick="selectListingType('offers')">Offers</button>
+                <button type="button" class="btn btn-outline-primary" onclick="selectListingType('buy_now', event)">Buy It Now</button>
+                <button type="button" class="btn btn-outline-primary" onclick="selectListingType('auction', event)">Auction</button>
+                <button type="button" class="btn btn-outline-primary" onclick="selectListingType('offers', event)">Offers</button>
             </div>
             <input type="hidden" name="listing_type" id="listing_type" required>
         </div>
@@ -90,9 +131,8 @@
                    id="buyNowPrice" 
                    class="form-control" 
                    min="1" 
-                   step="1" 
-                   value="0"
-                   disabled>
+                   step="1"
+                   value="0">
         </div>
 
         <!-- Auction Price Section -->
@@ -104,8 +144,7 @@
                    class="form-control" 
                    min="1" 
                    step="1"
-                   value="0"
-                   disabled>
+                   value="0">
         </div>
 
         <!-- Offers Price Section -->
@@ -117,17 +156,16 @@
                    class="form-control" 
                    min="1" 
                    step="1"
-                   value="0"
-                   disabled>
+                   value="0">
         </div>
 
         <!-- Image Upload -->
         <div class="form-group">
-            <label>Image:</label>
+            <label>Plate Image:</label>
             <input type="file" name="image" class="form-control" accept="image/*">
         </div>
 
-        <button type="submit" class="btn btn-primary">Create Listing</button>
+        <button type="submit" class="btn btn-primary">Add Listing</button>
     </form>
 </div>
 

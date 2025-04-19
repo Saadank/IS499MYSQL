@@ -1,15 +1,16 @@
 from fastapi import FastAPI, Request, Depends, BackgroundTasks
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
-from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
 from database import engine, Base, get_db
-from routes import auth, listings, users, auctions, wishlist
+from routes import auth, listings, users, auctions, wishlist, api
 from starlette.middleware.sessions import SessionMiddleware
 from services.license_plate_service import LicensePlateService
 from services.auction_service import AuctionService
+from services.session_service import SessionService
 import asyncio
 from datetime import datetime, timedelta
+from utils.template_config import templates
 
 app = FastAPI(title="License Plate Trading")
 
@@ -23,9 +24,6 @@ app.add_middleware(
 # Mount static files
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
-# Configure templates
-templates = Jinja2Templates(directory="templates")
-
 # Create database tables
 Base.metadata.create_all(bind=engine)
 
@@ -35,6 +33,7 @@ app.include_router(listings.router)
 app.include_router(users.router)
 app.include_router(auctions.router)
 app.include_router(wishlist.router)
+app.include_router(api.router)
 
 async def create_new_auction(db: Session):
     while True:
@@ -66,12 +65,12 @@ async def startup_event():
 
 @app.get("/", response_class=HTMLResponse)
 async def home(request: Request, db: Session = Depends(get_db)):
+    session_service = SessionService(request)
     plate_service = LicensePlateService(db)
     plates = plate_service.get_license_plates()
     
-    return templates.TemplateResponse("landingpage.html", {
-        "request": request,
-        "plates": plates,
-        "user_id": request.session.get("user_id"),
-        "username": request.session.get("username")
-    }) 
+    template_data = session_service.get_template_data({
+        "plates": plates
+    })
+    
+    return templates.TemplateResponse("landingpage.html", template_data) 

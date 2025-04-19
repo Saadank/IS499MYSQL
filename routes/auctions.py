@@ -1,15 +1,14 @@
 from fastapi import APIRouter, Request, Depends, HTTPException, status
 from fastapi.responses import HTMLResponse, RedirectResponse
-from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
 from database import get_db
 from services.auction_service import AuctionService
 from services.license_plate_service import LicensePlateService
 from services.session_service import SessionService
 from datetime import datetime
+from utils.template_config import templates
 
 router = APIRouter(prefix="/auctions", tags=["auctions"])
-templates = Jinja2Templates(directory="templates")
 
 @router.get("/", response_class=HTMLResponse)
 async def auction_page(request: Request, db: Session = Depends(get_db)):

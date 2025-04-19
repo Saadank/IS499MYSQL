@@ -1,78 +1,96 @@
-{% extends "base.html" %}
+{% extends "Base.html" %}
 
-{% block head %}
+{% block extra_css %}
 <link rel="stylesheet" href="{{ url_for('static', path='css/plate_details.css') }}">
 {% endblock %}
 
 {% block content %}
 <div class="plate-details-container">
     {% if error %}
-        <div class="alert alert-danger">{{ error }}</div>
-    {% endif %}
-
-    {% if plate %}
-        <div class="plate-image-section">
-            {% if plate.image_url %}
-                <img src="{{ url_for('static', path=plate.image_url) }}" alt="License Plate {{ plate.plate_number }}" class="plate-image">
-            {% else %}
-                <div class="no-image">No image available</div>
-            {% endif %}
+        <div class="error">{{ error }}</div>
+    {% elif plate %}
+        <div class="wishlist-button">
+            <button title="Add to Wishlist" data-plate-id="{{ plate.plateID }}" style="color: {% if is_in_wishlist %}red{% else %}black{% endif %}">
+                {% if is_in_wishlist %}♥{% else %}♡{% endif %}
+            </button>
         </div>
 
-        <div class="plate-info-section">
-            <h1>License Plate: {{ plate.plate_number }}</h1>
-            <div class="price-section">
-                <h2>Price: ${{ "%.2f"|format(plate.price) }}</h2>
-            </div>
-
-            <div class="action-buttons">
-                <button class="buy-now-btn" {% if not current_user.is_authenticated %}disabled{% endif %}>Buy Now</button>
-                <button class="make-offer-btn" {% if not current_user.is_authenticated %}disabled{% endif %}>Make Offer</button>
-                <button class="wishlist-btn" {% if not current_user.is_authenticated %}disabled{% endif %}>Add to Wishlist</button>
-            </div>
-
-            <div class="seller-info">
-                <h3>Seller Information</h3>
-                <div class="seller-profile">
-                    {% if plate.seller.profile_image %}
-                        <img src="{{ url_for('static', path=plate.seller.profile_image) }}" alt="Seller Profile" class="seller-avatar">
-                    {% else %}
-                        <div class="default-avatar">?</div>
-                    {% endif %}
-                    <div class="seller-details">
-                        <p class="seller-name">{{ plate.seller.username }}</p>
-                        <div class="seller-rating">
-                            <span class="stars">
-                                {% for i in range(5) %}
-                                    {% if i < plate.seller.rating|int %}
-                                        ★
-                                    {% else %}
-                                        ☆
-                                    {% endif %}
-                                {% endfor %}
-                            </span>
-                            <span class="rating-value">{{ "%.1f"|format(plate.seller.rating) }}/5.0</span>
-                        </div>
-                        <p class="member-since">Member since: {{ plate.seller.join_date }}</p>
+        <div class="plate-display">
+            <div class="plate-section numbers">
+                <div class="number-section">
+                    <div class="arabic-row">
+                        {% for digit in plate.plate_number %}
+                        <div class="plate-digit">{{ digit|arabic_numbers }}</div>
+                        {% endfor %}
+                    </div>
+                    <div class="english-row">
+                        {% for digit in plate.plate_number %}
+                        <div class="plate-digit">{{ digit }}</div>
+                        {% endfor %}
                     </div>
                 </div>
-                <div class="contact-info">
-                    <h4>Contact Information</h4>
-                    {% if plate.seller.email != 'N/A' %}
-                        <p>Email: {{ plate.seller.email }}</p>
-                    {% endif %}
-                    {% if plate.seller.phone != 'N/A' %}
-                        <p>Phone: {{ plate.seller.phone }}</p>
-                    {% endif %}
+            </div>
+            <div class="plate-section letters">
+                <div class="letter-section">
+                    <div class="arabic-row">
+                        {% for letter in plate.plate_letter %}
+                        <div class="plate-letter">{{ letter|arabic_letters }}</div>
+                        {% endfor %}
+                    </div>
+                    <div class="english-row">
+                        {% for letter in plate.plate_letter %}
+                        <div class="plate-letter">{{ letter }}</div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            <div class="ksa-label">
+                <span>K</span>
+                <span>S</span>
+                <span >A</span>
+            </div>
+        </div>
+
+        <div class="details-grid">
+            <div class="grid-row">
+                <div class="grid-item">
+                    <div class="item-label">Plate Type</div>
+                    <div class="item-value">{{ plate.plate_type }}</div>
+                </div>
+                <div class="grid-item">
+                    <div class="item-label">Publication Date</div>
+                    <div class="item-value">{{ plate.created_at.strftime('%Y-%m-%d') }}</div>
+                </div>
+                <div class="grid-item">
+                    <div class="item-label">Price</div>
+                    <div class="item-value">SAR {{ "%.2f"|format(plate.price) }}</div>
+                </div>
+            </div>
+            <div class="grid-row">
+                <div class="grid-item">
+                    <div class="item-label">City</div>
+                    <div class="item-value">{{ plate.city }}</div>
+                </div>
+                <div class="grid-item">
+                    <div class="item-label">Transfer Cost</div>
+                    <div class="item-value">{{ plate.transfer_cost }}</div>
+                </div>
+                <div class="grid-item">
+                    <div class="item-label">Type</div>
+                    <div class="item-value">{{ plate.plate_type }}</div>
                 </div>
             </div>
         </div>
+
+        {% if not username %}
+            <div style="text-align: center; margin-top: 2rem; color: #666;">
+                Please login to contact the seller
+            </div>
+        {% endif %}
     {% else %}
-        <div class="no-plate-found">
-            <h2>No plate found</h2>
-            <p>The requested license plate could not be found.</p>
-            <a href="/forsale" class="btn btn-primary">Back to For Sale</a>
-        </div>
+        <div class="loading">Loading plate details...</div>
     {% endif %}
 </div>
+
+<script src="{{ url_for('static', path='js/plate_details.js') }}"></script>
 {% endblock %} 

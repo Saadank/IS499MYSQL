@@ -1,15 +1,16 @@
 from fastapi import APIRouter, Request, Form, Depends, File, UploadFile, status, Query, HTTPException
 from fastapi.responses import HTMLResponse, RedirectResponse
-from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
 from database import get_db
-from dependencies import require_auth
+from dependencies import require_auth, get_current_user
 from typing import Optional
 from services.license_plate_service import LicensePlateService
 from services.session_service import SessionService
+from models import User
+from utils.template_config import templates
+from services.wishlist_service import WishlistService
 
 router = APIRouter(prefix="", tags=["listings"])
-templates = Jinja2Templates(directory="templates")
 
 @router.get("/addlisting", response_class=HTMLResponse)
 async def add_plate_page(
@@ -35,6 +36,9 @@ async def create_listing(
     buy_now_price: int = Form(0),
     auction_start_price: int = Form(0),
     minimum_offer_price: int = Form(0),
+    city: str = Form(...),
+    transfer_cost: str = Form(...),
+    plate_type: str = Form(...),
     image: UploadFile = File(None),
     db: Session = Depends(get_db),
     user_id: int = Depends(require_auth)
@@ -42,33 +46,31 @@ async def create_listing(
     try:
         plate_service = LicensePlateService(db)
         
-        # Combine digits into plate number, excluding 'x'
-        plate_number = ""
-        for digit in [digit1, digit2, digit3, digit4]:
-            if digit != 'x':
-                plate_number += digit
-        
-        # Combine letters, excluding empty values
-        plate_letter = letter1
-        if letter2 and letter2 != '':
-            plate_letter += letter2
-        if letter3 and letter3 != '':
-            plate_letter += letter3
+        # Calculate the price based on listing type
+        price = buy_now_price if listing_type == 'buy_now' else \
+               auction_start_price if listing_type == 'auction' else \
+               minimum_offer_price
 
         # Create the license plate
-        plate = await plate_service.create_license_plate(
-            plate_number=plate_number,
-            plate_letter=plate_letter,
+        plate = await plate_service.create_listing(
+            digit1=digit1,
+            digit2=digit2,
+            digit3=digit3,
+            digit4=digit4,
+            letter1=letter1,
+            letter2=letter2,
+            letter3=letter3,
             description=description,
-            price=buy_now_price if listing_type == 'buy_now' else 
-                  auction_start_price if listing_type == 'auction' else 
-                  minimum_offer_price,
+            price=price,
+            image=image,
+            user_id=user_id,
             listing_type=listing_type,
             buy_now_price=buy_now_price,
             auction_start_price=auction_start_price,
             minimum_offer_price=minimum_offer_price,
-            owner_id=user_id,
-            image=image
+            city=city,
+            transfer_cost=transfer_cost,
+            plate_type=plate_type
         )
         
         return RedirectResponse(url="/plates", status_code=status.HTTP_303_SEE_OTHER)
@@ -98,7 +100,8 @@ async def for_sale_page(
     letter2: Optional[str] = Query(None),
     letter3: Optional[str] = Query(None),
     sort_by: Optional[str] = Query("newest"),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    user_id: Optional[int] = Depends(get_current_user)
 ):
     session_service = SessionService(request)
     plate_service = LicensePlateService(db)
@@ -121,38 +124,33 @@ async def delete_plate(
         return {"message": "Plate removed successfully"}
     raise HTTPException(status_code=400, detail="Failed to remove plate")
 
-@router.get("/plate/{plate_id}", response_class=HTMLResponse)
-async def plate_details(
+@router.get("/plate/{plate_id}", name="plate_details")
+async def view_plate_details(
     request: Request,
     plate_id: int,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    user_id: Optional[int] = Depends(get_current_user)
 ):
-    try:
-        plate_service = LicensePlateService(db)
-        plate_data = plate_service.get_plate_details(plate_id)
-        if not plate_data:
-            return templates.TemplateResponse(
-                "plate_details.html",
-                {
-                    "request": request,
-                    "error": "Plate not found",
-                    "plate": None
-                }
-            )
-        return templates.TemplateResponse(
-            "plate_details.html",
-            {
-                "request": request,
-                "plate": plate_data,
-                "error": None
-            }
-        )
-    except Exception as e:
-        return templates.TemplateResponse(
-            "plate_details.html",
-            {
-                "request": request,
-                "error": f"Error loading plate details: {str(e)}",
-                "plate": None
-            }
-        ) 
+    session_service = SessionService(request)
+    plate_service = LicensePlateService(db)
+    wishlist_service = WishlistService(db)
+    
+    plate = plate_service.get_plate_details(plate_id)
+    
+    if not plate:
+        template_data = session_service.get_template_data({
+            "error": "Plate not found"
+        })
+        return templates.TemplateResponse("plate_details.html", template_data)
+    
+    # Check if plate is in user's wishlist
+    is_in_wishlist = False
+    if user_id:
+        is_in_wishlist = wishlist_service.is_in_wishlist(user_id, plate_id)
+    
+    template_data = session_service.get_template_data({
+        "plate": plate,
+        "is_in_wishlist": is_in_wishlist
+    })
+    
+    return templates.TemplateResponse("plate_details.html", template_data) 
