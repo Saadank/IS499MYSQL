@@ -27,63 +27,73 @@
         </div>
     </div>
 
-    <h2 class="listings-title">My Listed Plates</h2>
-    {% if listings %}
-        <div class="plates-grid">
-            {% for plate in listings %}
-            <div class="plate-card">
-                <div class="mini-plate-preview">
-                    <div class="mini-plate-numbers">
-                        <div class="number-display">
-                            <div class="arabic-row">
-                                {% for digit in plate.plateNumber %}
-                                <span>{{ digit|arabic_numbers }}</span>
-                                {% endfor %}
-                            </div>
-                            <div class="english-row">
-                                {% for digit in plate.plateNumber %}
-                                <span>{{ digit }}</span>
-                                {% endfor %}
-                            </div>
-                        </div>
-                    </div>
-                    <div class="mini-plate-letters">
-                        <div class="letter-display">
-                            <div class="arabic-row">
-                                {% for letter in plate.plateLetter %}
-                                <span>{{ letter }}</span>
-                                {% endfor %}
-                            </div>
-                            <div class="english-row">
-                                {% for letter in plate.plateLetter %}
-                                <span>{{ letter_english[letter] }}</span>
-                                {% endfor %}
+    <div class="my-listings">
+        <h2>My Listed Plates</h2>
+        {% if listings %}
+            <div class="plates-grid">
+                {% for plate in listings %}
+                <div class="plate-card" data-plate-id="{{ plate.plateID }}">
+                    <div class="mini-plate-preview">
+                        <div class="mini-plate-numbers">
+                            <div class="number-display">
+                                <div class="arabic-row">
+                                    {% for digit in plate.plateNumber %}
+                                    <span>{{ digit|arabic_numbers }}</span>
+                                    {% endfor %}
+                                </div>
+                                <div class="english-row">
+                                    {% for digit in plate.plateNumber %}
+                                    <span>{{ digit }}</span>
+                                    {% endfor %}
+                                </div>
                             </div>
                         </div>
+                        <div class="mini-plate-letters">
+                            <div class="letter-display">
+                                <div class="arabic-row">
+                                    {% for letter in plate.plateLetter %}
+                                    <span>{{ letter }}</span>
+                                    {% endfor %}
+                                </div>
+                                <div class="english-row">
+                                    {% for letter in plate.plateLetter %}
+                                    <span>{{ letter_english[letter] }}</span>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mini-ksa">
+                            <span>K</span>
+                            <span>S</span>
+                            <span>A</span>
+                        </div>
                     </div>
-                    <div class="mini-ksa">
-                        <span>K</span>
-                        <span>S</span>
-                        <span>A</span>
+                    <p class="price">SAR {{ "%.2f"|format(plate.price) }}</p>
+                    <p class="date">Listed: {{ plate.created_at.strftime('%Y-%m-%d') }}</p>
+                    {% if plate.description %}
+                        <p class="description">{{ plate.description }}</p>
+                    {% endif %}
+                    <div class="listing-details">
+                        <span class="listing-type">{{ plate.listing_type }}</span>
+                        {% if plate.listing_type == 'buy_now' %}
+                            <p>Buy Now Price: SAR {{ "%.2f"|format(plate.buy_now_price) }}</p>
+                        {% elif plate.listing_type == 'auction' %}
+                            <p>Starting Price: SAR {{ "%.2f"|format(plate.auction_start_price) }}</p>
+                        {% else %}
+                            <p>Minimum Offer: SAR {{ "%.2f"|format(plate.minimum_offer_price) }}</p>
+                        {% endif %}
                     </div>
+                    <button class="view-button remove-plate" data-plate-id="{{ plate.plateID }}">Remove Plate</button>
                 </div>
-                <p class="plate-id">{{ plate.plateNumber }}{{ plate.plateLetter }}</p>
-                <p class="price">{{ "%.2f"|format(plate.price) }} SAR</p>
-                <p class="plate-code">{{ plate.plateID }}</p>
-                {% if plate.listing_type == 'buy_now' %}
-                    <div class="buy-now-tag">buy_now</div>
-                    <p class="buy-now-price">Buy Now Price: {{ "%.2f"|format(plate.buy_now_price) }} SAR</p>
-                {% endif %}
-                <button class="remove-plate" data-plate-id="{{ plate.plateID }}">Remove Plate</button>
+                {% endfor %}
             </div>
-            {% endfor %}
-        </div>
-    {% else %}
-        <div class="no-listings">
-            <p>You haven't listed any plates yet.</p>
-            <a href="{{ url_for('add_plate_page') }}" class="add-plate-button">Add New Plate</a>
-        </div>
-    {% endif %}
+        {% else %}
+            <div class="no-results">
+                <p>You haven't listed any plates yet.</p>
+                <a href="{{ url_for('add_plate_page') }}" class="view-button">Add New Plate</a>
+            </div>
+        {% endif %}
+    </div>
 </div>
 
 <script src="{{ url_for('static', path='js/profile.js') }}"></script>

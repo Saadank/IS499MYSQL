@@ -2,6 +2,37 @@
 
 {% block title %}My Wishlist{% endblock %}
 
+{% block extra_css %}
+<style>
+.wishlist-section {
+    min-height: calc(100vh - 200px);
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+}
+
+.no-results {
+    text-align: center;
+    margin: auto;
+    padding: 20px;
+}
+
+.view-button {
+    display: inline-block;
+    background-color: rgb(53, 53, 235);
+    color: white;
+    padding: 10px 20px;
+    text-decoration: none;
+    border-radius: 5px;
+    margin-top: 15px;
+}
+
+.view-button:hover {
+    background-color: rgb(41, 41, 200);
+}
+</style>
+{% endblock %}
+
 {% block content %}
 <div class="wishlist-section">
     <h1>My Wishlist</h1>
