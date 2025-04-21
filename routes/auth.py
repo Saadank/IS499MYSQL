@@ -6,8 +6,25 @@ from services.auth_service import AuthService
 from services.session_service import SessionService
 from .schemas import UserLogin, UserSignup
 from utils.template_config import templates
+from models import User
 
 router = APIRouter(prefix="", tags=["auth"])
+
+async def get_current_user(request: Request, db: Session = Depends(get_db)) -> User:
+    session_service = SessionService(request)
+    user_id = session_service.get_user_id()
+    if not user_id:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Not authenticated"
+        )
+    user = db.query(User).filter(User.id == user_id).first()
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="User not found"
+        )
+    return user
 
 @router.get("/login", response_class=HTMLResponse)
 async def login_page(request: Request, error: str = None):

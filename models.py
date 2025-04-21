@@ -21,6 +21,8 @@ class User(Base):
     idnumber = Column(String(20), unique=True)
     address = Column(String(200))
     created_at = Column(DateTime, default=lambda: datetime.now(UTC))
+    is_admin = Column(Boolean, default=False)
+    is_banned = Column(Boolean, default=False)
     
     # Relationships
     plates = relationship("LicensePlate", back_populates="owner")

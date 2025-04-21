@@ -4,6 +4,7 @@ from fastapi.staticfiles import StaticFiles
 from sqlalchemy.orm import Session
 from database import engine, Base, get_db
 from routes import auth, listings, users, auctions, wishlist, api
+from routes.admin_routes import router as admin_router
 from starlette.middleware.sessions import SessionMiddleware
 from services.license_plate_service import LicensePlateService
 from services.auction_service import AuctionService
@@ -11,6 +12,7 @@ from services.session_service import SessionService
 import asyncio
 from datetime import datetime, timedelta
 from utils.template_config import templates
+from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI(title="License Plate Trading")
 
@@ -27,6 +29,15 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 # Create database tables
 Base.metadata.create_all(bind=engine)
 
+# Add CORS middleware
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 # Include routers
 app.include_router(auth.router)
 app.include_router(listings.router)
@@ -34,6 +45,7 @@ app.include_router(users.router)
 app.include_router(auctions.router)
 app.include_router(wishlist.router)
 app.include_router(api.router)
+app.include_router(admin_router)
 
 async def create_new_auction(db: Session):
     while True:
@@ -73,4 +85,8 @@ async def home(request: Request, db: Session = Depends(get_db)):
         "plates": plates
     })
     
-    return templates.TemplateResponse("landingpage.html", template_data) 
+    return templates.TemplateResponse("landingpage.html", template_data)
+
+@app.get("/")
+def read_root():
+    return {"message": "Welcome to the License Plate Marketplace API"} 

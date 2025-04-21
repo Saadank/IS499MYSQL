@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="mb-4">License Plate Management</h1>
+    <a href="/admin" class="btn btn-secondary mb-3">Back to Dashboard</a>
+    
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Plate Number</th>
+                    <th>Plate Letter</th>
+                    <th>Price</th>
+                    <th>Owner</th>
+                    <th>Listing Type</th>
+                    <th>City</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for plate in plates %}
+                <tr>
+                    <td>{{ plate.plateID }}</td>
+                    <td>{{ plate.plateNumber }}</td>
+                    <td>{{ plate.plateLetter }}</td>
+                    <td>{{ plate.price }}</td>
+                    <td>{{ plate.owner.username }}</td>
+                    <td>{{ plate.listing_type }}</td>
+                    <td>{{ plate.city }}</td>
+                    <td>
+                        <form action="/admin/license-plates/{{ plate.plateID }}" method="POST" class="d-inline">
+                            <input type="hidden" name="_method" value="DELETE">
+                            <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this license plate?')">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %} 

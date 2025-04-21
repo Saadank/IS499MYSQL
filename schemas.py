@@ -27,4 +27,39 @@ class UserInDB(UserBase):
     created_at: datetime
 
     class Config:
+        from_attributes = True
+
+class UserResponse(BaseModel):
+    id: int
+    username: str
+    email: str
+    firstname: str
+    lastname: str
+    idnumber: str
+    address: str
+    created_at: datetime
+    is_admin: bool = False
+    is_banned: bool = False
+
+    class Config:
+        from_attributes = True
+
+class LicensePlateResponse(BaseModel):
+    plateID: int
+    plateNumber: str
+    plateLetter: str
+    description: Optional[str]
+    price: float
+    owner_id: int
+    image_path: Optional[str]
+    created_at: datetime
+    listing_type: str
+    buy_now_price: Optional[float]
+    auction_start_price: Optional[float]
+    minimum_offer_price: Optional[float]
+    city: Optional[str]
+    transfer_cost: Optional[str]
+    plate_type: Optional[str]
+
+    class Config:
         from_attributes = True 
