@@ -21,6 +21,7 @@
             </div>
             <div class="navbar-right">
                 <ul>
+                    {% if username %}
                     <li><a href="/addlisting">Add Listing</a></li>
                     <li><div class="profile-menu-container">
                         <button class="profile-button" onclick="toggleProfileMenu()">
@@ -35,6 +36,9 @@
                             <a href="/logout" class="dropdown-item">Logout</a>
                         </div>
                     </div></li>
+                    {% else %}
+                    <li><a href="{{ url_for('login_page') }}" class="nav-button">Log In</a></li>
+                    {% endif %}
                 </ul>
             </div>
         </nav>
