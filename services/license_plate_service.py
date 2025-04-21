@@ -6,7 +6,7 @@ from services.file_service import FileService
 from fastapi import UploadFile, Request
 
 class LicensePlateService:
-    # Valid Arabic letters
+    # Valid Arabic letters in the correct order
     VALID_LETTERS = ['أ', 'ب', 'د', 'ع', 'ق', 'ه', 'ح', 'ك', 'ل', 'ن', 'ر', 'س', 'ط', 'و', 'ى', 'ص', 'م']
 
     # English letter mappings
@@ -120,8 +120,10 @@ class LicensePlateService:
         if len(plate_letter) > 3:
             return False, "Maximum 3 letters allowed"
             
-        if not all(letter in self.VALID_LETTERS for letter in plate_letter):
-            return False, "Invalid letters detected. Please use only valid Arabic letters"
+        # Check if all letters are in the valid set and in the correct order
+        for letter in plate_letter:
+            if letter not in self.VALID_LETTERS:
+                return False, "Invalid letters detected. Please use only valid Arabic letters in the correct order"
             
         return True, ""
 
