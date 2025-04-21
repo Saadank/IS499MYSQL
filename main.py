@@ -63,14 +63,24 @@ async def startup_event():
     # Start the background task for creating new auctions
     asyncio.create_task(create_new_auction(next(get_db())))
 
-@app.get("/", response_class=HTMLResponse)
+@app.get("/", response_class=HTMLResponse, name="home_page")
 async def home(request: Request, db: Session = Depends(get_db)):
     session_service = SessionService(request)
     plate_service = LicensePlateService(db)
     plates = plate_service.get_license_plates()
     
+    # Define the letter mapping
+    letter_english = {
+        'أ': 'A', 'ب': 'B', 'س': 'C', 'د': 'D', 'ع': 'E',
+        'ف': 'F', 'ج': 'G', 'ح': 'H', 'ي': 'I', 'ك': 'K',
+        'ل': 'L', 'م': 'M', 'ن': 'N', 'و': 'O', 'ق': 'Q',
+        'ر': 'R', 'ت': 'T', 'ز': 'Z'
+    }
+    
     template_data = session_service.get_template_data({
-        "plates": plates
+        "plates": plates,
+        "letter_english": letter_english,
+        "valid_letters": list(letter_english.keys())
     })
     
     return templates.TemplateResponse("landingpage.html", template_data) 

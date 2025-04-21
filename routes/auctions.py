@@ -10,7 +10,7 @@ from utils.template_config import templates
 
 router = APIRouter(prefix="/auctions", tags=["auctions"])
 
-@router.get("/", response_class=HTMLResponse)
+@router.get("/", response_class=HTMLResponse, name="auction_page")
 async def auction_page(request: Request, db: Session = Depends(get_db)):
     session_service = SessionService(request)
     auction_service = AuctionService(db)
