@@ -5,6 +5,7 @@ from database import get_db
 from dependencies import require_auth
 from services.wishlist_service import WishlistService
 from utils.template_config import templates
+from services.license_plate_service import LicensePlateService
 
 router = APIRouter(prefix="", tags=["wishlist"])
 
@@ -17,13 +18,8 @@ async def wishlist_page(
     wishlist_service = WishlistService(db)
     wishlist_plates = wishlist_service.get_wishlist(user_id)
     
-    # Define the letter mapping
-    letter_english = {
-        'أ': 'A', 'ب': 'B', 'س': 'C', 'د': 'D', 'ع': 'E',
-        'ف': 'F', 'ج': 'G', 'ح': 'H', 'ي': 'I', 'ك': 'K',
-        'ل': 'L', 'م': 'M', 'ن': 'N', 'و': 'O', 'ق': 'Q',
-        'ر': 'R', 'ت': 'T', 'ز': 'Z'
-    }
+    # Use the standardized letter mapping from LicensePlateService
+    letter_english = LicensePlateService.LETTER_ENGLISH
     
     return templates.TemplateResponse("wishlist.html", {
         "request": request,

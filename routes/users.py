@@ -8,6 +8,7 @@ from dependencies import require_auth
 from services.auth_service import get_current_user
 from models import User
 from utils.template_config import templates
+from services.license_plate_service import LicensePlateService
 
 router = APIRouter(prefix="/users", tags=["users"])
 
@@ -21,6 +22,13 @@ async def profile_page(
     user_service = UserService(db)
     
     user_data = user_service.get_user_profile_data(user_id)
+    
+    # Use the standardized letter mapping from LicensePlateService
+    letter_english = LicensePlateService.LETTER_ENGLISH
+    
+    # Add letter mapping to user data
+    user_data['letter_english'] = letter_english
+    
     template_data = session_service.get_template_data(user_data)
     
     return templates.TemplateResponse("profile.html", template_data)
