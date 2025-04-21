@@ -36,9 +36,27 @@ async def login(
         return RedirectResponse(url="/login?error=Incorrect username or password", status_code=status.HTTP_303_SEE_OTHER)
 
 @router.get("/signup", response_class=HTMLResponse)
-async def signup_page(request: Request):
+async def signup_page(
+    request: Request, 
+    error: str = None,
+    username: str = None,
+    email: str = None,
+    firstname: str = None,
+    lastname: str = None,
+    idnumber: str = None,
+    address: str = None
+):
     session_service = SessionService(request)
-    return templates.TemplateResponse("signup.html", session_service.get_template_data())
+    template_data = session_service.get_template_data({
+        "error": error,
+        "username": username,
+        "email": email,
+        "firstname": firstname,
+        "lastname": lastname,
+        "idnumber": idnumber,
+        "address": address
+    })
+    return templates.TemplateResponse("signup.html", template_data)
 
 @router.post("/signup")
 async def signup(
@@ -54,17 +72,53 @@ async def signup(
     db: Session = Depends(get_db)
 ):
     auth_service = AuthService(db)
-    await auth_service.register_user(
-        username=username,
-        email=email,
-        password=password,
-        confirm_password=confirm_password,
-        firstname=firstname,
-        lastname=lastname,
-        idnumber=idnumber,
-        address=address
-    )
-    return RedirectResponse(url="/login", status_code=status.HTTP_303_SEE_OTHER)
+    try:
+        await auth_service.register_user(
+            username=username,
+            email=email,
+            password=password,
+            confirm_password=confirm_password,
+            firstname=firstname,
+            lastname=lastname,
+            idnumber=idnumber,
+            address=address
+        )
+        return RedirectResponse(url="/login", status_code=status.HTTP_303_SEE_OTHER)
+    except Exception as e:
+        error_message = str(e)
+        if "string_too_short" in error_message:
+            if "username" in error_message:
+                error_message = "Username must be at least 3 characters long"
+            elif "password" in error_message:
+                error_message = "Password must be at least 6 characters long"
+        elif "email" in error_message.lower():
+            error_message = "Please enter a valid email address"
+        elif "Username already registered" in error_message:
+            error_message = "This username is already taken"
+        elif "Email already registered" in error_message:
+            error_message = "This email is already registered"
+        elif "ID number already registered" in error_message:
+            error_message = "This ID number is already registered"
+        elif "Passwords do not match" in error_message:
+            error_message = "Passwords do not match"
+        else:
+            error_message = "An error occurred during registration. Please try again."
+        
+        # Preserve form data
+        form_data = {
+            "error": error_message,
+            "username": username,
+            "email": email,
+            "firstname": firstname,
+            "lastname": lastname,
+            "idnumber": idnumber,
+            "address": address
+        }
+        
+        return RedirectResponse(
+            url=f"/signup?error={error_message}&username={username}&email={email}&firstname={firstname}&lastname={lastname}&idnumber={idnumber}&address={address}", 
+            status_code=status.HTTP_303_SEE_OTHER
+        )
 
 @router.get("/logout")
 async def logout(request: Request):
