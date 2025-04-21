@@ -10,24 +10,55 @@
         <div class="plates-grid">
             {% for plate in plates %}
             <div class="plate-card">
-                {% if plate.image_path %}
-                    <div class="plate-image">
-                        <img src="{{ plate.image_path }}" alt="License Plate {{ plate.plateNumber }}{{ plate.plateLetter }}">
+                <div class="mini-plate-preview">
+                    <div class="mini-plate-numbers">
+                        <div class="number-display">
+                            <div class="arabic-row">
+                                {% for digit in plate.plateNumber %}
+                                <span>{{ digit|arabic_numbers }}</span>
+                                {% endfor %}
+                            </div>
+                            <div class="english-row">
+                                {% for digit in plate.plateNumber %}
+                                <span>{{ digit }}</span>
+                                {% endfor %}
+                            </div>
+                        </div>
                     </div>
-                {% endif %}
-                <div class="plate-number">{{ plate.plateNumber }}{{ plate.plateLetter }}</div>
-                <p class="price">{{ "%.2f"|format(plate.price) }} SAR</p>
+                    <div class="mini-plate-letters">
+                        <div class="letter-display">
+                            <div class="arabic-row">
+                                {% for letter in plate.plateLetter %}
+                                <span>{{ letter }}</span>
+                                {% endfor %}
+                            </div>
+                            <div class="english-row">
+                                {% for letter in plate.plateLetter %}
+                                <span>{{ letter_english[letter] }}</span>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mini-ksa">
+                        <span>K</span>
+                        <span>S</span>
+                        <span>A</span>
+                    </div>
+                </div>
+                <p class="price">SAR {{ "%.2f"|format(plate.price) }}</p>
+                <p class="date">Listed: {{ plate.created_at.strftime('%Y-%m-%d') }}</p>
                 {% if plate.description %}
                     <p class="description">{{ plate.description }}</p>
                 {% endif %}
-                <div class="plate-actions">
-                    <button class="remove-from-wishlist" data-plate-id="{{ plate.plateID }}">Remove from Wishlist</button>
-                </div>
+                <button class="view-button remove-from-wishlist" data-plate-id="{{ plate.plateID }}">Remove from Wishlist</button>
             </div>
             {% endfor %}
         </div>
     {% else %}
-        <p>Your wishlist is empty.</p>
+        <div class="no-results">
+            <p>Your wishlist is empty.</p>
+            <a href="{{ url_for('list_plates') }}" class="view-button">Browse Plates</a>
+        </div>
     {% endif %}
 </div>
 

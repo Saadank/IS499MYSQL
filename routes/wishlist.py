@@ -5,6 +5,7 @@ from database import get_db
 from dependencies import require_auth
 from services.wishlist_service import WishlistService
 from utils.template_config import templates
+from services.license_plate_service import LicensePlateService
 
 router = APIRouter(prefix="", tags=["wishlist"])
 
@@ -17,10 +18,14 @@ async def wishlist_page(
     wishlist_service = WishlistService(db)
     wishlist_plates = wishlist_service.get_wishlist(user_id)
     
+    # Use the standardized letter mapping from LicensePlateService
+    letter_english = LicensePlateService.LETTER_ENGLISH
+    
     return templates.TemplateResponse("wishlist.html", {
         "request": request,
         "plates": wishlist_plates,
-        "username": request.session.get("username")
+        "username": request.session.get("username"),
+        "letter_english": letter_english
     })
 
 @router.post("/wishlist/add/{plate_id}")
