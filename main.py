@@ -3,7 +3,7 @@ from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from sqlalchemy.orm import Session
 from database import engine, Base, get_db
-from routes import auth, listings, users, auctions, wishlist, api
+from routes import auth, listings, users, auctions, wishlist, api, support
 from starlette.middleware.sessions import SessionMiddleware
 from services.license_plate_service import LicensePlateService
 from services.auction_service import AuctionService
@@ -34,6 +34,7 @@ app.include_router(users.router)
 app.include_router(auctions.router)
 app.include_router(wishlist.router)
 app.include_router(api.router)
+app.include_router(support.router)
 
 async def create_new_auction(db: Session):
     while True:
