@@ -25,7 +25,7 @@ class User(Base):
     is_banned = Column(Boolean, default=False)
     
     # Relationships
-    plates = relationship("LicensePlate", back_populates="owner")
+    plates = relationship("LicensePlate", back_populates="owner", cascade="all, delete-orphan")
     offers = relationship("Offer", back_populates="user")
     wishlist_items = relationship("WishlistItem", back_populates="user")
     purchases = relationship("Order", foreign_keys="Order.buyer_id", back_populates="buyer")
@@ -44,7 +44,7 @@ class LicensePlate(Base):
     plateLetter = Column(String(3), nullable=False)
     description = Column(String(500))
     price = Column(Float, nullable=False)
-    owner_id = Column(Integer, ForeignKey("users.id"))
+    owner_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"))
     image_path = Column(String(255))
     created_at = Column(DateTime, default=datetime.utcnow)
     listing_type = Column(String(20), nullable=False)

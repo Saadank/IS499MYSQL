@@ -51,6 +51,10 @@ class AuthService:
         if not user:
             raise HTTPException(status_code=400, detail="Incorrect username or password")
         
+        # Check if user is banned
+        if user.is_banned:
+            raise HTTPException(status_code=400, detail="Your account has been banned")
+        
         return user
 
     async def register_user(
@@ -88,9 +92,13 @@ class AuthService:
         if self.get_user_by_email(signup_data.email):
             raise HTTPException(status_code=400, detail="Email already registered")
         
-        # Check if ID number exists
-        if self.get_user_by_idnumber(signup_data.idnumber):
-            raise HTTPException(status_code=400, detail="ID number already registered")
+        # Check if ID number exists and if user is banned
+        existing_user = self.get_user_by_idnumber(signup_data.idnumber)
+        if existing_user:
+            if existing_user.is_banned:
+                raise HTTPException(status_code=400, detail="This ID number is banned from registration")
+            else:
+                raise HTTPException(status_code=400, detail="ID number already registered")
         
         # Create user
         user = self.create_user(

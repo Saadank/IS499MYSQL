@@ -59,6 +59,13 @@ async def ban_user(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="User not found"
         )
+    
+    # Delete all user's license plates
+    plates = db.query(LicensePlate).filter(LicensePlate.owner_id == user_id).all()
+    for plate in plates:
+        db.delete(plate)
+    
+    # Ban the user
     user.is_banned = True
     db.commit()
     return RedirectResponse(url="/admin/users", status_code=status.HTTP_303_SEE_OTHER)

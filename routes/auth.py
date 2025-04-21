@@ -49,7 +49,10 @@ async def login(
         session_service.set_user_session(user.id, user.username)
         return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
     except Exception as e:
-        # Show generic error message for all validation and authentication errors
+        error_message = str(e)
+        if "Your account has been banned" in error_message:
+            return RedirectResponse(url="/login?error=Your account has been banned", status_code=status.HTTP_303_SEE_OTHER)
+        # Show generic error message for all other validation and authentication errors
         return RedirectResponse(url="/login?error=Incorrect username or password", status_code=status.HTTP_303_SEE_OTHER)
 
 @router.get("/signup", response_class=HTMLResponse)
@@ -116,6 +119,8 @@ async def signup(
             error_message = "This email is already registered"
         elif "ID number already registered" in error_message:
             error_message = "This ID number is already registered"
+        elif "This ID number is banned from registration" in error_message:
+            error_message = "This ID number is banned from registration"
         elif "Passwords do not match" in error_message:
             error_message = "Passwords do not match"
         else:
