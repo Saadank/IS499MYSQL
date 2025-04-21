@@ -317,7 +317,7 @@ class LicensePlateService:
             'minimum_offer_price': plate.minimum_offer_price,
             'created_at': plate.created_at,
             'city': plate.city,
-            'transfer_cost': plate.transfer_cost,
+            'transfer_cost': "Buyer Responsibility",  # Always set to "Buyer Responsibility"
             'plate_type': plate.plate_type,
             'seller': {
                 'username': seller.username,

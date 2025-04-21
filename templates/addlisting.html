@@ -10,6 +10,9 @@
 <div class="addlisting">
     <h2>Add New License Plate</h2>
     <form method="POST" action="/addlisting" enctype="multipart/form-data" id="listingForm">
+        <!-- Hidden transfer cost field -->
+        <input type="hidden" name="transfer_cost" value="Buyer Responsibility">
+        
         <div class="form-row">
             <!-- Plate Number Section -->
             <div class="form-group half-width">
@@ -67,30 +70,17 @@
             </div>
         </div>
 
-        <div class="form-row">
-            <!-- City -->
-            <div class="form-group half-width">
-                <label>City:</label>
-                <select name="city" class="form-control" required>
-                    <option value="">Select City</option>
-                    <option value="Dammam">Dammam</option>
-                    <option value="Riyadh">Riyadh</option>
-                    <option value="Jeddah">Jeddah</option>
-                    <option value="Mecca">Mecca</option>
-                    <option value="Medina">Medina</option>
-                </select>
-            </div>
-
-            <!-- Transfer Cost -->
-            <div class="form-group half-width">
-                <label>Transfer Cost:</label>
-                <select name="transfer_cost" class="form-control" required>
-                    <option value="">Select Transfer Cost</option>
-                    <option value="Buyer Responsibility">Buyer Responsibility</option>
-                    <option value="Seller Responsibility">Seller Responsibility</option>
-                    <option value="Shared">Shared</option>
-                </select>
-            </div>
+        <!-- City -->
+        <div class="form-group">
+            <label>City:</label>
+            <select name="city" class="form-control" required>
+                <option value="">Select City</option>
+                <option value="Dammam">Dammam</option>
+                <option value="Riyadh">Riyadh</option>
+                <option value="Jeddah">Jeddah</option>
+                <option value="Mecca">Mecca</option>
+                <option value="Medina">Medina</option>
+            </select>
         </div>
 
         <!-- Plate Type -->
@@ -121,8 +111,6 @@
             <label>Listing Type:</label>
             <div class="listing-type-buttons">
                 <button type="button" class="btn btn-outline-primary" onclick="selectListingType('buy_now', event)">Buy It Now</button>
-                <button type="button" class="btn btn-outline-primary" onclick="selectListingType('auction', event)">Auction</button>
-                <button type="button" class="btn btn-outline-primary" onclick="selectListingType('offers', event)">Offers</button>
             </div>
             <input type="hidden" name="listing_type" id="listing_type" required>
         </div>
@@ -133,28 +121,6 @@
             <input type="number" 
                    name="buy_now_price" 
                    id="buyNowPrice" 
-                   class="form-control" 
-                   min="1" 
-                   step="1">
-        </div>
-
-        <!-- Auction Price Section -->
-        <div class="form-group price-section" id="auctionSection" style="display: none;">
-            <label>Starting Bid Price:</label>
-            <input type="number" 
-                   name="auction_start_price" 
-                   id="auctionStartPrice" 
-                   class="form-control" 
-                   min="1" 
-                   step="1">
-        </div>
-
-        <!-- Offers Price Section -->
-        <div class="form-group price-section" id="offersSection" style="display: none;">
-            <label>Minimum Offer Price:</label>
-            <input type="number" 
-                   name="minimum_offer_price" 
-                   id="minimumOfferPrice" 
                    class="form-control" 
                    min="1" 
                    step="1">

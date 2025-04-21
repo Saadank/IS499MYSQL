@@ -37,7 +37,7 @@ async def get_plate_details(
                 "city": plate.city,
                 "created_at": plate.created_at.isoformat() if plate.created_at else None,
                 "price": float(plate.price) if plate.price else 0,
-                "transfer_cost": plate.transfer_cost,
+                "transfer_cost": "Buyer Responsibility",
                 "plate_type": plate.plate_type,
                 "plateLetter": plate.plate_letter
             },

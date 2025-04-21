@@ -10,39 +10,14 @@ function selectListingType(type, event) {
     });
     event.target.classList.add('active');
     
-    // Show/hide price sections
+    // Show/hide price section
     const buyNowSection = document.getElementById('buyNowSection');
-    const auctionSection = document.getElementById('auctionSection');
-    const offersSection = document.getElementById('offersSection');
     const buyNowInput = document.getElementById('buyNowPrice');
-    const auctionInput = document.getElementById('auctionStartPrice');
-    const offersInput = document.getElementById('minimumOfferPrice');
     
-    // Hide all sections first
-    buyNowSection.style.display = 'none';
-    auctionSection.style.display = 'none';
-    offersSection.style.display = 'none';
-    
-    // Reset all price inputs
+    // Show Buy Now section and set focus
+    buyNowSection.style.display = 'block';
     buyNowInput.value = '';
-    auctionInput.value = '';
-    offersInput.value = '';
-    
-    // Show selected type and set focus
-    switch(type) {
-        case 'buy_now':
-            buyNowSection.style.display = 'block';
-            buyNowInput.focus();
-            break;
-        case 'auction':
-            auctionSection.style.display = 'block';
-            auctionInput.focus();
-            break;
-        case 'offers':
-            offersSection.style.display = 'block';
-            offersInput.focus();
-            break;
-    }
+    buyNowInput.focus();
 }
 
 // Add form submission handler
@@ -58,19 +33,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 return;
             }
 
-            // Get the appropriate price input based on listing type
-            let priceInput;
-            switch(listingType) {
-                case 'buy_now':
-                    priceInput = document.getElementById('buyNowPrice');
-                    break;
-                case 'auction':
-                    priceInput = document.getElementById('auctionStartPrice');
-                    break;
-                case 'offers':
-                    priceInput = document.getElementById('minimumOfferPrice');
-                    break;
-            }
+            const priceInput = document.getElementById('buyNowPrice');
 
             // Validate price
             if (!priceInput || !priceInput.value || priceInput.value <= 0) {
