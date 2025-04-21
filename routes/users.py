@@ -23,13 +23,8 @@ async def profile_page(
     
     user_data = user_service.get_user_profile_data(user_id)
     
-    # Define the letter mapping
-    letter_english = {
-        'أ': 'A', 'ب': 'B', 'س': 'C', 'د': 'D', 'ع': 'E',
-        'ف': 'F', 'ج': 'G', 'ح': 'H', 'ي': 'I', 'ك': 'K',
-        'ل': 'L', 'م': 'M', 'ن': 'N', 'و': 'O', 'ق': 'Q',
-        'ر': 'R', 'ت': 'T', 'ز': 'Z'
-    }
+    # Use the standardized letter mapping from LicensePlateService
+    letter_english = LicensePlateService.LETTER_ENGLISH
     
     # Add letter mapping to user data
     user_data['letter_english'] = letter_english

@@ -69,18 +69,14 @@ async def home(request: Request, db: Session = Depends(get_db)):
     plate_service = LicensePlateService(db)
     plates = plate_service.get_license_plates()
     
-    # Define the letter mapping
-    letter_english = {
-        'أ': 'A', 'ب': 'B', 'س': 'C', 'د': 'D', 'ع': 'E',
-        'ف': 'F', 'ج': 'G', 'ح': 'H', 'ي': 'I', 'ك': 'K',
-        'ل': 'L', 'م': 'M', 'ن': 'N', 'و': 'O', 'ق': 'Q',
-        'ر': 'R', 'ت': 'T', 'ز': 'Z'
-    }
+    # Use the standardized letter mapping from LicensePlateService
+    letter_english = LicensePlateService.LETTER_ENGLISH
+    valid_letters = LicensePlateService.VALID_LETTERS
     
     template_data = session_service.get_template_data({
         "plates": plates,
         "letter_english": letter_english,
-        "valid_letters": list(letter_english.keys())
+        "valid_letters": valid_letters
     })
     
     return templates.TemplateResponse("landingpage.html", template_data) 
