@@ -17,10 +17,19 @@ async def wishlist_page(
     wishlist_service = WishlistService(db)
     wishlist_plates = wishlist_service.get_wishlist(user_id)
     
+    # Define the letter mapping
+    letter_english = {
+        'أ': 'A', 'ب': 'B', 'س': 'C', 'د': 'D', 'ع': 'E',
+        'ف': 'F', 'ج': 'G', 'ح': 'H', 'ي': 'I', 'ك': 'K',
+        'ل': 'L', 'م': 'M', 'ن': 'N', 'و': 'O', 'ق': 'Q',
+        'ر': 'R', 'ت': 'T', 'ز': 'Z'
+    }
+    
     return templates.TemplateResponse("wishlist.html", {
         "request": request,
         "plates": wishlist_plates,
-        "username": request.session.get("username")
+        "username": request.session.get("username"),
+        "letter_english": letter_english
     })
 
 @router.post("/wishlist/add/{plate_id}")
