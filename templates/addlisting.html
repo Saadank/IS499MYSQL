@@ -10,89 +10,87 @@
 <div class="addlisting">
     <h2>Add New License Plate</h2>
     <form method="POST" action="/addlisting" enctype="multipart/form-data" id="listingForm">
-        <!-- Plate Number Section -->
-        <div class="form-group">
-            <label>Plate Number:</label>
-            <div class="d-flex gap-2">
-                <!-- First digit (required) -->
-                <select name="digit1" class="form-control" required>
-                    <option value="">-</option>
-                    {% for num in numbers %}
-                        <option value="{{ num }}">{{ num }}</option>
+        <div class="form-row">
+            <!-- Plate Number Section -->
+            <div class="form-group half-width">
+                <label>Plate Number:</label>
+                <div class="d-flex gap-2">
+                    <!-- First digit (required) -->
+                    <select name="digit1" class="form-control" required>
+                        <option value="">-</option>
+                        {% for num in numbers %}
+                            <option value="{{ num }}">{{ num }}</option>
+                        {% endfor %}
+                    </select>
+                    
+                    <!-- Optional digits 2-4 -->
+                    {% for i in range(2, 5) %}
+                    <select name="digit{{ i }}" class="form-control">
+                        <option value="x">-</option>
+                        {% for num in numbers %}
+                            <option value="{{ num }}">{{ num }}</option>
+                        {% endfor %}
+                    </select>
                     {% endfor %}
-                </select>
-                
-                <!-- Optional digits 2-4 -->
-                {% for i in range(2, 5) %}
-                <select name="digit{{ i }}" class="form-control">
-                    <option value="x">-</option>
-                    {% for num in numbers %}
-                        <option value="{{ num }}">{{ num }}</option>
-                    {% endfor %}
-                </select>
-                {% endfor %}
+                </div>
+            </div>
+
+            <!-- Plate Letters Section -->
+            <div class="form-group half-width">
+                <label>Plate Letters:</label>
+                <div class="d-flex gap-2">
+                    <!-- First letter (required) -->
+                    <select name="letter1" class="form-control" required>
+                        <option value="">Select Letter</option>
+                        {% for letter in valid_letters %}
+                            <option value="{{ letter }}">{{ letter }} ({{ letter_english[letter] }})</option>
+                        {% endfor %}
+                    </select>
+                    
+                    <!-- Second letter (optional) -->
+                    <select name="letter2" class="form-control">
+                        <option value="">-</option>
+                        {% for letter in valid_letters %}
+                            <option value="{{ letter }}">{{ letter }} ({{ letter_english[letter] }})</option>
+                        {% endfor %}
+                    </select>
+                    
+                    <!-- Third letter (optional) -->
+                    <select name="letter3" class="form-control">
+                        <option value="">-</option>
+                        {% for letter in valid_letters %}
+                            <option value="{{ letter }}">{{ letter }} ({{ letter_english[letter] }})</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <small class="text-muted">Select at least one letter. Maximum 3 letters allowed.</small>
             </div>
         </div>
 
-        <!-- Plate Letters Section -->
-        <div class="form-group">
-            <label>Plate Letters:</label>
-            <div class="d-flex gap-2">
-                <!-- First letter (required) -->
-                <select name="letter1" class="form-control" required>
-                    <option value="">Select Letter</option>
-                    {% for letter in valid_letters %}
-                        <option value="{{ letter }}">{{ letter }} ({{ letter_english[letter] }})</option>
-                    {% endfor %}
-                </select>
-                
-                <!-- Second letter (optional) -->
-                <select name="letter2" class="form-control">
-                    <option value="">-</option>
-                    {% for letter in valid_letters %}
-                        <option value="{{ letter }}">{{ letter }} ({{ letter_english[letter] }})</option>
-                    {% endfor %}
-                </select>
-                
-                <!-- Third letter (optional) -->
-                <select name="letter3" class="form-control">
-                    <option value="">-</option>
-                    {% for letter in valid_letters %}
-                        <option value="{{ letter }}">{{ letter }} ({{ letter_english[letter] }})</option>
-                    {% endfor %}
+        <div class="form-row">
+            <!-- City -->
+            <div class="form-group half-width">
+                <label>City:</label>
+                <select name="city" class="form-control" required>
+                    <option value="">Select City</option>
+                    <option value="Dammam">Dammam</option>
+                    <option value="Riyadh">Riyadh</option>
+                    <option value="Jeddah">Jeddah</option>
+                    <option value="Mecca">Mecca</option>
+                    <option value="Medina">Medina</option>
                 </select>
             </div>
-            <small class="text-muted">Select at least one letter. Maximum 3 letters allowed.</small>
-        </div>
 
-        <!-- Description -->
-        <div class="form-group">
-            <label>Description:</label>
-            <textarea name="description" class="form-control"></textarea>
-        </div>
-
-        <!-- City -->
-        <div class="form-group">
-            <label>City:</label>
-            <select name="city" class="form-control" required>
-                <option value="">Select City</option>
-                <option value="Dammam">Dammam</option>
-                <option value="Riyadh">Riyadh</option>
-                <option value="Jeddah">Jeddah</option>
-                <option value="Mecca">Mecca</option>
-                <option value="Medina">Medina</option>
-            </select>
-        </div>
-
-        <!-- Transfer Cost -->
-        <div class="form-group">
-            <label>Transfer Cost:</label>
-            <select name="transfer_cost" class="form-control" required>
-                <option value="">Select Transfer Cost</option>
-                <option value="Buyer Responsibility">Buyer Responsibility</option>
-                <option value="Seller Responsibility">Seller Responsibility</option>
-                <option value="Shared">Shared</option>
-            </select>
+            <!-- Transfer Cost -->
+            <div class="form-group half-width">
+                <label>Transfer Cost:</label>
+                <select name="transfer_cost" class="form-control" required>
+                    <option value="">Select Transfer Cost</option>
+                    <option value="Buyer Responsibility">Buyer Responsibility</option>
+                    <option value="Seller Responsibility">Seller Responsibility</option>
+                    <option value="Shared">Shared</option>
+                </select>
+            </div>
         </div>
 
         <!-- Plate Type -->
@@ -106,10 +104,16 @@
             </select>
         </div>
 
-        <!-- Price -->
+        <!-- Image Upload -->
         <div class="form-group">
-            <label>Price (SAR):</label>
-            <input type="number" name="price" class="form-control" required min="0" step="0.01">
+            <label>Plate Image:</label>
+            <input type="file" name="image" class="form-control" accept="image/*">
+        </div>
+
+        <!-- Description -->
+        <div class="form-group">
+            <label>Description:</label>
+            <textarea name="description" class="form-control"></textarea>
         </div>
 
         <!-- Listing Type Selection -->
@@ -131,8 +135,7 @@
                    id="buyNowPrice" 
                    class="form-control" 
                    min="1" 
-                   step="1"
-                   value="0">
+                   step="1">
         </div>
 
         <!-- Auction Price Section -->
@@ -143,8 +146,7 @@
                    id="auctionStartPrice" 
                    class="form-control" 
                    min="1" 
-                   step="1"
-                   value="0">
+                   step="1">
         </div>
 
         <!-- Offers Price Section -->
@@ -155,14 +157,7 @@
                    id="minimumOfferPrice" 
                    class="form-control" 
                    min="1" 
-                   step="1"
-                   value="0">
-        </div>
-
-        <!-- Image Upload -->
-        <div class="form-group">
-            <label>Plate Image:</label>
-            <input type="file" name="image" class="form-control" accept="image/*">
+                   step="1">
         </div>
 
         <button type="submit" class="btn btn-primary">Add Listing</button>

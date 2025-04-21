@@ -6,7 +6,7 @@ from services.file_service import FileService
 from fastapi import UploadFile, Request
 
 class LicensePlateService:
-    # Valid Arabic letters
+    # Valid Arabic letters in the correct order
     VALID_LETTERS = ['أ', 'ب', 'د', 'ع', 'ق', 'ه', 'ح', 'ك', 'ل', 'ن', 'ر', 'س', 'ط', 'و', 'ى', 'ص', 'م']
 
     # English letter mappings
@@ -120,8 +120,10 @@ class LicensePlateService:
         if len(plate_letter) > 3:
             return False, "Maximum 3 letters allowed"
             
-        if not all(letter in self.VALID_LETTERS for letter in plate_letter):
-            return False, "Invalid letters detected. Please use only valid Arabic letters"
+        # Check if all letters are in the valid set and in the correct order
+        for letter in plate_letter:
+            if letter not in self.VALID_LETTERS:
+                return False, "Invalid letters detected. Please use only valid Arabic letters in the correct order"
             
         return True, ""
 
@@ -149,7 +151,10 @@ class LicensePlateService:
         # Process image if provided
         image_path = None
         if image:
-            image_path = await self.file_service.save_image(image)
+            try:
+                image_path = await self.file_service.save_image(image)
+            except Exception as e:
+                raise ValueError(f"Failed to save image: {str(e)}")
 
         try:
             db_plate = LicensePlate(
@@ -173,8 +178,11 @@ class LicensePlateService:
             return db_plate
         except Exception as e:
             if image_path:
-                await self.file_service.delete_image(image_path)
-            raise e
+                try:
+                    await self.file_service.delete_image(image_path)
+                except:
+                    pass  # Ignore cleanup errors
+            raise ValueError(f"Failed to create license plate: {str(e)}")
 
     def get_license_plates(self, digit1=None, digit2=None, digit3=None, digit4=None,
                           letter1=None, letter2=None, letter3=None, sort_by="newest") -> List[LicensePlate]:
@@ -261,14 +269,17 @@ class LicensePlateService:
         self.db.refresh(plate)
         return plate
 
-    def delete_license_plate(self, plate_id: int, user_id: int) -> bool:
+    async def delete_license_plate(self, plate_id: int, user_id: int) -> bool:
         plate = self.get_license_plate(plate_id)
         if not plate or plate.owner_id != user_id:
             return False
         
         # Delete associated image if it exists
         if plate.image_path:
-            self.file_service.delete_image(plate.image_path)
+            try:
+                await self.file_service.delete_image(plate.image_path)
+            except:
+                pass  # Ignore cleanup errors
         
         # Delete associated wishlist items
         for wishlist_item in plate.wishlist_items:

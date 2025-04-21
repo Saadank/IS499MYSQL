@@ -4,16 +4,8 @@
 
 {% block content %}
 <div class="welcome-section">
-    <h1>Welcome to License Plate Trading</h1>
-    {% if username %}
-        <p>Welcome back, {{ username }}!</p>
-        <div class="user-actions">
-            <a href="/addlisting" class="button">Add New Plate</a>
-            <a href="{{ url_for('list_plates') }}" class="button">View All Plates</a>
-            <a href="{{ url_for('profile_page') }}" class="button">My Profile</a>
-            <a href="{{ url_for('logout') }}" class="button">Logout</a>
-        </div>
-    {% else %}
+    <h1>License Plate Trading</h1>
+    {% if not username %}
         <p>Please log in to add license plates or view detailed information.</p>
         <div class="auth-actions">
             <a href="{{ url_for('login_page') }}" class="button">Login</a>

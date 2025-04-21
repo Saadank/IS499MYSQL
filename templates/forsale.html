@@ -87,12 +87,32 @@
             <div class="plate-card">
                 <div class="mini-plate-preview">
                     <div class="mini-plate-numbers">
-                        <div class="arabic-row">{{ plate.plateNumber|arabic_numbers }}</div>
-                        <div class="english-row">{{ plate.plateNumber }}</div>
+                        <div class="number-display">
+                            <div class="arabic-row">
+                                {% for digit in plate.plateNumber %}
+                                <span>{{ digit|arabic_numbers }}</span>
+                                {% endfor %}
+                            </div>
+                            <div class="english-row">
+                                {% for digit in plate.plateNumber %}
+                                <span>{{ digit }}</span>
+                                {% endfor %}
+                            </div>
+                        </div>
                     </div>
                     <div class="mini-plate-letters">
-                        <div class="arabic-row">{{ plate.plateLetter|arabic_letters }}</div>
-                        <div class="english-row">{{ plate.plateLetter }}</div>
+                        <div class="letter-display">
+                            <div class="arabic-row">
+                                {% for letter in plate.plateLetter %}
+                                <span>{{ letter }}</span>
+                                {% endfor %}
+                            </div>
+                            <div class="english-row">
+                                {% for letter in plate.plateLetter %}
+                                <span>{{ letter_english[letter] }}</span>
+                                {% endfor %}
+                            </div>
+                        </div>
                     </div>
                     <div class="mini-ksa">
                         <span>K</span>

@@ -110,6 +110,7 @@ async def for_sale_page(
                                                letter1, letter2, letter3, sort_by)
     
     template_data = session_service.get_template_data(plate_data)
+    template_data["letter_english"] = plate_service.LETTER_ENGLISH
     
     return templates.TemplateResponse("forsale.html", template_data)
 
@@ -120,7 +121,7 @@ async def delete_plate(
     db: Session = Depends(get_db)
 ):
     plate_service = LicensePlateService(db)
-    if plate_service.delete_license_plate(plate_id, user_id):
+    if await plate_service.delete_license_plate(plate_id, user_id):
         return {"message": "Plate removed successfully"}
     raise HTTPException(status_code=400, detail="Failed to remove plate")
 
@@ -150,7 +151,8 @@ async def view_plate_details(
     
     template_data = session_service.get_template_data({
         "plate": plate,
-        "is_in_wishlist": is_in_wishlist
+        "is_in_wishlist": is_in_wishlist,
+        "letter_english": plate_service.LETTER_ENGLISH
     })
     
     return templates.TemplateResponse("plate_details.html", template_data) 
