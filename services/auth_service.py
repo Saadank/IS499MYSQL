@@ -39,6 +39,9 @@ class AuthService:
     def get_user_by_username(self, username: str) -> Optional[User]:
         return self.db.query(User).filter(User.username == username).first()
 
+    def get_user_by_idnumber(self, idnumber: str) -> Optional[User]:
+        return self.db.query(User).filter(User.idnumber == idnumber).first()
+
     async def login_user(self, username: str, password: str) -> User:
         # Validate input using schema
         login_data = UserLogin(username=username, password=password)
@@ -84,6 +87,10 @@ class AuthService:
         # Check if email exists
         if self.get_user_by_email(signup_data.email):
             raise HTTPException(status_code=400, detail="Email already registered")
+        
+        # Check if ID number exists
+        if self.get_user_by_idnumber(signup_data.idnumber):
+            raise HTTPException(status_code=400, detail="ID number already registered")
         
         # Create user
         user = self.create_user(
