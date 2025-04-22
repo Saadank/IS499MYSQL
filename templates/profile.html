@@ -35,56 +35,59 @@
                 {% for plate in listings %}
                 <div class="plate-card" data-plate-id="{{ plate.plateID }}">
                     <div class="mini-plate-preview">
-                        <div class="plate-section numbers">
-                            <div class="number-section">
+                        <div class="mini-plate-numbers">
+                            <div class="number-display">
                                 <div class="arabic-row">
                                     {% for digit in plate.plateNumber %}
-                                    <div class="plate-digit">{{ digit|arabic_numbers }}</div>
+                                    <span>{{ digit|arabic_numbers }}</span>
                                     {% endfor %}
                                 </div>
                                 <div class="english-row">
                                     {% for digit in plate.plateNumber %}
-                                    <div class="plate-digit">{{ digit }}</div>
+                                    <span>{{ digit }}</span>
                                     {% endfor %}
                                 </div>
                             </div>
                         </div>
-                        <div class="plate-section letters">
-                            <div class="letter-section">
+                        <div class="mini-plate-letters">
+                            <div class="letter-display">
                                 <div class="arabic-row">
                                     {% for letter in plate.plateLetter %}
-                                    <div class="plate-letter">{{ letter_arabic[letter] }}</div>
+                                    <span>{{ letter }}</span>
                                     {% endfor %}
                                 </div>
                                 <div class="english-row">
                                     {% for letter in plate.plateLetter %}
-                                    <div class="plate-letter">{{ letter }}</div>
+                                    <span>{{ letter_english[letter] }}</span>
                                     {% endfor %}
                                 </div>
                             </div>
                         </div>
-                        <div class="ksa-label">
+                        <div class="mini-ksa">
                             <span>K</span>
                             <span>S</span>
                             <span>A</span>
                         </div>
                     </div>
-                    <p class="price">SAR {{ "%.2f"|format(plate.price) }}</p>
-                    <p class="date">Listed: {{ plate.created_at.strftime('%Y-%m-%d') }}</p>
-                    {% if plate.description %}
-                        <p class="description">{{ plate.description }}</p>
-                    {% endif %}
-                    <div class="listing-details">
-                        <span class="listing-type">{{ plate.listing_type }}</span>
-                        {% if plate.listing_type == 'buy_now' %}
-                            <p>Buy Now Price: SAR {{ "%.2f"|format(plate.buy_now_price) }}</p>
-                        {% elif plate.listing_type == 'auction' %}
-                            <p>Starting Price: SAR {{ "%.2f"|format(plate.auction_start_price) }}</p>
-                        {% else %}
-                            <p>Minimum Offer: SAR {{ "%.2f"|format(plate.minimum_offer_price) }}</p>
+                    <div class="plate-info">
+                        <h3>{{ plate.plateNumber }}{{ plate.plateLetter }}</h3>
+                        <p class="price">SAR {{ "%.2f"|format(plate.price) }}</p>
+                        <p class="date">Listed: {{ plate.created_at.strftime('%Y-%m-%d') }}</p>
+                        {% if plate.description %}
+                            <p class="description">{{ plate.description }}</p>
                         {% endif %}
+                        <div class="listing-details">
+                            <span class="listing-type">{{ plate.listing_type }}</span>
+                            {% if plate.listing_type == 'buy_now' %}
+                                <p>Buy Now Price: SAR {{ "%.2f"|format(plate.buy_now_price) }}</p>
+                            {% elif plate.listing_type == 'auction' %}
+                                <p>Starting Price: SAR {{ "%.2f"|format(plate.auction_start_price) }}</p>
+                            {% else %}
+                                <p>Minimum Offer: SAR {{ "%.2f"|format(plate.minimum_offer_price) }}</p>
+                            {% endif %}
+                        </div>
+                        <button class="view-button remove-plate" data-plate-id="{{ plate.plateID }}">Remove Plate</button>
                     </div>
-                    <button class="view-button remove-plate" data-plate-id="{{ plate.plateID }}">Remove Plate</button>
                 </div>
                 {% endfor %}
             </div>

@@ -98,6 +98,6 @@ async def home(request: Request, db: Session = Depends(get_db)):
     
     return templates.TemplateResponse("landingpage.html", template_data)
 
-@app.get("/")
-def read_root():
+@app.get("/api/", response_model=dict)
+def api_root():
     return {"message": "Welcome to the License Plate Marketplace API"} 
