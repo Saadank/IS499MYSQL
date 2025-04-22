@@ -117,4 +117,23 @@ async def delete_license_plate(
         )
     db.delete(plate)
     db.commit()
+    return RedirectResponse(url="/admin/license-plates", status_code=status.HTTP_303_SEE_OTHER)
+
+@router.post("/license-plates/{plate_id}/approve")
+async def approve_license_plate(
+    plate_id: int,
+    request: Request,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(verify_admin)
+):
+    """Approve a license plate"""
+    plate = db.query(LicensePlate).filter(LicensePlate.plateID == plate_id).first()
+    if not plate:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="License plate not found"
+        )
+    
+    plate.is_approved = True
+    db.commit()
     return RedirectResponse(url="/admin/license-plates", status_code=status.HTTP_303_SEE_OTHER) 

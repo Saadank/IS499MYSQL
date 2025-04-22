@@ -55,6 +55,7 @@ class LicensePlate(Base):
     transfer_cost = Column(String(50))
     plate_type = Column(String(20))
     is_sold = Column(Boolean, default=False)
+    is_approved = Column(Boolean, default=False)
 
     # Relationships
     owner = relationship("User", back_populates="plates")

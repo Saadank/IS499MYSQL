@@ -82,17 +82,41 @@ class LicensePlateService:
         )
 
     def get_plates_data(self, request: Request) -> Dict[str, Any]:
+        # Get user from session
+        user_id = request.session.get("user_id")
+        is_admin = False
+        if user_id:
+            user = self.db.query(User).filter(User.id == user_id).first()
+            is_admin = user.is_admin if user else False
+
+        # If user is admin, show all plates, otherwise only show approved plates
+        if is_admin:
+            plates = self.db.query(LicensePlate).filter(LicensePlate.is_sold == False).all()
+        else:
+            plates = self.get_license_plates()  # This filters for approved plates
+
         return {
             "request": request,
-            "plates": self.get_license_plates(),
+            "plates": plates,
             "username": request.session.get("username")
         }
 
     def get_forsale_data(self, request: Request, digit1: Optional[str], digit2: Optional[str],
                         digit3: Optional[str], digit4: Optional[str], letter1: Optional[str],
                         letter2: Optional[str], letter3: Optional[str], sort_by: str) -> Dict[str, Any]:
-        plates = self.get_license_plates(digit1, digit2, digit3, digit4,
-                                       letter1, letter2, letter3, sort_by)
+        # Get user from session
+        user_id = request.session.get("user_id")
+        is_admin = False
+        if user_id:
+            user = self.db.query(User).filter(User.id == user_id).first()
+            is_admin = user.is_admin if user else False
+
+        # If user is admin, show all plates, otherwise only show approved plates
+        if is_admin:
+            plates = self.db.query(LicensePlate).filter(LicensePlate.is_sold == False).all()
+        else:
+            plates = self.get_license_plates(digit1, digit2, digit3, digit4,
+                                           letter1, letter2, letter3, sort_by)
         
         return {
             "request": request,
@@ -170,7 +194,8 @@ class LicensePlateService:
                 city=city,
                 transfer_cost=transfer_cost,
                 plate_type=plate_type,
-                image_path=image_path
+                image_path=image_path,
+                is_approved=False  # Set to False by default
             )
             self.db.add(db_plate)
             self.db.commit()
@@ -186,7 +211,11 @@ class LicensePlateService:
 
     def get_license_plates(self, digit1=None, digit2=None, digit3=None, digit4=None,
                           letter1=None, letter2=None, letter3=None, sort_by="newest") -> List[LicensePlate]:
-        plates = self.db.query(LicensePlate).filter(LicensePlate.is_sold == False).all()
+        # For regular users, only show approved plates
+        plates = self.db.query(LicensePlate).filter(
+            LicensePlate.is_sold == False,
+            LicensePlate.is_approved == True
+        ).all()
         
         # Apply digit filters
         if any([digit1, digit2, digit3, digit4]):
@@ -231,9 +260,13 @@ class LicensePlateService:
         return plates
 
     def get_license_plate(self, plate_id: int) -> Optional[LicensePlate]:
-        return self.db.query(LicensePlate).filter(LicensePlate.plateID == plate_id).first()
+        return self.db.query(LicensePlate).filter(
+            LicensePlate.plateID == plate_id,
+            LicensePlate.is_approved == True  # Only show approved plates
+        ).first()
 
     def get_user_license_plates(self, user_id: int) -> List[LicensePlate]:
+        # Show all plates to the owner, including unapproved ones
         return self.db.query(LicensePlate).filter(LicensePlate.owner_id == user_id).all()
 
     async def update_license_plate(
@@ -296,7 +329,8 @@ class LicensePlateService:
     def get_plate_details(self, plate_id: int) -> Optional[Dict[str, Any]]:
         plate = self.db.query(LicensePlate).filter(
             LicensePlate.plateID == plate_id,
-            LicensePlate.is_sold == False
+            LicensePlate.is_sold == False,
+            LicensePlate.is_approved == True  # Only show approved plates
         ).first()
         if not plate:
             return None
@@ -337,6 +371,7 @@ class LicensePlateService:
     def get_available_plates(self) -> List[LicensePlate]:
         return self.db.query(LicensePlate).filter(
             LicensePlate.is_sold == False,
+            LicensePlate.is_approved == True,  # Only show approved plates
             ~LicensePlate.plateID.in_(
                 self.db.query(Auction.plate_id).filter(Auction.is_active == True)
             )

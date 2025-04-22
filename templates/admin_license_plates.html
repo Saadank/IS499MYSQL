@@ -16,6 +16,7 @@
                     <th>Owner</th>
                     <th>Listing Type</th>
                     <th>City</th>
+                    <th>Status</th>
                     <th>Actions</th>
                 </tr>
             </thead>
@@ -30,6 +31,18 @@
                     <td>{{ plate.listing_type }}</td>
                     <td>{{ plate.city }}</td>
                     <td>
+                        {% if plate.is_approved %}
+                            <span class="badge bg-success">Approved</span>
+                        {% else %}
+                            <span class="badge bg-warning">Pending</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if not plate.is_approved %}
+                            <form action="/admin/license-plates/{{ plate.plateID }}/approve" method="POST" class="d-inline">
+                                <button type="submit" class="btn btn-success btn-sm">Approve</button>
+                            </form>
+                        {% endif %}
                         <form action="/admin/license-plates/{{ plate.plateID }}" method="POST" class="d-inline">
                             <input type="hidden" name="_method" value="DELETE">
                             <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this license plate?')">Delete</button>
