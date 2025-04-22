@@ -2,8 +2,9 @@ import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from config.email_config import email_settings
-from typing import List, Dict
+from typing import List, Dict, Optional
 import os
+from models import User, LicensePlate
 
 class EmailService:
     def __init__(self):
@@ -12,11 +13,11 @@ class EmailService:
         self.sender_email = os.getenv("EMAIL_USERNAME", "your-email@gmail.com")
         self.sender_password = os.getenv("EMAIL_PASSWORD", "your-app-password")
 
-    def send_email(self, to_email: str, subject: str, body: str) -> bool:
+    def send_email(self, recipient_email: str, subject: str, body: str) -> bool:
         try:
             msg = MIMEMultipart()
             msg['From'] = self.sender_email
-            msg['To'] = to_email
+            msg['To'] = recipient_email
             msg['Subject'] = subject
 
             msg.attach(MIMEText(body, 'html'))
@@ -28,7 +29,7 @@ class EmailService:
             server.quit()
             return True
         except Exception as e:
-            print(f"Error sending email: {str(e)}")
+            print(f"Failed to send email: {str(e)}")
             return False
 
     def send_welcome_email(self, to_email: str, username: str) -> bool:
@@ -145,4 +146,39 @@ class EmailService:
             server.send_message(msg)
             server.quit()
         except Exception as e:
-            print(f"Failed to send email: {str(e)}") 
+            print(f"Failed to send email: {str(e)}")
+
+    def send_listing_added_email(self, user: User, plate: LicensePlate) -> bool:
+        subject = "Your License Plate Listing Has Been Added"
+        body = f"""
+        <html>
+            <body>
+                <h2>Thank you for adding your license plate!</h2>
+                <p>Dear {user.username},</p>
+                <p>Your license plate listing for <strong>{plate.plateNumber}{plate.plateLetter}</strong> has been successfully added to our system.</p>
+                <p>Please note that your listing is currently pending admin approval. This process may take some time.</p>
+                <p>You will receive another email once your listing has been approved.</p>
+                <p>Thank you for your patience!</p>
+                <br>
+                <p>Best regards,<br>The License Plate Team</p>
+            </body>
+        </html>
+        """
+        return self.send_email(user.email, subject, body)
+
+    def send_listing_approved_email(self, user: User, plate: LicensePlate) -> bool:
+        subject = "Your License Plate Listing Has Been Approved"
+        body = f"""
+        <html>
+            <body>
+                <h2>Great news! Your license plate has been approved!</h2>
+                <p>Dear {user.username},</p>
+                <p>Your license plate listing for <strong>{plate.plateNumber}{plate.plateLetter}</strong> has been approved and is now live on our platform.</p>
+                <p>You can view your listing at: <a href="/plate/{plate.plateID}">View Listing</a></p>
+                <p>Thank you for using our platform!</p>
+                <br>
+                <p>Best regards,<br>The License Plate Team</p>
+            </body>
+        </html>
+        """
+        return self.send_email(user.email, subject, body) 

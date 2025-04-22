@@ -7,6 +7,7 @@ from models import User, LicensePlate
 from schemas import UserResponse, LicensePlateResponse
 from routes.auth import get_current_user
 from utils.template_config import templates
+from services.email_service import EmailService
 
 router = APIRouter(
     prefix="/admin",
@@ -136,4 +137,11 @@ async def approve_license_plate(
     
     plate.is_approved = True
     db.commit()
+    
+    # Send approval email
+    user = db.query(User).filter(User.id == plate.owner_id).first()
+    if user:
+        email_service = EmailService()
+        email_service.send_listing_approved_email(user, plate)
+    
     return RedirectResponse(url="/admin/license-plates", status_code=status.HTTP_303_SEE_OTHER) 

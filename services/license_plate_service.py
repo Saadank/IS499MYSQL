@@ -4,6 +4,7 @@ from models import LicensePlate, Auction, User
 from datetime import datetime, UTC
 from services.file_service import FileService
 from fastapi import UploadFile, Request
+from services.email_service import EmailService
 
 class LicensePlateService:
     # Valid Arabic letters in the correct order
@@ -19,6 +20,7 @@ class LicensePlateService:
     def __init__(self, db: Session):
         self.db = db
         self.file_service = FileService()
+        self.email_service = EmailService()
 
     def get_add_listing_data(self, request: Request) -> Dict[str, Any]:
         return {
@@ -200,6 +202,12 @@ class LicensePlateService:
             self.db.add(db_plate)
             self.db.commit()
             self.db.refresh(db_plate)
+
+            # Get the user and send email notification
+            user = self.db.query(User).filter(User.id == owner_id).first()
+            if user:
+                self.email_service.send_listing_added_email(user, db_plate)
+
             return db_plate
         except Exception as e:
             if image_path:
