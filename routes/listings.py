@@ -6,9 +6,10 @@ from dependencies import require_auth, get_current_user
 from typing import Optional
 from services.license_plate_service import LicensePlateService
 from services.session_service import SessionService
-from models import User
+from models import User, Order, OrderStatus, LicensePlate
 from utils.template_config import templates
 from services.wishlist_service import WishlistService
+from datetime import datetime
 
 router = APIRouter(prefix="", tags=["listings"])
 
@@ -149,10 +150,60 @@ async def view_plate_details(
     if user_id:
         is_in_wishlist = wishlist_service.is_in_wishlist(user_id, plate_id)
     
+    # Get user object if logged in
+    user = None
+    if user_id:
+        user = db.query(User).filter(User.id == user_id).first()
+    
     template_data = session_service.get_template_data({
         "plate": plate,
         "is_in_wishlist": is_in_wishlist,
-        "letter_english": plate_service.LETTER_ENGLISH
+        "letter_english": plate_service.LETTER_ENGLISH,
+        "user": user,
+        "username": user.username if user else None
     })
     
-    return templates.TemplateResponse("plate_details.html", template_data) 
+    return templates.TemplateResponse("plate_details.html", template_data)
+
+@router.post("/buy-now/{plate_id}")
+async def buy_now(request: Request, plate_id: int, db: Session = Depends(get_db)):
+    session_service = SessionService(request)
+    user_id = session_service.get_user_id()
+    
+    if not user_id:
+        raise HTTPException(status_code=401, detail="Please login to buy plates")
+    
+    # Get the user
+    user = db.query(User).filter(User.id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=401, detail="User not found")
+    
+    # Get the plate
+    plate = db.query(LicensePlate).filter(LicensePlate.plateID == plate_id).first()
+    if not plate:
+        raise HTTPException(status_code=404, detail="Plate not found")
+    
+    # Check if user is trying to buy their own plate
+    if plate.owner_id == user.id:
+        raise HTTPException(status_code=400, detail="You cannot buy your own plate")
+    
+    # Check if plate is already sold
+    if plate.is_sold:
+        raise HTTPException(status_code=400, detail="This plate has already been sold")
+    
+    # Create a new order
+    order = Order(
+        plate_id=plate_id,
+        buyer_id=user.id,
+        seller_id=plate.owner_id,
+        price=plate.price,
+        status=OrderStatus.PENDING,
+        created_at=datetime.utcnow(),
+        updated_at=datetime.utcnow()
+    )
+    
+    db.add(order)
+    db.commit()
+    
+    # Redirect to payment page
+    return {"redirect_url": f"/payment/{order.id}"} 

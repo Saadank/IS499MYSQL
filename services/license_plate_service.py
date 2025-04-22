@@ -186,7 +186,7 @@ class LicensePlateService:
 
     def get_license_plates(self, digit1=None, digit2=None, digit3=None, digit4=None,
                           letter1=None, letter2=None, letter3=None, sort_by="newest") -> List[LicensePlate]:
-        plates = self.db.query(LicensePlate).all()
+        plates = self.db.query(LicensePlate).filter(LicensePlate.is_sold == False).all()
         
         # Apply digit filters
         if any([digit1, digit2, digit3, digit4]):
@@ -294,7 +294,10 @@ class LicensePlateService:
         return True
 
     def get_plate_details(self, plate_id: int) -> Optional[Dict[str, Any]]:
-        plate = self.get_license_plate(plate_id)
+        plate = self.db.query(LicensePlate).filter(
+            LicensePlate.plateID == plate_id,
+            LicensePlate.is_sold == False
+        ).first()
         if not plate:
             return None
             
@@ -332,13 +335,9 @@ class LicensePlateService:
         return plate_data
 
     def get_available_plates(self) -> List[LicensePlate]:
-        # Get plates that are not currently in an active auction
-        active_auction_plate_ids = self.db.query(Auction.plate_id).filter(
-            Auction.is_active == True,
-            Auction.end_time > datetime.now(UTC)
-        ).all()
-        active_auction_plate_ids = [plate_id[0] for plate_id in active_auction_plate_ids]
-        
         return self.db.query(LicensePlate).filter(
-            ~LicensePlate.plateID.in_(active_auction_plate_ids)
+            LicensePlate.is_sold == False,
+            ~LicensePlate.plateID.in_(
+                self.db.query(Auction.plate_id).filter(Auction.is_active == True)
+            )
         ).all() 

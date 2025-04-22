@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="text-center">Payment Details</h3>
+                </div>
+                <div class="card-body">
+                    <div class="mb-4">
+                        <h5>License Plate Details</h5>
+                        <p>Plate Number: {{ plate.plateNumber }}{{ plate.plateLetter }}</p>
+                        <p>Price: SAR {{ order.price }}</p>
+                    </div>
+                    
+                    <form id="paymentForm" action="/process-payment/{{ order.id }}" method="POST">
+                        <div class="mb-3">
+                            <label for="cardNumber" class="form-label">Card Number</label>
+                            <input type="text" class="form-control" id="cardNumber" name="card_number" 
+                                   placeholder="1234 5678 9012 3456" required>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="expiryDate" class="form-label">Expiry Date</label>
+                                <input type="text" class="form-control" id="expiryDate" name="expiry_date" 
+                                       placeholder="MM/YY" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="cvv" class="form-label">CVV</label>
+                                <input type="text" class="form-control" id="cvv" name="cvv" 
+                                       placeholder="123" required>
+                            </div>
+                        </div>
+                        
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">Pay Now</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.getElementById('paymentForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const formData = new FormData(this);
+    
+    fetch(this.action, {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Payment failed');
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.message === 'Payment successful') {
+            alert('Payment successful!');
+            window.location.href = '/';
+        } else {
+            alert('Payment failed. Please try again.');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('An error occurred. Please try again.');
+    });
+});
+</script>
+{% endblock %} 

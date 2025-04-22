@@ -10,9 +10,11 @@
         <div class="error">{{ error }}</div>
     {% elif plate %}
         <div class="wishlist-button">
-            <button title="Add to Wishlist" data-plate-id="{{ plate.plateID }}" style="color: {% if is_in_wishlist %}red{% else %}black{% endif %}">
-                {% if is_in_wishlist %}♥{% else %}♡{% endif %}
-            </button>
+            {% if user %}
+                <button title="Add to Wishlist" data-plate-id="{{ plate.plateID }}" style="color: {% if is_in_wishlist %}red{% else %}black{% endif %}">
+                    {% if is_in_wishlist %}♥{% else %}♡{% endif %}
+                </button>
+            {% endif %}
         </div>
 
         <div class="plate-display">
@@ -47,7 +49,7 @@
             <div class="ksa-label">
                 <span>K</span>
                 <span>S</span>
-                <span >A</span>
+                <span>A</span>
             </div>
         </div>
 
@@ -82,9 +84,21 @@
             </div>
         </div>
 
-        {% if not username %}
-            <div style="text-align: center; margin-top: 2rem; color: #666;">
-                Please login to contact the seller
+        {% if user %}
+            {% if plate.owner_id == user.id %}
+                <div class="mt-4">
+                    <div class="alert alert-info">
+                        <p class="mb-0">This is your own plate. You cannot buy it.</p>
+                    </div>
+                </div>
+            {% else %}
+                <div class="mt-4">
+                    <button class="btn btn-primary btn-lg" onclick="buyNow({{ plate.plateID }})">Buy Now</button>
+                </div>
+            {% endif %}
+        {% else %}
+            <div class="mt-4">
+                <p class="text-muted">Please <a href="{{ url_for('login_page') }}">login</a> to buy this plate</p>
             </div>
         {% endif %}
     {% else %}
@@ -93,4 +107,27 @@
 </div>
 
 <script src="{{ url_for('static', path='js/plate_details.js') }}"></script>
+<script>
+async function buyNow(plateId) {
+    try {
+        const response = await fetch(`/buy-now/${plateId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+        
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.detail || 'Failed to process purchase');
+        }
+        
+        const data = await response.json();
+        window.location.href = data.redirect_url;
+    } catch (error) {
+        console.error('Error:', error);
+        alert(error.message || 'An error occurred. Please try again.');
+    }
+}
+</script>
 {% endblock %} 
