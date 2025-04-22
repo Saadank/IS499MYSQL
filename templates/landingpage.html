@@ -56,25 +56,25 @@
             <div class="letter-dropdowns">
                 <select name="letter1" class="letter-select">
                     <option value="">Any</option>
-                    {% for letter in valid_letters %}
-                    <option value="{{ letter }}" {% if letter1 == letter %}selected{% endif %}>
-                        {{ letter }} ({{ letter_english[letter] }})
+                    {% for eng_letter in ['A', 'B', 'D', 'E', 'G', 'H', 'J', 'K', 'L', 'N', 'R', 'S', 'T', 'U', 'V', 'X', 'Z'] %}
+                    <option value="{{ eng_letter }}" {% if letter1 == eng_letter %}selected{% endif %}>
+                        {{ eng_letter }}
                     </option>
                     {% endfor %}
                 </select>
                 <select name="letter2" class="letter-select">
                     <option value="">Any</option>
-                    {% for letter in valid_letters %}
-                    <option value="{{ letter }}" {% if letter2 == letter %}selected{% endif %}>
-                        {{ letter }} ({{ letter_english[letter] }})
+                    {% for eng_letter in ['A', 'B', 'D', 'E', 'G', 'H', 'J', 'K', 'L', 'N', 'R', 'S', 'T', 'U', 'V', 'X', 'Z'] %}
+                    <option value="{{ eng_letter }}" {% if letter2 == eng_letter %}selected{% endif %}>
+                        {{ eng_letter }}
                     </option>
                     {% endfor %}
                 </select>
                 <select name="letter3" class="letter-select">
                     <option value="">Any</option>
-                    {% for letter in valid_letters %}
-                    <option value="{{ letter }}" {% if letter3 == letter %}selected{% endif %}>
-                        {{ letter }} ({{ letter_english[letter] }})
+                    {% for eng_letter in ['A', 'B', 'D', 'E', 'G', 'H', 'J', 'K', 'L', 'N', 'R', 'S', 'T', 'U', 'V', 'X', 'Z'] %}
+                    <option value="{{ eng_letter }}" {% if letter3 == eng_letter %}selected{% endif %}>
+                        {{ eng_letter }}
                     </option>
                     {% endfor %}
                 </select>
@@ -100,35 +100,35 @@
         {% for plate in plates %}
         <div class="plate-card">
             <div class="mini-plate-preview">
-                <div class="mini-plate-numbers">
-                    <div class="number-display">
+                <div class="plate-section numbers">
+                    <div class="number-section">
                         <div class="arabic-row">
                             {% for digit in plate.plateNumber %}
-                            <span>{{ digit|arabic_numbers }}</span>
+                            <div class="plate-digit">{{ digit|arabic_numbers }}</div>
                             {% endfor %}
                         </div>
                         <div class="english-row">
                             {% for digit in plate.plateNumber %}
-                            <span>{{ digit }}</span>
+                            <div class="plate-digit">{{ digit }}</div>
                             {% endfor %}
                         </div>
                     </div>
                 </div>
-                <div class="mini-plate-letters">
-                    <div class="letter-display">
+                <div class="plate-section letters">
+                    <div class="letter-section">
                         <div class="arabic-row">
                             {% for letter in plate.plateLetter %}
-                            <span>{{ letter }}</span>
+                            <div class="plate-letter">{{ letter_arabic[letter] }}</div>
                             {% endfor %}
                         </div>
                         <div class="english-row">
                             {% for letter in plate.plateLetter %}
-                            <span>{{ letter_english[letter] }}</span>
+                            <div class="plate-letter">{{ letter }}</div>
                             {% endfor %}
                         </div>
                     </div>
                 </div>
-                <div class="mini-ksa">
+                <div class="ksa-label">
                     <span>K</span>
                     <span>S</span>
                     <span>A</span>

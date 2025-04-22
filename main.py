@@ -72,11 +72,13 @@ async def home(request: Request, db: Session = Depends(get_db)):
     
     # Use the standardized letter mapping from LicensePlateService
     letter_english = LicensePlateService.LETTER_ENGLISH
+    letter_arabic = LicensePlateService.LETTER_ARABIC
     valid_letters = LicensePlateService.VALID_LETTERS
     
     template_data = session_service.get_template_data({
         "plates": plates,
         "letter_english": letter_english,
+        "letter_arabic": letter_arabic,
         "valid_letters": valid_letters
     })
     

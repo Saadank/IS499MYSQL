@@ -6,8 +6,15 @@ from services.file_service import FileService
 from fastapi import UploadFile, Request
 
 class LicensePlateService:
-    # Valid Arabic letters in the correct order
-    VALID_LETTERS = ['أ', 'ب', 'د', 'ع', 'ق', 'ه', 'ح', 'ك', 'ل', 'ن', 'ر', 'س', 'ط', 'و', 'ى', 'ص', 'م']
+    # Valid English letters in the correct order
+    VALID_LETTERS = ['A', 'B', 'D', 'E', 'G', 'H', 'J', 'K', 'L', 'N', 'R', 'S', 'T', 'U', 'V', 'X', 'Z']
+
+    # Arabic letter mappings
+    LETTER_ARABIC = {
+        'A': 'أ', 'B': 'ب', 'D': 'د', 'E': 'ع', 'G': 'ق', 'H': 'ه', 'J': 'ح',
+        'K': 'ك', 'L': 'ل', 'N': 'ن', 'R': 'ر', 'S': 'س', 'T': 'ط', 'U': 'و',
+        'V': 'ى', 'X': 'ص', 'Z': 'م'
+    }
 
     # English letter mappings
     LETTER_ENGLISH = {
@@ -15,6 +22,9 @@ class LicensePlateService:
         'ك': 'K', 'ل': 'L', 'ن': 'N', 'ر': 'R', 'س': 'S', 'ط': 'T', 'و': 'U', 
         'ى': 'V', 'ص': 'X', 'م': 'Z'
     }
+
+    # Reverse mapping (English to Arabic)
+    LETTER_ARABIC_REVERSE = {v: k for k, v in LETTER_ENGLISH.items()}
 
     def __init__(self, db: Session):
         self.db = db
@@ -106,7 +116,8 @@ class LicensePlateService:
             "letter3": letter3,
             "sort_by": sort_by,
             "valid_letters": self.VALID_LETTERS,
-            "letter_english": self.LETTER_ENGLISH
+            "letter_english": self.LETTER_ENGLISH,
+            "letter_arabic": self.LETTER_ARABIC
         }
 
     def validate_plate_letter(self, plate_letter: str) -> tuple[bool, str]:
@@ -120,12 +131,17 @@ class LicensePlateService:
         if len(plate_letter) > 3:
             return False, "Maximum 3 letters allowed"
             
-        # Check if all letters are in the valid set and in the correct order
+        # Convert Arabic to English if Arabic letters are provided
+        english_letters = ""
         for letter in plate_letter:
-            if letter not in self.VALID_LETTERS:
-                return False, "Invalid letters detected. Please use only valid Arabic letters in the correct order"
+            if letter in self.LETTER_ENGLISH:
+                english_letters += self.LETTER_ENGLISH[letter]
+            elif letter in self.LETTER_ARABIC_REVERSE:  # It's already an English letter
+                english_letters += letter
+            else:
+                return False, f"Invalid letter: {letter}. Please use only valid Arabic letters or their English equivalents (A,B,D,E,G,H,J,K,L,N,R,S,T,U,V,X,Z)"
             
-        return True, ""
+        return True, english_letters
 
     async def create_license_plate(
         self,
@@ -143,10 +159,11 @@ class LicensePlateService:
         plate_type: str,
         image: Optional[UploadFile] = None
     ) -> LicensePlate:
-        # Validate plate letter
-        is_valid, error_message = self.validate_plate_letter(plate_letter)
+        # Validate and convert plate letter to English
+        is_valid, result = self.validate_plate_letter(plate_letter)
         if not is_valid:
-            raise ValueError(f"Invalid plate letter: {error_message}")
+            raise ValueError(f"Invalid plate letter: {result}")
+        english_plate_letter = result
 
         # Process image if provided
         image_path = None
@@ -159,7 +176,7 @@ class LicensePlateService:
         try:
             db_plate = LicensePlate(
                 plateNumber=plate_number,
-                plateLetter=plate_letter,
+                plateLetter=english_plate_letter,  # Store English version
                 description=description,
                 price=price,
                 listing_type=listing_type,
@@ -302,12 +319,16 @@ class LicensePlateService:
         seller = self.db.query(User).filter(User.id == plate.owner_id).first()
         if not seller:
             return None
+
+        # Convert English letters back to Arabic
+        arabic_letters = ''.join(self.LETTER_ARABIC_REVERSE[letter] for letter in plate.plateLetter)
             
         # Format the plate data
         plate_data = {
             'plateID': plate.plateID,
             'plate_number': plate.plateNumber,
-            'plate_letter': plate.plateLetter,
+            'plate_letter': arabic_letters,  # Show Arabic version
+            'plate_letter_english': plate.plateLetter,  # Also provide English version
             'price': plate.price,
             'description': plate.description,
             'image_url': plate.image_path or '/static/images/default_plate.jpg',
@@ -317,7 +338,7 @@ class LicensePlateService:
             'minimum_offer_price': plate.minimum_offer_price,
             'created_at': plate.created_at,
             'city': plate.city,
-            'transfer_cost': "Buyer Responsibility",  # Always set to "Buyer Responsibility"
+            'transfer_cost': plate.transfer_cost or "Buyer Responsibility",
             'plate_type': plate.plate_type,
             'seller': {
                 'username': seller.username,

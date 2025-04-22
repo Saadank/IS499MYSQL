@@ -1,0 +1,171 @@
+.wishlist-section {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.plates-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 2rem;
+}
+
+.plate-card {
+    background-color: white;
+    border-radius: 8px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    transition: transform 0.2s;
+}
+
+.plate-card:hover {
+    transform: translateY(-5px);
+}
+
+.mini-plate-preview {
+    border: 1px solid #000;
+    margin: 1rem auto;
+    padding: 0.5rem 1.5rem 0.5rem 0.5rem;
+    display: flex;
+    position: relative;
+    background: white;
+    max-width: 250px;
+    border-radius: 2px;
+}
+
+.plate-section {
+    display: flex;
+    padding: 0.25rem;
+}
+
+.plate-section.numbers {
+    flex: 2;
+    justify-content: center;
+}
+
+.plate-section.letters {
+    flex: 1;
+    justify-content: center;
+    border-left: 1px solid #000;
+}
+
+.number-section, .letter-section {
+    width: 100%;
+}
+
+.arabic-row, .english-row {
+    display: flex;
+    justify-content: center;
+    gap: 0.25rem;
+}
+
+.arabic-row {
+    border-bottom: 1px solid #ddd;
+    margin-bottom: 0.1rem;
+}
+
+.plate-digit, .plate-letter {
+    font-size: 1.2rem;
+    font-weight: bold;
+    padding: 0.1rem;
+    color: #000;
+    margin: 0 0.1rem;
+}
+
+.arabic-row .plate-digit,
+.arabic-row .plate-letter {
+    font-family: "Traditional Arabic", "Arial", sans-serif;
+    font-size: 1.2rem;
+    letter-spacing: 0.1rem;
+}
+
+.english-row .plate-digit,
+.english-row .plate-letter {
+    font-family: "Arial", sans-serif;
+    font-size: 1rem;
+    color: #666;
+}
+
+.ksa-label {
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    width: 1rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    border-left: 1px solid #000;
+    background: white;
+    font-weight: normal;
+}
+
+.ksa-label span {
+    display: block;
+    font-size: 0.6rem;
+    margin: 0;
+    color: #666;
+}
+
+.price {
+    font-size: 1rem;
+    font-weight: bold;
+    color: #333;
+    margin: 0.5rem 0;
+    text-align: center;
+}
+
+.date {
+    color: #666;
+    font-size: 0.8rem;
+    text-align: center;
+    margin: 0.25rem 0;
+}
+
+.description {
+    color: #666;
+    font-size: 0.8rem;
+    text-align: center;
+    margin: 0.5rem 0;
+}
+
+.remove-from-wishlist {
+    display: block;
+    width: 100%;
+    padding: 0.75rem;
+    background-color: #e74c3c;
+    color: white;
+    text-align: center;
+    text-decoration: none;
+    border: none;
+    border-radius: 4px;
+    margin-top: 1rem;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.remove-from-wishlist:hover {
+    background-color: #c0392b;
+}
+
+.no-results {
+    text-align: center;
+    padding: 2rem;
+    color: #666;
+}
+
+.no-results .view-button {
+    display: inline-block;
+    background-color: rgb(53, 53, 235);
+    color: white;
+    padding: 10px 20px;
+    text-decoration: none;
+    border-radius: 5px;
+    margin-top: 15px;
+    transition: background-color 0.2s;
+}
+
+.no-results .view-button:hover {
+    background-color: rgb(41, 41, 200);
+} 

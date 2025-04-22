@@ -4,6 +4,7 @@
 
 {% block extra_css %}
 <link rel="stylesheet" href="{{ url_for('static', path='css/profile.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', path='css/landingpage.css') }}">
 {% endblock %}
 
 {% block content %}
@@ -34,35 +35,35 @@
                 {% for plate in listings %}
                 <div class="plate-card" data-plate-id="{{ plate.plateID }}">
                     <div class="mini-plate-preview">
-                        <div class="mini-plate-numbers">
-                            <div class="number-display">
+                        <div class="plate-section numbers">
+                            <div class="number-section">
                                 <div class="arabic-row">
                                     {% for digit in plate.plateNumber %}
-                                    <span>{{ digit|arabic_numbers }}</span>
+                                    <div class="plate-digit">{{ digit|arabic_numbers }}</div>
                                     {% endfor %}
                                 </div>
                                 <div class="english-row">
                                     {% for digit in plate.plateNumber %}
-                                    <span>{{ digit }}</span>
+                                    <div class="plate-digit">{{ digit }}</div>
                                     {% endfor %}
                                 </div>
                             </div>
                         </div>
-                        <div class="mini-plate-letters">
-                            <div class="letter-display">
+                        <div class="plate-section letters">
+                            <div class="letter-section">
                                 <div class="arabic-row">
                                     {% for letter in plate.plateLetter %}
-                                    <span>{{ letter }}</span>
+                                    <div class="plate-letter">{{ letter_arabic[letter] }}</div>
                                     {% endfor %}
                                 </div>
                                 <div class="english-row">
                                     {% for letter in plate.plateLetter %}
-                                    <span>{{ letter_english[letter] }}</span>
+                                    <div class="plate-letter">{{ letter }}</div>
                                     {% endfor %}
                                 </div>
                             </div>
                         </div>
-                        <div class="mini-ksa">
+                        <div class="ksa-label">
                             <span>K</span>
                             <span>S</span>
                             <span>A</span>

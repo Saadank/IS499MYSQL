@@ -20,12 +20,14 @@ async def wishlist_page(
     
     # Use the standardized letter mapping from LicensePlateService
     letter_english = LicensePlateService.LETTER_ENGLISH
+    letter_arabic = LicensePlateService.LETTER_ARABIC
     
     return templates.TemplateResponse("wishlist.html", {
         "request": request,
         "plates": wishlist_plates,
         "username": request.session.get("username"),
-        "letter_english": letter_english
+        "letter_english": letter_english,
+        "letter_arabic": letter_arabic
     })
 
 @router.post("/wishlist/add/{plate_id}")
