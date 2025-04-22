@@ -2,29 +2,30 @@ import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from config.email_config import email_settings
-from typing import List
+from typing import List, Dict
+import os
 
 class EmailService:
     def __init__(self):
-        self.smtp_server = email_settings.SMTP_SERVER
-        self.smtp_port = email_settings.SMTP_PORT
-        self.username = email_settings.EMAIL_USERNAME
-        self.password = email_settings.EMAIL_PASSWORD
-        self.email_from = email_settings.EMAIL_FROM
+        self.smtp_server = "smtp.gmail.com"
+        self.smtp_port = 587
+        self.sender_email = os.getenv("EMAIL_USERNAME", "your-email@gmail.com")
+        self.sender_password = os.getenv("EMAIL_PASSWORD", "your-app-password")
 
     def send_email(self, to_email: str, subject: str, body: str) -> bool:
         try:
             msg = MIMEMultipart()
-            msg['From'] = self.email_from
+            msg['From'] = self.sender_email
             msg['To'] = to_email
             msg['Subject'] = subject
 
             msg.attach(MIMEText(body, 'html'))
 
-            with smtplib.SMTP(self.smtp_server, self.smtp_port) as server:
-                server.starttls()
-                server.login(self.username, self.password)
-                server.send_message(msg)
+            server = smtplib.SMTP(self.smtp_server, self.smtp_port)
+            server.starttls()
+            server.login(self.sender_email, self.sender_password)
+            server.send_message(msg)
+            server.quit()
             return True
         except Exception as e:
             print(f"Error sending email: {str(e)}")
@@ -82,19 +83,66 @@ class EmailService:
         """
         return self.send_email(to_email, subject, body)
 
-    def send_purchase_notification(self, to_email: str, plate_number: str, amount: float) -> bool:
-        subject = "License Plate Purchase Confirmation"
-        body = f"""
-        <html>
-            <body>
-                <h2>Purchase Confirmation</h2>
-                <p>Thank you for your purchase!</p>
-                <p>License Plate: {plate_number}</p>
-                <p>Amount: {amount} SAR</p>
-                <p>Please log in to your account to view the details of your purchase.</p>
-                <br>
-                <p>Best regards,<br>License Plate Trading Team</p>
-            </body>
-        </html>
+    def send_purchase_notification(self, buyer_info: Dict, seller_info: Dict, plate_info: Dict):
+        # Email to buyer
+        buyer_subject = "License Plate Purchase Confirmation"
+        buyer_body = f"""
+        Dear {buyer_info['name']},
+
+        Thank you for your purchase! Here are the details of your transaction:
+
+        Plate Number: {plate_info['number']}{plate_info['letter']}
+        Price: SAR {plate_info['price']}
+
+        Seller Contact Information:
+        Name: {seller_info['name']}
+        Email: {seller_info['email']}
+        Phone: {seller_info.get('phone', 'Not provided')}
+
+        Please contact the seller to arrange the transfer of the license plate.
+
+        Best regards,
+        License Plate Trading Platform
         """
-        return self.send_email(to_email, subject, body) 
+
+        # Email to seller
+        seller_subject = "New License Plate Sale"
+        seller_body = f"""
+        Dear {seller_info['name']},
+
+        Your license plate has been sold! Here are the details:
+
+        Plate Number: {plate_info['number']}{plate_info['letter']}
+        Price: SAR {plate_info['price']}
+
+        Buyer Contact Information:
+        Name: {buyer_info['name']}
+        Email: {buyer_info['email']}
+        Phone: {buyer_info.get('phone', 'Not provided')}
+
+        Please contact the buyer to arrange the transfer of the license plate.
+
+        Best regards,
+        License Plate Trading Platform
+        """
+
+        # Send emails
+        self._send_email(buyer_info['email'], buyer_subject, buyer_body)
+        self._send_email(seller_info['email'], seller_subject, seller_body)
+
+    def _send_email(self, recipient: str, subject: str, body: str):
+        try:
+            msg = MIMEMultipart()
+            msg['From'] = self.sender_email
+            msg['To'] = recipient
+            msg['Subject'] = subject
+
+            msg.attach(MIMEText(body, 'plain'))
+
+            server = smtplib.SMTP(self.smtp_server, self.smtp_port)
+            server.starttls()
+            server.login(self.sender_email, self.sender_password)
+            server.send_message(msg)
+            server.quit()
+        except Exception as e:
+            print(f"Failed to send email: {str(e)}") 

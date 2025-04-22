@@ -1,10 +1,12 @@
 from sqlalchemy.orm import Session
-from models import Order, OrderStatus, LicensePlate
+from models import Order, OrderStatus, LicensePlate, User
 from datetime import datetime
+from services.email_service import EmailService
 
 class PaymentService:
     def __init__(self, db: Session):
         self.db = db
+        self.email_service = EmailService()
 
     def process_payment(self, order_id: int, card_number: str, expiry_date: str, cvv: str) -> bool:
         """
@@ -31,5 +33,25 @@ class PaymentService:
         order.status = OrderStatus.COMPLETED
         order.updated_at = datetime.utcnow()
         self.db.commit()
+        
+        # Get buyer and seller info
+        buyer = self.db.query(User).filter(User.id == order.buyer_id).first()
+        seller = self.db.query(User).filter(User.id == order.seller_id).first()
+
+        # Send emails to buyer and seller
+        buyer_info = {
+            'name': buyer.username,
+            'email': buyer.email
+        }
+        seller_info = {
+            'name': seller.username,
+            'email': seller.email
+        }
+        plate_info = {
+            'number': plate.plateNumber,
+            'letter': plate.plateLetter,
+            'price': plate.price
+        }
+        self.email_service.send_purchase_notification(buyer_info, seller_info, plate_info)
         
         return True 
