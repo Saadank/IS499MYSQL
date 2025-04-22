@@ -140,6 +140,7 @@ class Order(Base):
     status = Column(SQLAlchemyEnum(OrderStatus), default=OrderStatus.PENDING)
     created_at = Column(DateTime, default=lambda: datetime.now(UTC))
     updated_at = Column(DateTime, default=lambda: datetime.now(UTC), onupdate=lambda: datetime.now(UTC))
+    expires_at = Column(DateTime, default=lambda: datetime.now(UTC) + timedelta(minutes=1))
 
     # Relationships
     plate = relationship("LicensePlate")

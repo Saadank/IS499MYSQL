@@ -9,7 +9,8 @@ from services.session_service import SessionService
 from models import User, Order, OrderStatus, LicensePlate
 from utils.template_config import templates
 from services.wishlist_service import WishlistService
-from datetime import datetime
+from datetime import datetime, timedelta
+from services.order_service import OrderService
 
 router = APIRouter(prefix="", tags=["listings"])
 
@@ -191,6 +192,19 @@ async def buy_now(request: Request, plate_id: int, db: Session = Depends(get_db)
     if plate.is_sold:
         raise HTTPException(status_code=400, detail="This plate has already been sold")
     
+    # Clean up any expired orders
+    order_service = OrderService(db)
+    order_service.cleanup_expired_orders()
+    
+    # Check if there's already a pending order for this plate
+    existing_order = db.query(Order).filter(
+        Order.plate_id == plate_id,
+        Order.status == OrderStatus.PENDING
+    ).first()
+    
+    if existing_order:
+        raise HTTPException(status_code=400, detail="This plate is already in a pending order")
+    
     # Create a new order
     order = Order(
         plate_id=plate_id,
@@ -199,7 +213,8 @@ async def buy_now(request: Request, plate_id: int, db: Session = Depends(get_db)
         price=plate.price,
         status=OrderStatus.PENDING,
         created_at=datetime.utcnow(),
-        updated_at=datetime.utcnow()
+        updated_at=datetime.utcnow(),
+        expires_at=datetime.utcnow() + timedelta(minutes=1)
     )
     
     db.add(order)

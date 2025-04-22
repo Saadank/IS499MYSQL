@@ -9,6 +9,7 @@ from services.auth_service import get_current_user
 from models import User
 from utils.template_config import templates
 from services.license_plate_service import LicensePlateService
+from services.order_service import OrderService
 
 router = APIRouter(prefix="/users", tags=["users"])
 
@@ -45,12 +46,21 @@ async def order_history(
     current_user: User = Depends(get_current_user)
 ):
     session_service = SessionService(request)
-    user_service = UserService(db)
-    orders = user_service.get_user_orders(current_user.id)
+    order_service = OrderService(db)
+    
+    # Clean up any expired orders
+    order_service.cleanup_expired_orders()
+    
+    # Get user's orders
+    orders = order_service.get_user_orders(current_user.id)
+    
+    # Separate purchases and sales
+    purchases = [order for order in orders if order.buyer_id == current_user.id]
+    sales = [order for order in orders if order.seller_id == current_user.id]
     
     template_data = session_service.get_template_data({
-        "purchases": orders["purchases"],
-        "sales": orders["sales"]
+        "purchases": purchases,
+        "sales": sales
     })
     
     return templates.TemplateResponse("order-history.html", template_data)

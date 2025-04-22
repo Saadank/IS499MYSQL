@@ -1,6 +1,6 @@
 from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Enum
 from sqlalchemy.orm import relationship
-from datetime import datetime
+from datetime import datetime, timedelta
 import enum
 
 class OrderStatus(enum.Enum):
@@ -18,6 +18,7 @@ class Order(Base):
     status = Column(Enum(OrderStatus), default=OrderStatus.PENDING)
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    expires_at = Column(DateTime, default=lambda: datetime.utcnow() + timedelta(minutes=1))
 
     # Relationships
     buyer = relationship("User", foreign_keys=[buyer_id])
@@ -45,5 +46,6 @@ class Order(Base):
             },
             "status": self.status.value,
             "created_at": self.created_at.isoformat(),
-            "updated_at": self.updated_at.isoformat()
+            "updated_at": self.updated_at.isoformat(),
+            "expires_at": self.expires_at.isoformat()
         } 

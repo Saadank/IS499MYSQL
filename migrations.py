@@ -25,6 +25,18 @@ def run_migrations():
             if 'plate_type' not in existing_columns:
                 connection.execute(text("ALTER TABLE license_plates ADD COLUMN plate_type VARCHAR(20)"))
             
+            # Check if expires_at column exists in orders table
+            result = connection.execute(text("""
+                SELECT COLUMN_NAME 
+                FROM INFORMATION_SCHEMA.COLUMNS 
+                WHERE TABLE_NAME = 'orders' 
+                AND TABLE_SCHEMA = DATABASE()
+            """))
+            existing_columns = [row[0].lower() for row in result]
+            
+            if 'expires_at' not in existing_columns:
+                connection.execute(text("ALTER TABLE orders ADD COLUMN expires_at DATETIME"))
+            
             connection.commit()
             print("Migration completed successfully!")
         except Exception as e:
