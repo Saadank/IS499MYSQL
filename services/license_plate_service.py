@@ -36,7 +36,8 @@ class LicensePlateService:
             "username": request.session.get("username"),
             "valid_letters": self.VALID_LETTERS,
             "numbers": list(range(10)),
-            "letter_english": self.LETTER_ENGLISH
+            "letter_english": self.LETTER_ENGLISH,
+            "letter_arabic": self.LETTER_ARABIC
         }
 
     async def create_listing(self, digit1: str, digit2: str, digit3: str, digit4: str,

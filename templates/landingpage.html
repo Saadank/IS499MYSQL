@@ -56,25 +56,25 @@
             <div class="letter-dropdowns">
                 <select name="letter1" class="letter-select">
                     <option value="">Any</option>
-                    {% for eng_letter in ['A', 'B', 'D', 'E', 'G', 'H', 'J', 'K', 'L', 'N', 'R', 'S', 'T', 'U', 'V', 'X', 'Z'] %}
-                    <option value="{{ eng_letter }}" {% if letter1 == eng_letter %}selected{% endif %}>
-                        {{ eng_letter }}
+                    {% for letter in valid_letters %}
+                    <option value="{{ letter }}" {% if letter1 == letter %}selected{% endif %}>
+                        {{ letter }} ({{ letter_arabic[letter] }})
                     </option>
                     {% endfor %}
                 </select>
                 <select name="letter2" class="letter-select">
                     <option value="">Any</option>
-                    {% for eng_letter in ['A', 'B', 'D', 'E', 'G', 'H', 'J', 'K', 'L', 'N', 'R', 'S', 'T', 'U', 'V', 'X', 'Z'] %}
-                    <option value="{{ eng_letter }}" {% if letter2 == eng_letter %}selected{% endif %}>
-                        {{ eng_letter }}
+                    {% for letter in valid_letters %}
+                    <option value="{{ letter }}" {% if letter2 == letter %}selected{% endif %}>
+                        {{ letter }} ({{ letter_arabic[letter] }})
                     </option>
                     {% endfor %}
                 </select>
                 <select name="letter3" class="letter-select">
                     <option value="">Any</option>
-                    {% for eng_letter in ['A', 'B', 'D', 'E', 'G', 'H', 'J', 'K', 'L', 'N', 'R', 'S', 'T', 'U', 'V', 'X', 'Z'] %}
-                    <option value="{{ eng_letter }}" {% if letter3 == eng_letter %}selected{% endif %}>
-                        {{ eng_letter }}
+                    {% for letter in valid_letters %}
+                    <option value="{{ letter }}" {% if letter3 == letter %}selected{% endif %}>
+                        {{ letter }} ({{ letter_arabic[letter] }})
                     </option>
                     {% endfor %}
                 </select>
