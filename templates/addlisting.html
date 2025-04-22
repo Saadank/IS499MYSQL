@@ -46,7 +46,7 @@
                     <select name="letter1" class="form-control" required>
                         <option value="">Select Letter</option>
                         {% for letter in valid_letters %}
-                            <option value="{{ letter }}">{{ letter }} ({{ letter_english[letter] }})</option>
+                            <option value="{{ letter }}">{{ letter }} ({{ letter_english[letter] }} - {{ letter_arabic[letter] }})</option>
                         {% endfor %}
                     </select>
                     
@@ -54,7 +54,7 @@
                     <select name="letter2" class="form-control">
                         <option value="">-</option>
                         {% for letter in valid_letters %}
-                            <option value="{{ letter }}">{{ letter }} ({{ letter_english[letter] }})</option>
+                            <option value="{{ letter }}">{{ letter }} ({{ letter_english[letter] }} - {{ letter_arabic[letter] }})</option>
                         {% endfor %}
                     </select>
                     
@@ -62,7 +62,7 @@
                     <select name="letter3" class="form-control">
                         <option value="">-</option>
                         {% for letter in valid_letters %}
-                            <option value="{{ letter }}">{{ letter }} ({{ letter_english[letter] }})</option>
+                            <option value="{{ letter }}">{{ letter }} ({{ letter_english[letter] }} - {{ letter_arabic[letter] }})</option>
                         {% endfor %}
                     </select>
                 </div>

@@ -113,85 +113,111 @@
 }
 
 .mini-plate-preview {
-    border: 2px solid #000;
+    border: 1px solid #000;
     margin: 1rem auto;
-    padding: 1rem 2rem 1rem 0.5rem;
+    padding: 0.5rem 1.5rem 0.5rem 0.5rem;
     display: flex;
     position: relative;
     background: white;
     max-width: 250px;
+    border-radius: 2px;
 }
 
-.mini-plate-numbers {
-    flex: 2.2;
-    border-right: 2px solid #000;
-    padding-right: 1rem;
-    margin-left: -0.25rem;
+.plate-section {
     display: flex;
-    align-items: center;
+    padding: 0.25rem;
+}
+
+.plate-section.numbers {
+    flex: 2;
     justify-content: center;
 }
 
-.mini-plate-letters {
-    flex: 0.8;
-    padding-left: 0.75rem;
-    display: flex;
-    align-items: center;
+.plate-section.letters {
+    flex: 1;
     justify-content: center;
+    border-left: 1px solid #000;
 }
 
-.number-display,
-.letter-display {
-    text-align: center;
+.number-section, .letter-section {
     width: 100%;
 }
 
+.arabic-row, .english-row {
+    display: flex;
+    justify-content: center;
+    gap: 0.25rem;
+}
+
 .arabic-row {
-    border-bottom: 1px solid #000;
-    margin-bottom: 0.25rem;
-    padding-bottom: 0.25rem;
-    display: flex;
-    justify-content: center;
-    gap: 0.25rem;
+    border-bottom: 1px solid #ddd;
+    margin-bottom: 0.1rem;
 }
 
-.english-row {
-    display: flex;
-    justify-content: center;
-    gap: 0.25rem;
-}
-
-.arabic-row span {
-    font-size: 1.5rem;
-    margin: 0;
-}
-
-.english-row span {
+.plate-digit, .plate-letter {
     font-size: 1.2rem;
-    margin: 0;
+    font-weight: bold;
+    padding: 0.1rem;
+    color: #000;
+    margin: 0 0.1rem;
 }
 
-.mini-ksa {
+.arabic-row .plate-digit,
+.arabic-row .plate-letter {
+    font-family: "Traditional Arabic", "Arial", sans-serif;
+    font-size: 1.2rem;
+    letter-spacing: 0.1rem;
+}
+
+.arabic-row .plate-letter {
+    font-family: "Traditional Arabic", "Arial", sans-serif;
+    font-size: 1.2rem;
+    letter-spacing: 0.1rem;
+    font-weight: bold;
+}
+
+.english-row .plate-digit,
+.english-row .plate-letter {
+    font-family: "Arial", sans-serif;
+    font-size: 1rem;
+    color: #666;
+}
+
+.english-row .plate-letter {
+    font-family: "Arial", sans-serif;
+    font-size: 1rem;
+    color: #666;
+    text-transform: uppercase;
+    font-weight: normal;
+}
+
+.ksa-label {
     position: absolute;
     right: 0;
     top: 0;
     bottom: 0;
-    width: 1.5rem;
+    width: 1rem;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    border-left: 2px solid #000;
+    border-left: 1px solid #000;
     background: white;
-    font-weight: bold;
-    font-size: 1rem;
+    font-weight: normal;
+}
+
+.ksa-label span {
+    display: block;
+    font-size: 0.6rem;
+    margin: 0;
+    color: #666;
 }
 
 .price {
-    font-size: 1.25rem;
+    font-size: 1rem;
     font-weight: bold;
-    color: #007bff;
-    margin: 1rem 0;
+    color: #333;
+    margin: 0.5rem 0;
     text-align: center;
 }
 
@@ -202,10 +228,10 @@
 }
 
 .date {
-    color: #999;
-    font-size: 0.9rem;
+    color: #666;
+    font-size: 0.8rem;
     text-align: center;
-    margin: 0.5rem 0;
+    margin: 0.25rem 0;
 }
 
 .view-button {

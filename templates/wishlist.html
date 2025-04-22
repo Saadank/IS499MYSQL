@@ -3,34 +3,8 @@
 {% block title %}My Wishlist{% endblock %}
 
 {% block extra_css %}
-<style>
-.wishlist-section {
-    min-height: calc(100vh - 200px);
-    display: flex;
-    flex-direction: column;
-    padding: 20px;
-}
-
-.no-results {
-    text-align: center;
-    margin: auto;
-    padding: 20px;
-}
-
-.view-button {
-    display: inline-block;
-    background-color: rgb(53, 53, 235);
-    color: white;
-    padding: 10px 20px;
-    text-decoration: none;
-    border-radius: 5px;
-    margin-top: 15px;
-}
-
-.view-button:hover {
-    background-color: rgb(41, 41, 200);
-}
-</style>
+<link rel="stylesheet" href="{{ url_for('static', path='css/landingpage.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', path='css/wishlist.css') }}">
 {% endblock %}
 
 {% block content %}
@@ -42,35 +16,35 @@
             {% for plate in plates %}
             <div class="plate-card">
                 <div class="mini-plate-preview">
-                    <div class="mini-plate-numbers">
-                        <div class="number-display">
+                    <div class="plate-section numbers">
+                        <div class="number-section">
                             <div class="arabic-row">
                                 {% for digit in plate.plateNumber %}
-                                <span>{{ digit|arabic_numbers }}</span>
+                                <div class="plate-digit">{{ digit|arabic_numbers }}</div>
                                 {% endfor %}
                             </div>
                             <div class="english-row">
                                 {% for digit in plate.plateNumber %}
-                                <span>{{ digit }}</span>
+                                <div class="plate-digit">{{ digit }}</div>
                                 {% endfor %}
                             </div>
                         </div>
                     </div>
-                    <div class="mini-plate-letters">
-                        <div class="letter-display">
+                    <div class="plate-section letters">
+                        <div class="letter-section">
                             <div class="arabic-row">
                                 {% for letter in plate.plateLetter %}
-                                <span>{{ letter }}</span>
+                                <div class="plate-letter">{{ letter_arabic[letter] }}</div>
                                 {% endfor %}
                             </div>
                             <div class="english-row">
                                 {% for letter in plate.plateLetter %}
-                                <span>{{ letter_english[letter] }}</span>
+                                <div class="plate-letter">{{ letter }}</div>
                                 {% endfor %}
                             </div>
                         </div>
                     </div>
-                    <div class="mini-ksa">
+                    <div class="ksa-label">
                         <span>K</span>
                         <span>S</span>
                         <span>A</span>

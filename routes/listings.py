@@ -113,6 +113,8 @@ async def for_sale_page(
     
     template_data = session_service.get_template_data(plate_data)
     template_data["letter_english"] = plate_service.LETTER_ENGLISH
+    template_data["letter_arabic"] = plate_service.LETTER_ARABIC
+    template_data["valid_letters"] = plate_service.VALID_LETTERS
     
     return templates.TemplateResponse("forsale.html", template_data)
 
