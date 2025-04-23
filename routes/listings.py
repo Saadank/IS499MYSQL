@@ -223,4 +223,38 @@ async def buy_now(request: Request, plate_id: int, db: Session = Depends(get_db)
     db.commit()
     
     # Redirect to payment page
-    return {"redirect_url": f"/payment/{order.id}"} 
+    return {"redirect_url": f"/payment/{order.id}"}
+
+@router.get("/seller-control-panel", response_class=HTMLResponse)
+async def seller_control_panel(
+    request: Request,
+    db: Session = Depends(get_db),
+    user_id: int = Depends(require_auth)
+):
+    plate_service = LicensePlateService(db)
+    session_service = SessionService(request)
+    
+    # Query all plates owned by the current user
+    plates = db.query(LicensePlate).filter(LicensePlate.owner_id == user_id).all()
+    
+    # For each plate, get the buyer information if sold
+    for plate in plates:
+        if plate.is_sold:
+            order = db.query(Order).filter(
+                Order.plate_id == plate.plateID,
+                Order.status == OrderStatus.COMPLETED
+            ).first()
+            if order:
+                plate.buyer = db.query(User).filter(User.id == order.buyer_id).first()
+                plate.sale_date = order.updated_at
+        else:
+            plate.buyer = None
+            plate.sale_date = None
+    
+    template_data = session_service.get_template_data({
+        "plates": plates,
+        "letter_english": plate_service.LETTER_ENGLISH,
+        "letter_arabic": plate_service.LETTER_ARABIC
+    })
+    
+    return templates.TemplateResponse("seller_control_panel.html", template_data) 

@@ -1,0 +1,149 @@
+{% extends "Base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="mb-4">Seller Control Panel</h2>
+    
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Plate Number</th>
+                    <th>Listed Date</th>
+                    <th>Price</th>
+                    <th>Status</th>
+                    <th>Buyer</th>
+                    <th>Sale Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for plate in plates %}
+                <tr>
+                    <td>
+                        <div class="mini-plate-preview">
+                            <div class="plate-section numbers">
+                                <div class="number-section">
+                                    <div class="arabic-row">
+                                        {% for digit in plate.plateNumber %}
+                                        <div class="plate-digit">{{ digit|arabic_numbers }}</div>
+                                        {% endfor %}
+                                    </div>
+                                    <div class="english-row">
+                                        {% for digit in plate.plateNumber %}
+                                        <div class="plate-digit">{{ digit }}</div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="plate-section letters">
+                                <div class="letter-section">
+                                    <div class="arabic-row">
+                                        {% for letter in plate.plateLetter %}
+                                        <div class="plate-letter">{{ letter_arabic[letter] }}</div>
+                                        {% endfor %}
+                                    </div>
+                                    <div class="english-row">
+                                        {% for letter in plate.plateLetter %}
+                                        <div class="plate-letter">{{ letter }}</div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </td>
+                    <td>{{ plate.created_at.strftime('%Y-%m-%d') }}</td>
+                    <td>${{ "%.2f"|format(plate.price) }}</td>
+                    <td>
+                        {% if plate.is_sold %}
+                        <span class="badge bg-success">Sold</span>
+                        {% else %}
+                        <span class="badge bg-warning">Available</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if plate.buyer %}
+                        {{ plate.buyer.username }}
+                        {% else %}
+                        -
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if plate.sale_date %}
+                        {{ plate.sale_date.strftime('%Y-%m-%d') }}
+                        {% else %}
+                        -
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<style>
+.mini-plate-preview {
+    border: 1px solid #000;
+    margin: 0.5rem auto;
+    padding: 0.5rem;
+    display: flex;
+    position: relative;
+    background: white;
+    max-width: 200px;
+    border-radius: 2px;
+}
+
+.plate-section {
+    display: flex;
+    padding: 0.25rem;
+}
+
+.plate-section.numbers {
+    flex: 2;
+    justify-content: center;
+}
+
+.plate-section.letters {
+    flex: 1;
+    justify-content: center;
+    border-left: 1px solid #000;
+}
+
+.number-section, .letter-section {
+    width: 100%;
+}
+
+.arabic-row, .english-row {
+    display: flex;
+    justify-content: center;
+    gap: 0.25rem;
+}
+
+.arabic-row {
+    border-bottom: 1px solid #ddd;
+    margin-bottom: 0.1rem;
+}
+
+.plate-digit, .plate-letter {
+    font-size: 1rem;
+    font-weight: bold;
+    padding: 0.1rem;
+    color: #000;
+    margin: 0 0.1rem;
+}
+
+.arabic-row .plate-digit,
+.arabic-row .plate-letter {
+    font-family: "Traditional Arabic", "Arial", sans-serif;
+    font-size: 1rem;
+    letter-spacing: 0.1rem;
+}
+
+.english-row .plate-digit,
+.english-row .plate-letter {
+    font-family: "Arial", sans-serif;
+    font-size: 0.8rem;
+    color: #666;
+}
+</style>
+{% endblock %} 
