@@ -15,64 +15,30 @@
                         <p>Price: SAR {{ order.price }}</p>
                     </div>
                     
-                    <form id="paymentForm" action="/process-payment/{{ order.id }}" method="POST">
-                        <div class="mb-3">
-                            <label for="cardNumber" class="form-label">Card Number</label>
-                            <input type="text" class="form-control" id="cardNumber" name="card_number" 
-                                   placeholder="1234 5678 9012 3456" required>
-                        </div>
-                        
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label for="expiryDate" class="form-label">Expiry Date</label>
-                                <input type="text" class="form-control" id="expiryDate" name="expiry_date" 
-                                       placeholder="MM/YY" required>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label for="cvv" class="form-label">CVV</label>
-                                <input type="text" class="form-control" id="cvv" name="cvv" 
-                                       placeholder="123" required>
-                            </div>
-                        </div>
-                        
-                        <div class="d-grid gap-2">
-                            <button type="submit" class="btn btn-primary">Pay Now</button>
-                        </div>
-                    </form>
+                    <div class="text-center">
+                        <a href="{{ paypal_approval_url }}" class="btn btn-primary">
+                            <i class="fab fa-paypal"></i> Pay with PayPal
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
 
-<script>
-document.getElementById('paymentForm').addEventListener('submit', function(e) {
-    e.preventDefault();
-    
-    const formData = new FormData(this);
-    
-    fetch(this.action, {
-        method: 'POST',
-        body: formData
-    })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error('Payment failed');
-        }
-        return response.json();
-    })
-    .then(data => {
-        if (data.message === 'Payment successful') {
-            alert('Payment successful!');
-            window.location.href = '/';
-        } else {
-            alert('Payment failed. Please try again.');
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        alert('An error occurred. Please try again.');
-    });
-});
-</script>
+<style>
+    .btn-primary {
+        background-color: #0070ba;
+        border-color: #0070ba;
+        padding: 10px 30px;
+        font-size: 1.1em;
+    }
+    .btn-primary:hover {
+        background-color: #005ea6;
+        border-color: #005ea6;
+    }
+    .fa-paypal {
+        margin-right: 8px;
+    }
+</style>
 {% endblock %} 

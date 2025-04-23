@@ -142,6 +142,7 @@ class Order(Base):
     created_at = Column(DateTime, default=lambda: datetime.now(UTC))
     updated_at = Column(DateTime, default=lambda: datetime.now(UTC), onupdate=lambda: datetime.now(UTC))
     expires_at = Column(DateTime, default=lambda: datetime.now(UTC) + timedelta(minutes=1))
+    payment_id = Column(String(50), nullable=True)  # PayPal payment ID
 
     # Relationships
     plate = relationship("LicensePlate")
