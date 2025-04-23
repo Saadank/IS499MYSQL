@@ -3,7 +3,7 @@ from fastapi.responses import HTMLResponse, RedirectResponse
 from sqlalchemy.orm import Session
 from typing import List
 from database import get_db
-from models import User, LicensePlate
+from models import User, LicensePlate, Order
 from schemas import UserResponse, LicensePlateResponse
 from routes.auth import get_current_user
 from utils.template_config import templates
@@ -88,6 +88,30 @@ async def delete_user(
     db.delete(user)
     db.commit()
     return RedirectResponse(url="/admin/users", status_code=status.HTTP_303_SEE_OTHER)
+
+@router.get("/users/{user_id}/details", response_class=HTMLResponse)
+async def view_user_details(
+    user_id: int,
+    request: Request,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(verify_admin)
+):
+    """View detailed information about a specific user"""
+    user = db.query(User).filter(User.id == user_id).first()
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User not found"
+        )
+    
+    # Load the user's purchases
+    purchases = db.query(Order).filter(Order.buyer_id == user_id).order_by(Order.created_at.desc()).all()
+    user.purchases = purchases
+    
+    return templates.TemplateResponse(
+        "user_details.html",
+        {"request": request, "user": user}
+    )
 
 @router.get("/license-plates", response_class=HTMLResponse)
 async def admin_license_plates(

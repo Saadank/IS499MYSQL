@@ -62,7 +62,10 @@
                     </td>
                     <td>
                         {% if plate.buyer %}
-                        {{ plate.buyer.username }}
+                        <a href="{{ url_for('buyer_details', buyer_id=plate.buyer.id) }}" class="text-decoration-none">
+                            {{ plate.buyer.username }}
+                            <i class="fas fa-external-link-alt ms-1 small"></i>
+                        </a>
                         {% else %}
                         -
                         {% endif %}

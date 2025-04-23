@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Buyer Information</h2>
+    
+    <!-- Personal Information Section -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h3 class="h5 mb-0">Personal Information</h3>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <p><strong>Username:</strong> {{ buyer.username }}</p>
+                    <p><strong>Full Name:</strong> {{ buyer.firstname }} {{ buyer.lastname }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contact Information Section -->
+    <div class="card">
+        <div class="card-header">
+            <h3 class="h5 mb-0">Contact Information</h3>
+        </div>
+        <div class="card-body">
+            <p class="mb-0">For any inquiries or issues related to plate transfers, please contact the buyer through:</p>
+            <ul class="list-unstyled mt-3">
+                <li><i class="fas fa-envelope me-2"></i> Email: {{ buyer.email }}</li>
+                {% if buyer.phone %}
+                <li><i class="fas fa-phone me-2"></i> Phone: {{ buyer.phone }}</li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+</div>
+
+<style>
+.card {
+    border: none;
+    box-shadow: 0 0 15px rgba(0,0,0,0.1);
+}
+.card-header {
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #eee;
+}
+</style>
+{% endblock %} 

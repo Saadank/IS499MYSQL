@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Buyer Information</h2>
+    
+    <!-- Personal Information Section -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h3 class="h5 mb-0">Personal Information</h3>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <p><strong>Username:</strong> {{ buyer.username }}</p>
+                    <p><strong>Full Name:</strong> {{ buyer.firstname }} {{ buyer.lastname }}</p>
+                    <p><strong>ID Number:</strong> {{ buyer.idnumber }}</p>
+                    <p><strong>Email:</strong> {{ buyer.email }}</p>
+                </div>
+                <div class="col-md-6">
+                    <p><strong>Address:</strong> {{ buyer.address }}</p>
+                    <p><strong>Member Since:</strong> {{ buyer.created_at.strftime('%B %Y') }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Purchase History Section -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h3 class="h5 mb-0">Purchase History</h3>
+        </div>
+        <div class="card-body">
+            {% if purchases %}
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Order ID</th>
+                            <th>Plate Number</th>
+                            <th>Purchase Date</th>
+                            <th>Price</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for order in purchases %}
+                        <tr>
+                            <td>#{{ order.id }}</td>
+                            <td>{{ order.plate.plateNumber }}{{ order.plate.plateLetter }}</td>
+                            <td>{{ order.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                            <td>SAR {{ "%.2f"|format(order.price) }}</td>
+                            <td>
+                                <span class="badge {% if order.status == 'completed' %}bg-success{% elif order.status == 'pending' %}bg-warning{% else %}bg-danger{% endif %}">
+                                    {{ order.status|title }}
+                                </span>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <p class="text-muted">No purchase history found.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Contact Information Section -->
+    <div class="card">
+        <div class="card-header">
+            <h3 class="h5 mb-0">Contact Information</h3>
+        </div>
+        <div class="card-body">
+            <p class="mb-0">For any inquiries or issues related to plate transfers, please contact the buyer through:</p>
+            <ul class="list-unstyled mt-3">
+                <li><i class="fas fa-envelope me-2"></i> Email: {{ buyer.email }}</li>
+                {% if buyer.phone %}
+                <li><i class="fas fa-phone me-2"></i> Phone: {{ buyer.phone }}</li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+</div>
+
+<style>
+.card {
+    border: none;
+    box-shadow: 0 0 15px rgba(0,0,0,0.1);
+}
+.card-header {
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #eee;
+}
+.badge {
+    padding: 0.5em 0.75em;
+}
+.table th {
+    background-color: #f8f9fa;
+}
+</style>
+{% endblock %} 
