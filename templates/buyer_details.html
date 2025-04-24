@@ -1,39 +1,57 @@
 {% extends "base.html" %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', path='css/buyer-details.css') }}">
+{% endblock %}
+
 {% block content %}
-<div class="container mt-4">
-    <h2>Buyer Information</h2>
+<div class="container">
+    <h2 class="page-title">Buyer Information</h2>
     
     <!-- Personal Information Section -->
-    <div class="card mb-4">
+    <div class="card">
         <div class="card-header">
-            <h3 class="h5 mb-0">Personal Information</h3>
+            <h3><i class="fas fa-user"></i> Personal Information</h3>
         </div>
         <div class="card-body">
-            <div class="row">
-                <div class="col-md-6">
-                    <p><strong>Username:</strong> {{ buyer.username }}</p>
-                    <p><strong>Full Name:</strong> {{ buyer.firstname }} {{ buyer.lastname }}</p>
-                    <p><strong>ID Number:</strong> {{ buyer.idnumber }}</p>
-                    <p><strong>Email:</strong> {{ buyer.email }}</p>
+            <div class="info-row">
+                <div class="info-item">
+                    <div class="info-label">Username</div>
+                    <div class="info-value">{{ buyer.username }}</div>
                 </div>
-                <div class="col-md-6">
-                    <p><strong>Address:</strong> {{ buyer.address }}</p>
-                    <p><strong>Member Since:</strong> {{ buyer.created_at.strftime('%B %Y') }}</p>
+                <div class="info-item">
+                    <div class="info-label">Full Name</div>
+                    <div class="info-value">{{ buyer.firstname }} {{ buyer.lastname }}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">ID Number</div>
+                    <div class="info-value">{{ buyer.idnumber }}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Email</div>
+                    <div class="info-value">{{ buyer.email }}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Address</div>
+                    <div class="info-value">{{ buyer.address }}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Member Since</div>
+                    <div class="info-value">{{ buyer.created_at.strftime('%B %Y') }}</div>
                 </div>
             </div>
         </div>
     </div>
 
     <!-- Purchase History Section -->
-    <div class="card mb-4">
+    <div class="card">
         <div class="card-header">
-            <h3 class="h5 mb-0">Purchase History</h3>
+            <h3><i class="fas fa-shopping-cart"></i> Purchase History</h3>
         </div>
         <div class="card-body">
             {% if purchases %}
             <div class="table-responsive">
-                <table class="table table-striped">
+                <table class="table">
                     <thead>
                         <tr>
                             <th>Order ID</th>
@@ -47,7 +65,7 @@
                         {% for order in purchases %}
                         <tr>
                             <td>#{{ order.id }}</td>
-                            <td>{{ order.plate.plateNumber }}{{ order.plate.plateLetter }}</td>
+                            <td><span class="plate-number">{{ order.plate.plateNumber }}{{ order.plate.plateLetter }}</span></td>
                             <td>{{ order.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
                             <td>SAR {{ "%.2f"|format(order.price) }}</td>
                             <td>
@@ -61,7 +79,10 @@
                 </table>
             </div>
             {% else %}
-            <p class="text-muted">No purchase history found.</p>
+            <div class="text-center py-4">
+                <i class="fas fa-shopping-bag fa-3x text-muted mb-3"></i>
+                <p class="text-muted">No purchase history found.</p>
+            </div>
             {% endif %}
         </div>
     </div>
@@ -69,34 +90,23 @@
     <!-- Contact Information Section -->
     <div class="card">
         <div class="card-header">
-            <h3 class="h5 mb-0">Contact Information</h3>
+            <h3><i class="fas fa-address-card"></i> Contact Information</h3>
         </div>
         <div class="card-body">
             <p class="mb-0">For any inquiries or issues related to plate transfers, please contact the buyer through:</p>
-            <ul class="list-unstyled mt-3">
-                <li><i class="fas fa-envelope me-2"></i> Email: {{ buyer.email }}</li>
+            <ul class="contact-list">
+                <li class="contact-item">
+                    <i class="fas fa-envelope"></i>
+                    <span>{{ buyer.email }}</span>
+                </li>
                 {% if buyer.phone %}
-                <li><i class="fas fa-phone me-2"></i> Phone: {{ buyer.phone }}</li>
+                <li class="contact-item">
+                    <i class="fas fa-phone"></i>
+                    <span>{{ buyer.phone }}</span>
+                </li>
                 {% endif %}
             </ul>
         </div>
     </div>
 </div>
-
-<style>
-.card {
-    border: none;
-    box-shadow: 0 0 15px rgba(0,0,0,0.1);
-}
-.card-header {
-    background-color: #f8f9fa;
-    border-bottom: 1px solid #eee;
-}
-.badge {
-    padding: 0.5em 0.75em;
-}
-.table th {
-    background-color: #f8f9fa;
-}
-</style>
 {% endblock %} 
