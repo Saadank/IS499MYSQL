@@ -1,0 +1,189 @@
+.payment-container {
+    max-width: 600px;
+    margin: 40px auto;
+}
+
+.payment-card {
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+.payment-header {
+    background: #f8f9fa;
+    padding: 20px;
+    border-bottom: 1px solid #eee;
+}
+
+.payment-header h3 {
+    margin: 0;
+    color: #2d3748;
+    font-size: 1.5rem;
+    font-weight: 600;
+}
+
+.payment-body {
+    padding: 30px;
+}
+
+.plate-preview {
+    background: #f8f9fa;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 30px;
+}
+
+.plate-details {
+    margin-bottom: 20px;
+}
+
+.plate-number {
+    font-size: 1.8rem;
+    font-weight: 600;
+    color: #2d3748;
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+.price-tag {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #2d3748;
+    text-align: center;
+    margin: 20px 0;
+}
+
+.price-tag .currency {
+    font-size: 1rem;
+    color: #718096;
+    margin-right: 5px;
+}
+
+.payment-divider {
+    height: 1px;
+    background: #e2e8f0;
+    margin: 20px 0;
+}
+
+.payment-method {
+    text-align: center;
+    padding: 20px 0;
+}
+
+.paypal-button {
+    background-color: #0070ba;
+    color: white;
+    border: none;
+    border-radius: 25px;
+    padding: 15px 40px;
+    font-size: 1.1rem;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    min-width: 200px;
+}
+
+.paypal-button:hover {
+    background-color: #005ea6;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    color: white;
+    text-decoration: none;
+}
+
+.paypal-button i {
+    margin-right: 10px;
+    font-size: 1.2rem;
+}
+
+.payment-footer {
+    background: #f8f9fa;
+    padding: 20px;
+    text-align: center;
+    border-top: 1px solid #eee;
+    font-size: 0.9rem;
+    color: #718096;
+}
+
+.secure-badge {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 20px;
+    color: #718096;
+}
+
+.secure-badge i {
+    color: #48bb78;
+}
+
+.plate-display {
+    border: 2px solid #ddd;
+    margin: 0 auto;
+    padding: 1rem;
+    display: flex;
+    background: white;
+    max-width: 300px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.plate-section {
+    display: flex;
+    padding: 0.5rem;
+}
+
+.plate-section.numbers {
+    flex: 2;
+    justify-content: center;
+}
+
+.plate-section.letters {
+    flex: 1;
+    justify-content: center;
+    border-left: 2px solid #ddd;
+    margin-left: 1rem;
+    padding-left: 1rem;
+}
+
+.number-section, .letter-section {
+    width: 100%;
+}
+
+.arabic-row, .english-row {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.arabic-row {
+    border-bottom: 1px solid #eee;
+    margin-bottom: 0.25rem;
+    padding-bottom: 0.25rem;
+}
+
+.plate-digit, .plate-letter {
+    font-weight: bold;
+    padding: 0.25rem;
+    color: #000;
+}
+
+.arabic-row .plate-digit,
+.arabic-row .plate-letter {
+    font-family: "Traditional Arabic", "Arial", sans-serif;
+    font-size: 1.5rem;
+    letter-spacing: 0.1rem;
+}
+
+.english-row .plate-digit,
+.english-row .plate-letter {
+    font-family: "Arial", sans-serif;
+    font-size: 1rem;
+    color: #666;
+} 

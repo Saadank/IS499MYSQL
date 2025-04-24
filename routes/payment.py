@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 from database import get_db
 from services.paypal_service import PayPalService
 from services.session_service import SessionService
+from services.license_plate_service import LicensePlateService
 from utils.template_config import templates
 from fastapi.responses import HTMLResponse, RedirectResponse
 from models import Order, LicensePlate
@@ -31,7 +32,8 @@ async def payment_page(request: Request, order_id: int, db: Session = Depends(ge
         template_data = session_service.get_template_data({
             "order": order,
             "plate": plate,
-            "paypal_approval_url": payment["approval_url"]
+            "paypal_approval_url": payment["approval_url"],
+            "letter_arabic": LicensePlateService.LETTER_ARABIC
         })
         
         return templates.TemplateResponse("payment.html", template_data)

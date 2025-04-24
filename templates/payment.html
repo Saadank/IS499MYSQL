@@ -1,44 +1,68 @@
-{% extends "base.html" %}
+{% extends "Base.html" %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', path='css/payment.css') }}">
+{% endblock %}
 
 {% block content %}
-<div class="container mt-5">
-    <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="card">
-                <div class="card-header">
-                    <h3 class="text-center">Payment Details</h3>
+<div class="payment-container">
+    <div class="payment-card">
+        <div class="payment-header">
+            <h3>Complete Your Purchase</h3>
+        </div>
+        <div class="payment-body">
+            <div class="plate-preview">
+                <div class="plate-display">
+                    <div class="plate-section numbers">
+                        <div class="number-section">
+                            <div class="arabic-row">
+                                {% for digit in plate.plateNumber %}
+                                <div class="plate-digit">{{ digit|arabic_numbers }}</div>
+                                {% endfor %}
+                            </div>
+                            <div class="english-row">
+                                {% for digit in plate.plateNumber %}
+                                <div class="plate-digit">{{ digit }}</div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="plate-section letters">
+                        <div class="letter-section">
+                            <div class="arabic-row">
+                                {% for letter in plate.plateLetter %}
+                                <div class="plate-letter">{{ letter_arabic[letter] }}</div>
+                                {% endfor %}
+                            </div>
+                            <div class="english-row">
+                                {% for letter in plate.plateLetter %}
+                                <div class="plate-letter">{{ letter }}</div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="card-body">
-                    <div class="mb-4">
-                        <h5>License Plate Details</h5>
-                        <p>Plate Number: {{ plate.plateNumber }}{{ plate.plateLetter }}</p>
-                        <p>Price: SAR {{ order.price }}</p>
-                    </div>
-                    
-                    <div class="text-center">
-                        <a href="{{ paypal_approval_url }}" class="btn btn-primary">
-                            <i class="fab fa-paypal"></i> Pay with PayPal
-                        </a>
-                    </div>
+                <div class="price-tag">
+                    <span class="currency">SAR</span>{{ order.price }}
+                </div>
+            </div>
+            
+            <div class="payment-divider"></div>
+            
+            <div class="payment-method">
+                <a href="{{ paypal_approval_url }}" class="paypal-button">
+                    <i class="fab fa-paypal"></i>
+                    Pay with PayPal
+                </a>
+                <div class="secure-badge">
+                    <i class="fas fa-lock"></i>
+                    Secure Payment
                 </div>
             </div>
         </div>
+        <div class="payment-footer">
+            By proceeding with the payment, you agree to our terms and conditions
+        </div>
     </div>
 </div>
-
-<style>
-    .btn-primary {
-        background-color: #0070ba;
-        border-color: #0070ba;
-        padding: 10px 30px;
-        font-size: 1.1em;
-    }
-    .btn-primary:hover {
-        background-color: #005ea6;
-        border-color: #005ea6;
-    }
-    .fa-paypal {
-        margin-right: 8px;
-    }
-</style>
 {% endblock %} 
