@@ -237,39 +237,40 @@ class LicensePlateService:
 
     def get_license_plates(self, digit1=None, digit2=None, digit3=None, digit4=None,
                           letter1=None, letter2=None, letter3=None, sort_by="newest") -> List[LicensePlate]:
-        # For regular users, only show approved plates
+        # For development, show all plates including unapproved ones
         plates = self.db.query(LicensePlate).filter(
-            LicensePlate.is_sold == False,
-            LicensePlate.is_approved == True
+            LicensePlate.is_sold == False
         ).all()
         
         # Apply digit filters
         if any([digit1, digit2, digit3, digit4]):
             filtered_plates = []
             for plate in plates:
-                plate_digits = [int(d) for d in plate.plateNumber]
+                plate_digits = list(plate.plateNumber)  # Convert to list of characters
                 matches = True
+                
+                # Check each digit position
                 for i, digit in enumerate([digit1, digit2, digit3, digit4]):
-                    if digit == 'x':
-                        if i < len(plate_digits):
+                    if digit is not None and digit != 'x':  # Skip if digit is None or 'x'
+                        if i >= len(plate_digits):  # If plate number is shorter than expected
                             matches = False
                             break
-                    elif digit is not None:
-                        if i >= len(plate_digits) or plate_digits[i] != int(digit):
+                        if plate_digits[i] != digit:  # If digits don't match
                             matches = False
                             break
+                
                 if matches:
                     filtered_plates.append(plate)
             plates = filtered_plates
-
+        
         # Apply letter filters
         if any([letter1, letter2, letter3]):
             filtered_plates = []
             for plate in plates:
                 plate_letters = list(plate.plateLetter)
                 if (not letter1 or plate_letters[0] == letter1) and \
-                   (not letter2 or len(plate_letters) > 1 and plate_letters[1] == letter2) and \
-                   (not letter3 or len(plate_letters) > 2 and plate_letters[2] == letter3):
+                   (not letter2 or (len(plate_letters) > 1 and plate_letters[1] == letter2)) and \
+                   (not letter3 or (len(plate_letters) > 2 and plate_letters[2] == letter3)):
                     filtered_plates.append(plate)
             plates = filtered_plates
         
@@ -282,7 +283,7 @@ class LicensePlateService:
             plates.sort(key=lambda x: x.price, reverse=True)
         elif sort_by == "price_low":
             plates.sort(key=lambda x: x.price)
-            
+        
         return plates
 
     def get_license_plate(self, plate_id: int) -> Optional[LicensePlate]:

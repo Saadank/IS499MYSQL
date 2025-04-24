@@ -69,25 +69,22 @@
                             <span>A</span>
                         </div>
                     </div>
-                    <div class="plate-info">
-                        <h3>{{ plate.plateNumber }}{{ plate.plateLetter }}</h3>
-                        <p class="price">SAR {{ "%.2f"|format(plate.price) }}</p>
-                        <p class="date">Listed: {{ plate.created_at.strftime('%Y-%m-%d') }}</p>
-                        {% if plate.description %}
-                            <p class="description">{{ plate.description }}</p>
+                    <p class="price">SAR {{ "%.2f"|format(plate.price) }}</p>
+                    <p class="date">Listed: {{ plate.created_at.strftime('%Y-%m-%d') }}</p>
+                    {% if plate.description %}
+                        <p class="description">{{ plate.description }}</p>
+                    {% endif %}
+                    <div class="listing-details">
+                        <span class="listing-type">{{ plate.listing_type }}</span>
+                        {% if plate.listing_type == 'buy_now' %}
+                            <p>Buy Now Price: SAR {{ "%.2f"|format(plate.buy_now_price) }}</p>
+                        {% elif plate.listing_type == 'auction' %}
+                            <p>Starting Price: SAR {{ "%.2f"|format(plate.auction_start_price) }}</p>
+                        {% else %}
+                            <p>Minimum Offer: SAR {{ "%.2f"|format(plate.minimum_offer_price) }}</p>
                         {% endif %}
-                        <div class="listing-details">
-                            <span class="listing-type">{{ plate.listing_type }}</span>
-                            {% if plate.listing_type == 'buy_now' %}
-                                <p>Buy Now Price: SAR {{ "%.2f"|format(plate.buy_now_price) }}</p>
-                            {% elif plate.listing_type == 'auction' %}
-                                <p>Starting Price: SAR {{ "%.2f"|format(plate.auction_start_price) }}</p>
-                            {% else %}
-                                <p>Minimum Offer: SAR {{ "%.2f"|format(plate.minimum_offer_price) }}</p>
-                            {% endif %}
-                        </div>
-                        <button class="view-button remove-plate" data-plate-id="{{ plate.plateID }}">Remove Plate</button>
                     </div>
+                    <button class="view-button remove-plate" data-plate-id="{{ plate.plateID }}">Remove Plate</button>
                 </div>
                 {% endfor %}
             </div>

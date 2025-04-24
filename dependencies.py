@@ -19,9 +19,5 @@ async def require_auth(request: Request, db: Session = Depends(get_db)) -> int:
     """Require authentication. Redirects to login if not authenticated."""
     user_id = await get_current_user(request, db)
     if not user_id:
-        raise HTTPException(
-            status_code=status.HTTP_303_SEE_OTHER,
-            detail="Not authenticated",
-            headers={"Location": "/login"}
-        )
+        return RedirectResponse(url="/login", status_code=status.HTTP_303_SEE_OTHER)
     return user_id 
