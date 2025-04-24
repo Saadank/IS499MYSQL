@@ -43,7 +43,7 @@ async def profile_page(
 async def order_history(
     request: Request,
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user)
+    user_id: int = Depends(require_auth)
 ):
     session_service = SessionService(request)
     order_service = OrderService(db)
@@ -52,11 +52,11 @@ async def order_history(
     order_service.cleanup_expired_orders()
     
     # Get user's orders
-    orders = order_service.get_user_orders(current_user.id)
+    orders = order_service.get_user_orders(user_id)
     
     # Separate purchases and sales
-    purchases = [order for order in orders if order.buyer_id == current_user.id]
-    sales = [order for order in orders if order.seller_id == current_user.id]
+    purchases = [order for order in orders if order.buyer_id == user_id]
+    sales = [order for order in orders if order.seller_id == user_id]
     
     template_data = session_service.get_template_data({
         "purchases": purchases,

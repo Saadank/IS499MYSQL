@@ -169,13 +169,12 @@ async def view_plate_details(
     return templates.TemplateResponse("plate_details.html", template_data)
 
 @router.post("/buy-now/{plate_id}")
-async def buy_now(request: Request, plate_id: int, db: Session = Depends(get_db)):
-    session_service = SessionService(request)
-    user_id = session_service.get_user_id()
-    
-    if not user_id:
-        raise HTTPException(status_code=401, detail="Please login to buy plates")
-    
+async def buy_now(
+    request: Request, 
+    plate_id: int, 
+    db: Session = Depends(get_db),
+    user_id: int = Depends(require_auth)
+):
     # Get the user
     user = db.query(User).filter(User.id == user_id).first()
     if not user:
