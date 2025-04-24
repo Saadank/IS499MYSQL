@@ -262,7 +262,7 @@ class LicensePlateService:
                 if matches:
                     filtered_plates.append(plate)
             plates = filtered_plates
-        
+
         # Apply letter filters
         if any([letter1, letter2, letter3]):
             filtered_plates = []
@@ -283,7 +283,7 @@ class LicensePlateService:
             plates.sort(key=lambda x: x.price, reverse=True)
         elif sort_by == "price_low":
             plates.sort(key=lambda x: x.price)
-        
+            
         return plates
 
     def get_license_plate(self, plate_id: int) -> Optional[LicensePlate]:

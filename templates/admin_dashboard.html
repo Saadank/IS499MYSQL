@@ -4,13 +4,55 @@
 <div class="container mt-4">
     <h1 class="mb-4">Admin Dashboard</h1>
     
-    <div class="row">
+    <div class="management-section mb-4">
+        <div class="section-header">
+            <h5>User Management</h5>
+            <p class="mb-2">Manage users, view all users, ban users, and delete user accounts.</p>
+            <div class="d-flex justify-content-end">
+                <a href="/admin/users" class="btn custom-btn">Manage Users</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="management-section mb-4">
+        <div class="section-header">
+            <h5>License Plate Management</h5>
+            <p class="mb-2">View all license plates, approve listings, and manage plate status.</p>
+            <div class="d-flex justify-content-end">
+                <a href="/admin/license-plates" class="btn custom-btn">Manage License Plates</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="management-section mb-4">
+        <div class="section-header">
+            <h5>Order Management</h5>
+            <p class="mb-2">View and manage all orders, track transactions, and handle disputes.</p>
+            <div class="d-flex justify-content-end">
+                <a href="/admin/orders" class="btn custom-btn">Manage Orders</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-4">
         <div class="col-md-6">
             <div class="card">
                 <div class="card-body">
-                    <h5 class="card-title">User Management</h5>
-                    <p class="card-text">Manage users, view all users, ban users, and delete user accounts.</p>
-                    <a href="/admin/users" class="btn btn-primary">Manage Users</a>
+                    <h5 class="card-title">Quick Stats</h5>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="stat-box">
+                                <h6>Total Users</h6>
+                                <p class="stat-number">{{ total_users }}</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="stat-box">
+                                <h6>Active Listings</h6>
+                                <p class="stat-number">{{ active_listings }}</p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -18,12 +60,99 @@
         <div class="col-md-6">
             <div class="card">
                 <div class="card-body">
-                    <h5 class="card-title">License Plate Management</h5>
-                    <p class="card-text">View all license plates and manage listings.</p>
-                    <a href="/admin/license-plates" class="btn btn-primary">Manage License Plates</a>
+                    <h5 class="card-title">Recent Activity</h5>
+                    <div class="activity-list">
+                        {% for activity in recent_activities %}
+                        <div class="activity-item">
+                            <p class="mb-0">{{ activity.description }}</p>
+                            <small class="text-muted">{{ activity.timestamp }}</small>
+                        </div>
+                        {% endfor %}
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+<style>
+.management-section {
+    background-color: white;
+    padding: 15px;
+    border-radius: 5px;
+    position: relative;
+}
+
+.section-header {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.section-header h5 {
+    margin: 0;
+    font-weight: bold;
+}
+
+.section-header p {
+    margin: 0;
+}
+
+.section-header .btn {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+}
+
+.card {
+    margin-bottom: 20px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    transition: transform 0.2s;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+}
+
+.stat-box {
+    text-align: center;
+    padding: 15px;
+    background-color: #f8f9fa;
+    border-radius: 5px;
+}
+
+.stat-number {
+    font-size: 24px;
+    font-weight: bold;
+    margin: 10px 0;
+}
+
+.activity-list {
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.activity-item {
+    padding: 10px;
+    border-bottom: 1px solid #eee;
+}
+
+.activity-item:last-child {
+    border-bottom: none;
+}
+
+.custom-btn {
+    background-color: #0066cc;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    transition: background-color 0.3s;
+}
+
+.custom-btn:hover {
+    background-color: #0052a3;
+    color: white;
+}
+</style>
 {% endblock %} 

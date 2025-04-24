@@ -25,12 +25,37 @@ def verify_admin(current_user: User = Depends(get_current_user)):
 @router.get("", response_class=HTMLResponse)
 async def admin_dashboard(
     request: Request,
+    db: Session = Depends(get_db),
     current_user: User = Depends(verify_admin)
 ):
     """Admin dashboard page"""
+    # Get total users count
+    total_users = db.query(User).count()
+    
+    # Get active listings count (not sold and approved)
+    active_listings = db.query(LicensePlate).filter(
+        LicensePlate.is_sold == False,
+        LicensePlate.is_approved == True
+    ).count()
+    
+    # Get recent activities (last 5 orders)
+    recent_orders = db.query(Order).order_by(Order.created_at.desc()).limit(5).all()
+    recent_activities = [
+        {
+            "description": f"Order #{order.id} created by user {order.buyer_id}",
+            "timestamp": order.created_at.strftime("%Y-%m-%d %H:%M:%S")
+        }
+        for order in recent_orders
+    ]
+    
     return templates.TemplateResponse(
         "admin_dashboard.html",
-        {"request": request}
+        {
+            "request": request,
+            "total_users": total_users,
+            "active_listings": active_listings,
+            "recent_activities": recent_activities
+        }
     )
 
 @router.get("/users", response_class=HTMLResponse)
