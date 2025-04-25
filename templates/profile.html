@@ -5,6 +5,22 @@
 {% block extra_css %}
 <link rel="stylesheet" href="{{ url_for('static', path='css/profile.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', path='css/landingpage.css') }}">
+<style>
+.profile-item .label {
+    font-weight: 600;
+    color: #666;
+    margin-right: 8px;
+}
+
+.profile-item .value {
+    color: #333;
+}
+
+.profile-item.sensitive .value {
+    font-family: monospace;
+    letter-spacing: 1px;
+}
+</style>
 {% endblock %}
 
 {% block content %}
@@ -12,20 +28,35 @@
     <h1 class="profile-title">My Profile</h1>
     <div class="profile-grid">
         <div class="profile-item">
-            <span>Username: {{ user.username }}</span>
+            <span class="label">Username:</span>
+            <span class="value">{{ user.username }}</span>
         </div>
         <div class="profile-item">
-            <span>Email: {{ user.email }}</span>
+            <span class="label">Email:</span>
+            <span class="value">{{ user.email }}</span>
         </div>
         <div class="profile-item">
-            <span>Name: {{ user.firstname }} {{ user.lastname }}</span>
+            <span class="label">Name:</span>
+            <span class="value">{{ user.firstname }} {{ user.lastname }}</span>
+        </div>
+        <div class="profile-item sensitive">
+            <span class="label">ID Number:</span>
+            <span class="value">{% if user.idnumber %}•••••{{ user.idnumber[-2:] }}{% endif %}</span>
         </div>
         <div class="profile-item">
-            <span>ID Number: {% if user.idnumber %}•••••{{ user.idnumber[-2:] }}{% endif %}</span>
+            <span class="label">Address:</span>
+            <span class="value">{{ user.address }}</span>
         </div>
         <div class="profile-item">
-            <span>Address: {{ user.address }}</span>
+            <span class="label">Phone Number:</span>
+            <span class="value">{{ user.phone_number }}</span>
         </div>
+        {% if user.iban %}
+        <div class="profile-item sensitive">
+            <span class="label">IBAN:</span>
+            <span class="value">{{ "••••" + user.iban[-4:] if user.iban else "" }}</span>
+        </div>
+        {% endif %}
     </div>
 
     <div class="my-listings">

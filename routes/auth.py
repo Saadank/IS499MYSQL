@@ -89,6 +89,8 @@ async def signup(
     lastname: str = Form(...),
     idnumber: str = Form(...),
     address: str = Form(...),
+    phone_number: str = Form(...),
+    iban: str = Form(None),
     db: Session = Depends(get_db)
 ):
     auth_service = AuthService(db)
@@ -101,30 +103,36 @@ async def signup(
             firstname=firstname,
             lastname=lastname,
             idnumber=idnumber,
-            address=address
+            address=address,
+            phone_number=phone_number,
+            iban=iban
         )
         return RedirectResponse(url="/login", status_code=status.HTTP_303_SEE_OTHER)
     except Exception as e:
         error_message = str(e)
         if "string_too_short" in error_message:
             if "username" in error_message:
-                error_message = "Username must be at least 3 characters long"
+                error_message = "⚠️ Username must be at least 3 characters long"
             elif "password" in error_message:
-                error_message = "Password must be at least 6 characters long"
+                error_message = "🔒 Password must be at least 6 characters long"
+            elif "iban" in error_message.lower():
+                error_message = "🏦 IBAN must not be empty if provided"
         elif "email" in error_message.lower():
-            error_message = "Please enter a valid email address"
+            error_message = "📧 Please enter a valid email address"
         elif "Username already registered" in error_message:
-            error_message = "This username is already taken"
+            error_message = "👤 This username is already taken"
         elif "Email already registered" in error_message:
-            error_message = "This email is already registered"
+            error_message = "📧 This email is already registered"
         elif "ID number already registered" in error_message:
-            error_message = "This ID number is already registered"
+            error_message = "🆔 This ID number is already registered"
         elif "This ID number is banned from registration" in error_message:
-            error_message = "This ID number is banned from registration"
+            error_message = "⛔ This ID number is banned from registration"
         elif "Passwords do not match" in error_message:
-            error_message = "Passwords do not match"
+            error_message = "🔐 Passwords do not match"
+        elif "phone_number" in error_message.lower():
+            error_message = "📱 Phone number must be exactly 10 digits"
         else:
-            error_message = "An error occurred during registration. Please try again."
+            error_message = "❌ An error occurred during registration. Please try again."
         
         # Preserve form data
         form_data = {
@@ -134,11 +142,13 @@ async def signup(
             "firstname": firstname,
             "lastname": lastname,
             "idnumber": idnumber,
-            "address": address
+            "address": address,
+            "phone_number": phone_number,
+            "iban": iban
         }
         
         return RedirectResponse(
-            url=f"/signup?error={error_message}&username={username}&email={email}&firstname={firstname}&lastname={lastname}&idnumber={idnumber}&address={address}", 
+            url=f"/signup?error={error_message}&username={username}&email={email}&firstname={firstname}&lastname={lastname}&idnumber={idnumber}&address={address}&phone_number={phone_number}&iban={iban}", 
             status_code=status.HTTP_303_SEE_OTHER
         )
 

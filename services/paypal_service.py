@@ -114,11 +114,13 @@ class PayPalService:
                 # Send emails to buyer and seller
                 buyer_info = {
                     'name': buyer.username,
-                    'email': buyer.email
+                    'email': buyer.email,
+                    'phone_number': buyer.phone_number
                 }
                 seller_info = {
                     'name': seller.username,
-                    'email': seller.email
+                    'email': seller.email,
+                    'phone_number': seller.phone_number
                 }
                 plate_info = {
                     'number': plate.plateNumber,

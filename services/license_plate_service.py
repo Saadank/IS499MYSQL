@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 from typing import List, Optional, Dict, Any
-from models import LicensePlate, Auction, User
+from models import LicensePlate, User
 from datetime import datetime, UTC
 from services.file_service import FileService
 from fastapi import UploadFile, Request
@@ -102,16 +102,20 @@ class LicensePlateService:
             user = self.db.query(User).filter(User.id == user_id).first()
             is_admin = user.is_admin if user else False
 
-        # If user is admin, show all plates, otherwise only show approved plates
+        # If user is admin, show all plates, otherwise only show approved and unsold plates
         if is_admin:
-            plates = self.db.query(LicensePlate).filter(LicensePlate.is_sold == False).all()
+            plates = self.db.query(LicensePlate).all()
         else:
-            plates = self.get_license_plates()  # This filters for approved plates
+            plates = self.db.query(LicensePlate).filter(
+                LicensePlate.is_sold == False,
+                LicensePlate.is_approved == True
+            ).all()
 
         return {
             "request": request,
             "plates": plates,
-            "username": request.session.get("username")
+            "username": request.session.get("username"),
+            "is_admin": is_admin
         }
 
     def get_forsale_data(self, request: Request, digit1: Optional[str], digit2: Optional[str],
@@ -237,9 +241,10 @@ class LicensePlateService:
 
     def get_license_plates(self, digit1=None, digit2=None, digit3=None, digit4=None,
                           letter1=None, letter2=None, letter3=None, sort_by="newest") -> List[LicensePlate]:
-        # For development, show all plates including unapproved ones
+        # Only show approved and unsold plates
         plates = self.db.query(LicensePlate).filter(
-            LicensePlate.is_sold == False
+            LicensePlate.is_sold == False,
+            LicensePlate.is_approved == True
         ).all()
         
         # Apply digit filters
@@ -268,9 +273,9 @@ class LicensePlateService:
             filtered_plates = []
             for plate in plates:
                 plate_letters = list(plate.plateLetter)
-                if (not letter1 or plate_letters[0] == letter1) and \
-                   (not letter2 or (len(plate_letters) > 1 and plate_letters[1] == letter2)) and \
-                   (not letter3 or (len(plate_letters) > 2 and plate_letters[2] == letter3)):
+                if (not letter1 or letter1 == 'any' or plate_letters[0] == letter1) and \
+                   (not letter2 or letter2 == 'any' or (len(plate_letters) > 1 and plate_letters[1] == letter2)) and \
+                   (not letter3 or letter3 == 'any' or (len(plate_letters) > 2 and plate_letters[2] == letter3)):
                     filtered_plates.append(plate)
             plates = filtered_plates
         
@@ -381,8 +386,6 @@ class LicensePlateService:
             'image_url': plate.image_path or '/static/images/default_plate.jpg',
             'listing_type': plate.listing_type,
             'buy_now_price': plate.buy_now_price,
-            'auction_start_price': plate.auction_start_price,
-            'minimum_offer_price': plate.minimum_offer_price,
             'created_at': plate.created_at,
             'city': plate.city,
             'transfer_cost': plate.transfer_cost or "Buyer Responsibility",
@@ -402,8 +405,5 @@ class LicensePlateService:
     def get_available_plates(self) -> List[LicensePlate]:
         return self.db.query(LicensePlate).filter(
             LicensePlate.is_sold == False,
-            LicensePlate.is_approved == True,  # Only show approved plates
-            ~LicensePlate.plateID.in_(
-                self.db.query(Auction.plate_id).filter(Auction.is_active == True)
-            )
+            LicensePlate.is_approved == True  # Only show approved plates
         ).all() 

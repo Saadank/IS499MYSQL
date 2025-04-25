@@ -66,7 +66,9 @@ class AuthService:
         firstname: str,
         lastname: str,
         idnumber: str,
-        address: str
+        address: str,
+        phone_number: str,
+        iban: Optional[str] = None
     ) -> User:
         # Validate input using schema
         signup_data = UserSignup(
@@ -77,7 +79,9 @@ class AuthService:
             firstname=firstname,
             lastname=lastname,
             idnumber=idnumber,
-            address=address
+            address=address,
+            phone_number=phone_number,
+            iban=iban
         )
         
         # Validate passwords match
@@ -108,7 +112,9 @@ class AuthService:
             firstname=signup_data.firstname,
             lastname=signup_data.lastname,
             idnumber=signup_data.idnumber,
-            address=signup_data.address
+            address=signup_data.address,
+            phone_number=signup_data.phone_number,
+            iban=signup_data.iban
         )
 
         # Send welcome email
@@ -117,7 +123,7 @@ class AuthService:
         
         return user
 
-    def create_user(self, username: str, email: str, password: str, firstname: str, lastname: str, idnumber: str, address: str) -> User:
+    def create_user(self, username: str, email: str, password: str, firstname: str, lastname: str, idnumber: str, address: str, phone_number: Optional[str] = None, iban: Optional[str] = None) -> User:
         hashed_password = hashlib.sha256(password.encode()).hexdigest()
         db_user = User(
             username=username,
@@ -126,7 +132,9 @@ class AuthService:
             firstname=firstname,
             lastname=lastname,
             idnumber=idnumber,
-            address=address
+            address=address,
+            phone_number=phone_number,
+            iban=iban
         )
         self.db.add(db_user)
         self.db.commit()

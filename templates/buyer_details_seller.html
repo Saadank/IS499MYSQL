@@ -1,19 +1,76 @@
 {% extends "base.html" %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', path='css/buyer-details.css') }}">
+<style>
+.info-value.sensitive {
+    font-family: monospace;
+    letter-spacing: 1px;
+}
+.contact-list {
+    list-style: none;
+    padding: 0;
+    margin: 15px 0;
+}
+.contact-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+    padding: 10px;
+    background-color: #f8f9fa;
+    border-radius: 5px;
+}
+.contact-item i {
+    margin-right: 15px;
+    color: #666;
+    width: 20px;
+    text-align: center;
+}
+.contact-item span {
+    font-size: 1.1em;
+}
+.card {
+    border: none;
+    box-shadow: 0 0 15px rgba(0,0,0,0.1);
+    margin-bottom: 20px;
+}
+.card-header {
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #eee;
+}
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="container mt-4">
-    <h2>Buyer Information</h2>
+<div class="container">
+    <h2 class="page-title">Buyer Information</h2>
     
     <!-- Personal Information Section -->
-    <div class="card mb-4">
+    <div class="card">
         <div class="card-header">
-            <h3 class="h5 mb-0">Personal Information</h3>
+            <h3><i class="fas fa-user"></i> Personal Information</h3>
         </div>
         <div class="card-body">
-            <div class="row">
-                <div class="col-md-6">
-                    <p><strong>Username:</strong> {{ buyer.username }}</p>
-                    <p><strong>Full Name:</strong> {{ buyer.firstname }} {{ buyer.lastname }}</p>
+            <div class="info-row">
+                <div class="info-item">
+                    <div class="info-label">Username</div>
+                    <div class="info-value">{{ buyer.username }}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Full Name</div>
+                    <div class="info-value">{{ buyer.firstname }} {{ buyer.lastname }}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">ID Number</div>
+                    <div class="info-value">{{ buyer.idnumber }}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Email</div>
+                    <div class="info-value">{{ buyer.email }}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Phone Number</div>
+                    <div class="info-value">{{ buyer.phone_number }}</div>
                 </div>
             </div>
         </div>
@@ -22,28 +79,25 @@
     <!-- Contact Information Section -->
     <div class="card">
         <div class="card-header">
-            <h3 class="h5 mb-0">Contact Information</h3>
+            <h3><i class="fas fa-address-card"></i> Contact Information</h3>
         </div>
         <div class="card-body">
             <p class="mb-0">For any inquiries or issues related to plate transfers, please contact the buyer through:</p>
-            <ul class="list-unstyled mt-3">
-                <li><i class="fas fa-envelope me-2"></i> Email: {{ buyer.email }}</li>
-                {% if buyer.phone %}
-                <li><i class="fas fa-phone me-2"></i> Phone: {{ buyer.phone }}</li>
-                {% endif %}
+            <ul class="contact-list">
+                <li class="contact-item">
+                    <i class="fas fa-envelope"></i>
+                    <span>{{ buyer.email }}</span>
+                </li>
+                <li class="contact-item">
+                    <i class="fas fa-phone"></i>
+                    <span>{{ buyer.phone_number }}</span>
+                </li>
+                <li class="contact-item">
+                    <i class="fas fa-id-card"></i>
+                    <span>{{ buyer.idnumber }}</span>
+                </li>
             </ul>
         </div>
     </div>
 </div>
-
-<style>
-.card {
-    border: none;
-    box-shadow: 0 0 15px rgba(0,0,0,0.1);
-}
-.card-header {
-    background-color: #f8f9fa;
-    border-bottom: 1px solid #eee;
-}
-</style>
 {% endblock %} 

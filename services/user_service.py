@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 from typing import Dict, Any
-from models import User, LicensePlate, Offer, WishlistItem, Order
+from models import User, LicensePlate, WishlistItem, Order
 from schemas import UserCreate, UserUpdate
 from fastapi import HTTPException
 from passlib.context import CryptContext
@@ -52,34 +52,4 @@ class UserService:
         return {
             "purchases": purchases,
             "sales": sales
-        }
-
-    def get_user_offers(self, user_id: int):
-        """
-        Retrieve all offers made by and received by a user.
-        """
-        user = self.db.query(User).filter(User.id == user_id).first()
-        if not user:
-            raise HTTPException(status_code=404, detail="User not found")
-
-        # Get offers made by the user
-        sent_offers = (
-            self.db.query(Offer)
-            .filter(Offer.user_id == user_id)
-            .order_by(Offer.created_at.desc())
-            .all()
-        )
-
-        # Get offers received by the user (offers on their plates)
-        received_offers = (
-            self.db.query(Offer)
-            .join(LicensePlate)
-            .filter(LicensePlate.owner_id == user_id)
-            .order_by(Offer.created_at.desc())
-            .all()
-        )
-
-        return {
-            "sent": sent_offers,
-            "received": received_offers
         } 

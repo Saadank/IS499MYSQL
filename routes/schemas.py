@@ -14,6 +14,8 @@ class UserSignup(BaseModel):
     lastname: constr(min_length=1, max_length=50)
     idnumber: constr(min_length=1, max_length=20)
     address: constr(min_length=1, max_length=200)
+    phone_number: constr(min_length=10, max_length=10, pattern=r'^\d{10}$')
+    iban: Optional[constr(min_length=1, max_length=34)] = None
 
 class LicensePlateCreate(BaseModel):
     plateNumber: constr(min_length=1, max_length=10)

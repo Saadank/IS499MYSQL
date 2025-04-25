@@ -88,65 +88,66 @@ class EmailService:
         # Email to buyer
         buyer_subject = "License Plate Purchase Confirmation"
         buyer_body = f"""
-        Dear {buyer_info['name']},
+        <html>
+            <body>
+                <h2>License Plate Purchase Confirmation</h2>
+                <p>Dear {buyer_info['name']},</p>
+                
+                <p>Thank you for your purchase! Here are the details of your transaction:</p>
+                
+                <div style="background-color: #f8f9fa; padding: 15px; border-radius: 5px; margin: 15px 0;">
+                    <h3 style="color: #333; margin-top: 0;">Plate Details</h3>
+                    <p>Plate Number: <strong>{plate_info['number']}{plate_info['letter']}</strong></p>
+                    <p>Price: <strong>SAR {plate_info['price']}</strong></p>
+                </div>
 
-        Thank you for your purchase! Here are the details of your transaction:
+                <div style="background-color: #f8f9fa; padding: 15px; border-radius: 5px; margin: 15px 0;">
+                    <h3 style="color: #333; margin-top: 0;">Seller Contact Information</h3>
+                    <p>Name: <strong>{seller_info['name']}</strong></p>
+                    <p>Email: <strong>{seller_info['email']}</strong></p>
+                    <p>Phone: <strong>{seller_info.get('phone_number', 'Not provided')}</strong></p>
+                </div>
 
-        Plate Number: {plate_info['number']}{plate_info['letter']}
-        Price: SAR {plate_info['price']}
-
-        Seller Contact Information:
-        Name: {seller_info['name']}
-        Email: {seller_info['email']}
-        Phone: {seller_info.get('phone', 'Not provided')}
-
-        Please contact the seller to arrange the transfer of the license plate.
-
-        Best regards,
-        License Plate Trading Platform
+                <p>Please contact the seller to arrange the transfer of the license plate.</p>
+                <br>
+                <p>Best regards,<br>License Plate Trading Platform</p>
+            </body>
+        </html>
         """
 
         # Email to seller
-        seller_subject = "New License Plate Sale"
+        seller_subject = "License Plate Sale Confirmation"
         seller_body = f"""
-        Dear {seller_info['name']},
+        <html>
+            <body>
+                <h2>License Plate Sale Confirmation</h2>
+                <p>Dear {seller_info['name']},</p>
+                
+                <p>Your license plate has been sold! Here are the details:</p>
+                
+                <div style="background-color: #f8f9fa; padding: 15px; border-radius: 5px; margin: 15px 0;">
+                    <h3 style="color: #333; margin-top: 0;">Plate Details</h3>
+                    <p>Plate Number: <strong>{plate_info['number']}{plate_info['letter']}</strong></p>
+                    <p>Price: <strong>SAR {plate_info['price']}</strong></p>
+                </div>
 
-        Your license plate has been sold! Here are the details:
+                <div style="background-color: #f8f9fa; padding: 15px; border-radius: 5px; margin: 15px 0;">
+                    <h3 style="color: #333; margin-top: 0;">Buyer Contact Information</h3>
+                    <p>Name: <strong>{buyer_info['name']}</strong></p>
+                    <p>Email: <strong>{buyer_info['email']}</strong></p>
+                    <p>Phone: <strong>{buyer_info.get('phone_number', 'Not provided')}</strong></p>
+                </div>
 
-        Plate Number: {plate_info['number']}{plate_info['letter']}
-        Price: SAR {plate_info['price']}
-
-        Buyer Contact Information:
-        Name: {buyer_info['name']}
-        Email: {buyer_info['email']}
-        Phone: {buyer_info.get('phone', 'Not provided')}
-
-        Please contact the buyer to arrange the transfer of the license plate.
-
-        Best regards,
-        License Plate Trading Platform
+                <p>Please contact the buyer to arrange the transfer of the license plate.</p>
+                <br>
+                <p>Best regards,<br>License Plate Trading Platform</p>
+            </body>
+        </html>
         """
 
         # Send emails
-        self._send_email(buyer_info['email'], buyer_subject, buyer_body)
-        self._send_email(seller_info['email'], seller_subject, seller_body)
-
-    def _send_email(self, recipient: str, subject: str, body: str):
-        try:
-            msg = MIMEMultipart()
-            msg['From'] = self.sender_email
-            msg['To'] = recipient
-            msg['Subject'] = subject
-
-            msg.attach(MIMEText(body, 'plain'))
-
-            server = smtplib.SMTP(self.smtp_server, self.smtp_port)
-            server.starttls()
-            server.login(self.sender_email, self.sender_password)
-            server.send_message(msg)
-            server.quit()
-        except Exception as e:
-            print(f"Failed to send email: {str(e)}")
+        self.send_email(buyer_info['email'], buyer_subject, buyer_body)
+        self.send_email(seller_info['email'], seller_subject, seller_body)
 
     def send_listing_added_email(self, user: User, plate: LicensePlate) -> bool:
         subject = "Your License Plate Listing Has Been Added"

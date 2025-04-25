@@ -20,21 +20,20 @@ class User(Base):
     lastname = Column(String(50))
     idnumber = Column(String(20), unique=True)
     address = Column(String(200))
+    phone_number = Column(String(20), nullable=False)
+    iban = Column(String(34))
     created_at = Column(DateTime, default=lambda: datetime.now(UTC))
     is_admin = Column(Boolean, default=False)
     is_banned = Column(Boolean, default=False)
     
     # Relationships
     plates = relationship("LicensePlate", back_populates="owner", cascade="all, delete-orphan")
-    offers = relationship("Offer", back_populates="user")
     wishlist_items = relationship("WishlistItem", back_populates="user")
     purchases = relationship("Order", foreign_keys="Order.buyer_id", back_populates="buyer")
     sales = relationship("Order", foreign_keys="Order.seller_id", back_populates="seller")
 
 class ListingType(str, Enum):
     BUY_NOW = "buy_now"
-    AUCTION = "auction"
-    OFFERS = "offers"
 
 class LicensePlate(Base):
     __tablename__ = "license_plates"
@@ -49,8 +48,6 @@ class LicensePlate(Base):
     created_at = Column(DateTime, default=datetime.utcnow)
     listing_type = Column(String(20), nullable=False)
     buy_now_price = Column(Float, nullable=True)
-    auction_start_price = Column(Float, nullable=True)
-    minimum_offer_price = Column(Float, nullable=True)
     city = Column(String(50))
     transfer_cost = Column(String(50))
     plate_type = Column(String(20))
@@ -59,7 +56,6 @@ class LicensePlate(Base):
 
     # Relationships
     owner = relationship("User", back_populates="plates")
-    offers = relationship("Offer", back_populates="plate")
 
     __table_args__ = (
         CheckConstraint(
@@ -68,50 +64,6 @@ class LicensePlate(Base):
         ),
         UniqueConstraint('plateNumber', 'plateLetter', name='unique_plate_number_letter'),
     )
-
-class Auction(Base):
-    __tablename__ = "auctions"
-
-    id = Column(Integer, primary_key=True, index=True)
-    plate_id = Column(Integer, ForeignKey("license_plates.plateID"), nullable=False)
-    start_price = Column(Float, nullable=False)
-    current_price = Column(Float, nullable=False)
-    start_time = Column(DateTime, default=lambda: datetime.now(UTC))
-    end_time = Column(DateTime, nullable=False)
-    is_active = Column(Boolean, default=True)
-    winner_id = Column(Integer, ForeignKey("users.id"), nullable=True)
-    
-    # Relationships
-    plate = relationship("LicensePlate", backref="auctions")
-    winner = relationship("User", backref="won_auctions")
-    bids = relationship("Bid", back_populates="auction")
-
-class Bid(Base):
-    __tablename__ = "bids"
-
-    id = Column(Integer, primary_key=True, index=True)
-    auction_id = Column(Integer, ForeignKey("auctions.id"), nullable=False)
-    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
-    amount = Column(Float, nullable=False)
-    timestamp = Column(DateTime, default=lambda: datetime.now(UTC))
-    
-    # Relationships
-    auction = relationship("Auction", back_populates="bids")
-    user = relationship("User", backref="bids")
-
-class Offer(Base):
-    __tablename__ = "offers"
-    
-    id = Column(Integer, primary_key=True, index=True)
-    plate_id = Column(Integer, ForeignKey("license_plates.plateID"))
-    user_id = Column(Integer, ForeignKey("users.id"))
-    offer_amount = Column(Float, nullable=False)
-    status = Column(String(20), default="pending")  # Added length specification
-    created_at = Column(DateTime, default=datetime.utcnow)
-    
-    # Relationships
-    plate = relationship("LicensePlate", back_populates="offers")
-    user = relationship("User", back_populates="offers") 
 
 class WishlistItem(Base):
     __tablename__ = "wishlist_items"
@@ -128,7 +80,7 @@ class WishlistItem(Base):
     # Ensure unique combination of user and plate
     __table_args__ = (
         UniqueConstraint('user_id', 'plate_id', name='unique_user_plate_wishlist'),
-    ) 
+    )
 
 class Order(Base):
     __tablename__ = "orders"
