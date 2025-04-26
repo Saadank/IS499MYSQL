@@ -70,19 +70,24 @@ class AuthService:
         phone_number: str,
         iban: Optional[str] = None
     ) -> User:
-        # Validate input using schema
-        signup_data = UserSignup(
-            username=username,
-            email=email,
-            password=password,
-            confirm_password=confirm_password,
-            firstname=firstname,
-            lastname=lastname,
-            idnumber=idnumber,
-            address=address,
-            phone_number=phone_number,
-            iban=iban
-        )
+        print(f"Debug - Attempting to register with email: {email}")  # Debug log
+        try:
+            # Validate input using schema
+            signup_data = UserSignup(
+                username=username,
+                email=email,
+                password=password,
+                confirm_password=confirm_password,
+                firstname=firstname,
+                lastname=lastname,
+                idnumber=idnumber,
+                address=address,
+                phone_number=phone_number,
+                iban=iban
+            )
+        except Exception as e:
+            print(f"Debug - Validation error: {str(e)}")  # Debug log
+            raise HTTPException(status_code=400, detail=str(e))
         
         # Validate passwords match
         if signup_data.password != signup_data.confirm_password:
