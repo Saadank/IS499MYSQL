@@ -20,7 +20,7 @@ class User(Base):
     lastname = Column(String(50))
     idnumber = Column(String(20), unique=True)
     address = Column(String(200))
-    phone_number = Column(String(20), nullable=False)
+    phone_number = Column(String(20), unique=True, nullable=False)
     iban = Column(String(34))
     created_at = Column(DateTime, default=lambda: datetime.now(UTC))
     is_admin = Column(Boolean, default=False)
@@ -31,6 +31,13 @@ class User(Base):
     wishlist_items = relationship("WishlistItem", back_populates="user")
     purchases = relationship("Order", foreign_keys="Order.buyer_id", back_populates="buyer")
     sales = relationship("Order", foreign_keys="Order.seller_id", back_populates="seller")
+
+    __table_args__ = (
+        CheckConstraint(
+            "LENGTH(phone_number) = 10 AND phone_number REGEXP '^[0-9]{10}$'",
+            name='phone_number_format'
+        ),
+    )
 
 class ListingType(str, Enum):
     BUY_NOW = "buy_now"

@@ -20,6 +20,39 @@
     font-family: monospace;
     letter-spacing: 1px;
 }
+
+.edit-form {
+    display: none;
+    margin-top: 10px;
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: 5px;
+}
+
+.edit-form input {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.edit-form button {
+    margin-right: 10px;
+}
+
+.edit-button {
+    background: none;
+    border: none;
+    color: #007bff;
+    cursor: pointer;
+    padding: 0;
+    margin-left: 10px;
+}
+
+.edit-button:hover {
+    text-decoration: underline;
+}
 </style>
 {% endblock %}
 
@@ -50,13 +83,37 @@
         <div class="profile-item">
             <span class="label">Phone Number:</span>
             <span class="value">{{ user.phone_number }}</span>
+            <button class="edit-button" data-field="phone">Edit</button>
+            <div id="phone-edit-form" class="edit-form">
+                <input type="tel" id="new-phone" placeholder="New phone number" required>
+                <button class="view-button update-button" data-field="phone">Update</button>
+                <button class="view-button cancel-button" data-field="phone">Cancel</button>
+            </div>
         </div>
         {% if user.iban %}
         <div class="profile-item sensitive">
             <span class="label">IBAN:</span>
             <span class="value">{{ "••••" + user.iban[-4:] if user.iban else "" }}</span>
+            <button class="edit-button" data-field="iban">Edit</button>
+            <div id="iban-edit-form" class="edit-form">
+                <input type="text" id="new-iban" placeholder="New IBAN" required>
+                <button class="view-button update-button" data-field="iban">Update</button>
+                <button class="view-button cancel-button" data-field="iban">Cancel</button>
+            </div>
         </div>
         {% endif %}
+        <div class="profile-item">
+            <span class="label">Password:</span>
+            <span class="value">••••••••</span>
+            <button class="edit-button" data-field="password">Change</button>
+            <div id="password-edit-form" class="edit-form">
+                <input type="password" id="current-password" placeholder="Current password" required>
+                <input type="password" id="new-password" placeholder="New password" required>
+                <input type="password" id="confirm-password" placeholder="Confirm new password" required>
+                <button class="view-button update-button" data-field="password">Update</button>
+                <button class="view-button cancel-button" data-field="password">Cancel</button>
+            </div>
+        </div>
     </div>
 
     <div class="my-listings">

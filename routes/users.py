@@ -1,11 +1,11 @@
-from fastapi import APIRouter, Request, Depends, HTTPException
-from fastapi.responses import HTMLResponse
+from fastapi import APIRouter, Request, Depends, HTTPException, Form
+from fastapi.responses import HTMLResponse, JSONResponse
 from sqlalchemy.orm import Session
 from database import get_db
 from services.user_service import UserService
 from services.session_service import SessionService
 from dependencies import require_auth
-from services.auth_service import get_current_user
+from services.auth_service import get_current_user, verify_password, get_password_hash
 from models import User, Order
 from utils.template_config import templates
 from services.license_plate_service import LicensePlateService
@@ -181,4 +181,49 @@ async def delete_user(
         return {"success": True}
     except Exception as e:
         db.rollback()
-        raise HTTPException(status_code=500, detail=str(e)) 
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.post("/update-phone")
+async def update_phone(
+    phone_number: str = Form(...),
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    try:
+        user_service = UserService(db)
+        user_service.update_user_phone(current_user.id, phone_number)
+        return JSONResponse(content={"message": "Phone number updated successfully"})
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+@router.post("/update-iban")
+async def update_iban(
+    iban: str = Form(...),
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    try:
+        user_service = UserService(db)
+        user_service.update_user_iban(current_user.id, iban)
+        return JSONResponse(content={"message": "IBAN updated successfully"})
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+@router.post("/update-password")
+async def update_password(
+    current_password: str = Form(...),
+    new_password: str = Form(...),
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    # Verify current password
+    if not verify_password(current_password, current_user.password):
+        raise HTTPException(status_code=400, detail="Current password is incorrect")
+    
+    try:
+        user_service = UserService(db)
+        hashed_password = get_password_hash(new_password)
+        user_service.update_user_password(current_user.id, hashed_password)
+        return JSONResponse(content={"message": "Password updated successfully"})
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e)) 
