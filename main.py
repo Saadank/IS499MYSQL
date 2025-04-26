@@ -69,4 +69,11 @@ async def home(request: Request, db: Session = Depends(get_db)):
 
 @app.get("/api/", response_model=dict)
 def api_root():
-    return {"message": "Welcome to the License Plate Marketplace API"} 
+    return {"message": "Welcome to the License Plate Marketplace API"}
+
+@app.get("/auctions", response_class=HTMLResponse)
+async def auctions_page(request: Request):
+    """Auction feature coming soon page"""
+    session_service = SessionService(request)
+    template_data = session_service.get_template_data({})
+    return templates.TemplateResponse("auction.html", template_data) 

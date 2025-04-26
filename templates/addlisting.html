@@ -10,8 +10,9 @@
 <div class="addlisting">
     <h2>Add New License Plate</h2>
     <form method="POST" action="/addlisting" enctype="multipart/form-data" id="listingForm">
-        <!-- Hidden transfer cost field -->
+        <!-- Hidden fields -->
         <input type="hidden" name="transfer_cost" value="Buyer Responsibility">
+        <input type="hidden" name="listing_type" value="buy_now">
         
         <div class="form-row">
             <!-- Plate Number Section -->
@@ -106,24 +107,15 @@
             <textarea name="description" class="form-control"></textarea>
         </div>
 
-        <!-- Listing Type Selection -->
+        <!-- Price -->
         <div class="form-group">
-            <label>Listing Type:</label>
-            <div class="listing-type-buttons">
-                <button type="button" class="btn btn-outline-primary" onclick="selectListingType('buy_now', event)">Buy It Now</button>
-            </div>
-            <input type="hidden" name="listing_type" id="listing_type" required>
-        </div>
-
-        <!-- Buy Now Price Section -->
-        <div class="form-group price-section" id="buyNowSection" style="display: none;">
-            <label>Buy It Now Price:</label>
+            <label>Price (SAR):</label>
             <input type="number" 
                    name="buy_now_price" 
-                   id="buyNowPrice" 
                    class="form-control" 
                    min="1" 
-                   step="1">
+                   step="1"
+                   required>
         </div>
 
         <button type="submit" class="btn btn-primary">Add Listing</button>

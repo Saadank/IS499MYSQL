@@ -25,24 +25,13 @@ document.addEventListener('DOMContentLoaded', function() {
     const form = document.getElementById('listingForm');
     if (form) {
         form.addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const listingType = document.getElementById('listing_type').value;
-            if (!listingType) {
-                alert('Please select a listing type');
-                return;
-            }
-
-            const priceInput = document.getElementById('buyNowPrice');
-
-            // Validate price
+            // Basic validation
+            const priceInput = form.querySelector('input[name="buy_now_price"]');
             if (!priceInput || !priceInput.value || priceInput.value <= 0) {
+                e.preventDefault();
                 alert('Please enter a valid price');
                 return;
             }
-
-            // If all validations pass, submit the form
-            this.submit();
         });
     }
 }); 

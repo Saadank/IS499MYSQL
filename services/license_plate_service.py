@@ -47,8 +47,6 @@ class LicensePlateService:
                            description: str, price: float, image: Optional[UploadFile],
                            user_id: int, listing_type: str = 'buy_now',
                            buy_now_price: Optional[float] = None,
-                           auction_start_price: Optional[float] = None,
-                           minimum_offer_price: Optional[float] = None,
                            city: str = '', transfer_cost: str = '',
                            plate_type: str = '') -> LicensePlate:
         # Combine digits into plate number, excluding 'x'
@@ -67,16 +65,8 @@ class LicensePlateService:
         # Set appropriate prices based on listing type
         if listing_type == 'buy_now':
             buy_now_price = price
-            auction_start_price = None
-            minimum_offer_price = None
-        elif listing_type == 'auction':
+        else:
             buy_now_price = None
-            auction_start_price = price
-            minimum_offer_price = None
-        else:  # offers
-            buy_now_price = None
-            auction_start_price = None
-            minimum_offer_price = price
 
         return await self.create_license_plate(
             plate_number=plate_number,
@@ -85,8 +75,6 @@ class LicensePlateService:
             price=price,
             listing_type=listing_type,
             buy_now_price=buy_now_price,
-            auction_start_price=auction_start_price,
-            minimum_offer_price=minimum_offer_price,
             owner_id=user_id,
             city=city,
             transfer_cost=transfer_cost,
@@ -182,8 +170,6 @@ class LicensePlateService:
         price: float,
         listing_type: str,
         buy_now_price: int,
-        auction_start_price: int,
-        minimum_offer_price: int,
         owner_id: int,
         city: str,
         transfer_cost: str,
@@ -212,8 +198,6 @@ class LicensePlateService:
                 price=price,
                 listing_type=listing_type,
                 buy_now_price=buy_now_price,
-                auction_start_price=auction_start_price,
-                minimum_offer_price=minimum_offer_price,
                 owner_id=owner_id,
                 city=city,
                 transfer_cost=transfer_cost,

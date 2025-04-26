@@ -36,8 +36,6 @@ async def create_listing(
     description: str = Form(None),
     listing_type: str = Form(...),
     buy_now_price: int = Form(0),
-    auction_start_price: int = Form(0),
-    minimum_offer_price: int = Form(0),
     city: str = Form(...),
     transfer_cost: str = Form(...),
     plate_type: str = Form(...),
@@ -49,9 +47,7 @@ async def create_listing(
         plate_service = LicensePlateService(db)
         
         # Calculate the price based on listing type
-        price = buy_now_price if listing_type == 'buy_now' else \
-               auction_start_price if listing_type == 'auction' else \
-               minimum_offer_price
+        price = buy_now_price
 
         # Create the license plate
         plate = await plate_service.create_listing(
@@ -68,8 +64,6 @@ async def create_listing(
             user_id=user_id,
             listing_type=listing_type,
             buy_now_price=buy_now_price,
-            auction_start_price=auction_start_price,
-            minimum_offer_price=minimum_offer_price,
             city=city,
             transfer_cost=transfer_cost,
             plate_type=plate_type
