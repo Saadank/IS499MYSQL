@@ -76,4 +76,25 @@ async def auctions_page(request: Request):
     """Auction feature coming soon page"""
     session_service = SessionService(request)
     template_data = session_service.get_template_data({})
-    return templates.TemplateResponse("auction.html", template_data) 
+    return templates.TemplateResponse("auction.html", template_data)
+
+@app.get("/about", response_class=HTMLResponse)
+async def about_page(request: Request):
+    """About Us page"""
+    session_service = SessionService(request)
+    template_data = session_service.get_template_data({})
+    return templates.TemplateResponse("about.html", template_data)
+
+@app.get("/terms", response_class=HTMLResponse)
+async def terms_page(request: Request):
+    """Terms & Conditions page"""
+    session_service = SessionService(request)
+    template_data = session_service.get_template_data({})
+    return templates.TemplateResponse("terms.html", template_data)
+
+@app.get("/privacy", response_class=HTMLResponse)
+async def privacy_page(request: Request):
+    """Privacy Policy page"""
+    session_service = SessionService(request)
+    template_data = session_service.get_template_data({})
+    return templates.TemplateResponse("privacy.html", template_data) 

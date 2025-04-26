@@ -1,0 +1,51 @@
+{% extends "Base.html" %}
+
+{% block title %}About Us{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', path='css/about.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="about-container">
+    <div class="about-header">
+        <h1>About Us</h1>
+        <p>Welcome to License Plate Trading - A Capstone Project by Information Systems Students</p>
+    </div>
+
+    <div class="about-content">
+        <div class="team-section">
+            <h2>Development Team</h2>
+            <div class="team-members">
+                <div class="team-member">
+                    <h3>Azzam Alsaeed</h3>
+                    <p>Information Systems Student</p>
+                </div>
+                <div class="team-member">
+                    <h3>Saad Alangri</h3>
+                    <p>Information Systems Student</p>
+                </div>
+                <div class="team-member">
+                    <h3>Abdulatif Almenaa</h3>
+                    <p>Information Systems Student</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="supervisor-section">
+            <h2>Project Supervisor</h2>
+            <div class="team-member" style="margin: 0 auto;">
+                <h3>Dr. Ahmad Alhamed</h3>
+                <p>Faculty Supervisor</p>
+            </div>
+        </div>
+
+        <div class="university-info">
+            <h3>King Saud University</h3>
+            <p>College of Computer and Information Sciences</p>
+            <p>Department of Information Systems</p>
+            <p>Capstone Project - 2024</p>
+        </div>
+    </div>
+</div>
+{% endblock %} 
