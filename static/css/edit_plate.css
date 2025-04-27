@@ -1,0 +1,120 @@
+.card {
+    border: none;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.card-header {
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #dee2e6;
+    padding: 1rem;
+}
+
+.card-body {
+    padding: 2rem;
+}
+
+.plate-preview {
+    border: 1px solid #ddd;
+    padding: 1rem;
+    display: flex;
+    background: white;
+    border-radius: 4px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    justify-content: center;
+}
+
+.plate-section {
+    display: flex;
+    padding: 0.5rem;
+}
+
+.plate-section.numbers {
+    flex: 2;
+    justify-content: center;
+}
+
+.plate-section.letters {
+    flex: 1;
+    justify-content: center;
+    border-left: 1px solid #ddd;
+}
+
+.number-section, .letter-section {
+    width: 100%;
+}
+
+.arabic-row, .english-row {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.arabic-row {
+    border-bottom: 1px solid #eee;
+    margin-bottom: 0.2rem;
+    padding-bottom: 0.2rem;
+}
+
+.plate-digit, .plate-letter {
+    font-weight: bold;
+    padding: 0.2rem;
+    color: #000;
+    margin: 0 0.2rem;
+}
+
+.arabic-row .plate-digit,
+.arabic-row .plate-letter {
+    font-family: "Traditional Arabic", "Arial", sans-serif;
+    font-size: 1.4rem;
+    letter-spacing: 0.1rem;
+}
+
+.english-row .plate-digit,
+.english-row .plate-letter {
+    font-family: "Arial", sans-serif;
+    font-size: 1rem;
+    color: #666;
+}
+
+.form-label {
+    font-weight: 500;
+    color: #333;
+}
+
+.form-control {
+    border: 1px solid #ddd;
+    padding: 0.75rem;
+    border-radius: 4px;
+}
+
+.form-control:focus {
+    border-color: #80bdff;
+    box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25);
+}
+
+.btn {
+    padding: 0.75rem 1.5rem;
+    font-weight: 500;
+    border-radius: 4px;
+    transition: all 0.2s;
+}
+
+select.form-control {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 0.75rem center;
+    background-size: 1em;
+    padding-right: 2.5rem;
+}
+
+select.form-control:focus {
+    border-color: #80bdff;
+    box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25);
+}
+
+select.form-control option {
+    padding: 8px;
+} 

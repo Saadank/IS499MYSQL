@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Request, Depends, BackgroundTasks
+from fastapi import FastAPI, Request, Depends, BackgroundTasks, Query, HTTPException
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from sqlalchemy.orm import Session
@@ -12,6 +12,7 @@ from services.session_service import SessionService
 from datetime import datetime, timedelta
 from utils.template_config import templates
 from fastapi.middleware.cors import CORSMiddleware
+from typing import Optional
 
 app = FastAPI(title="License Plate Trading")
 
@@ -48,10 +49,47 @@ app.include_router(support.router)
 app.include_router(admin_router)
 
 @app.get("/", response_class=HTMLResponse, name="home_page")
-async def home(request: Request, db: Session = Depends(get_db)):
+async def home(
+    request: Request,
+    digit1: Optional[str] = Query(None, min_length=0, max_length=1, regex="^[0-9x]?$"),
+    digit2: Optional[str] = Query(None, min_length=0, max_length=1, regex="^[0-9x]?$"),
+    digit3: Optional[str] = Query(None, min_length=0, max_length=1, regex="^[0-9x]?$"),
+    digit4: Optional[str] = Query(None, min_length=0, max_length=1, regex="^[0-9x]?$"),
+    letter1: Optional[str] = Query(None),
+    letter2: Optional[str] = Query(None),
+    letter3: Optional[str] = Query(None),
+    sort_by: Optional[str] = Query("newest", regex="^(newest|oldest|price_high|price_low)$"),
+    db: Session = Depends(get_db)
+):
     session_service = SessionService(request)
     plate_service = LicensePlateService(db)
-    plates = plate_service.get_license_plates()
+    
+    # Clean and validate letter inputs
+    cleaned_letters = []
+    valid_letters = set(plate_service.VALID_LETTERS + ['ANY'])
+    for letter in [letter1, letter2, letter3]:
+        if letter and letter.strip():
+            upper_letter = letter.strip().upper()
+            if upper_letter != 'ANY' and upper_letter not in valid_letters:
+                raise HTTPException(
+                    status_code=400,
+                    detail=f"Invalid letter: {letter}. Valid letters are: {', '.join(plate_service.VALID_LETTERS)}"
+                )
+            cleaned_letters.append(upper_letter)
+        else:
+            cleaned_letters.append(None)
+    
+    # Get plates with search criteria
+    plates = plate_service.get_license_plates(
+        digit1=digit1.strip() if digit1 and digit1.strip() else None,
+        digit2=digit2.strip() if digit2 and digit2.strip() else None,
+        digit3=digit3.strip() if digit3 and digit3.strip() else None,
+        digit4=digit4.strip() if digit4 and digit4.strip() else None,
+        letter1=cleaned_letters[0],
+        letter2=cleaned_letters[1],
+        letter3=cleaned_letters[2],
+        sort_by=sort_by
+    )
     
     # Use the standardized letter mapping from LicensePlateService
     letter_english = LicensePlateService.LETTER_ENGLISH
@@ -62,7 +100,15 @@ async def home(request: Request, db: Session = Depends(get_db)):
         "plates": plates,
         "letter_english": letter_english,
         "letter_arabic": letter_arabic,
-        "valid_letters": valid_letters
+        "valid_letters": valid_letters,
+        "digit1": digit1,
+        "digit2": digit2,
+        "digit3": digit3,
+        "digit4": digit4,
+        "letter1": letter1,
+        "letter2": letter2,
+        "letter3": letter3,
+        "sort_by": sort_by
     })
     
     return templates.TemplateResponse("landingpage.html", template_data)

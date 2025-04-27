@@ -6,7 +6,7 @@
     <h2 class="text-center">Search License Plates</h2>
     
     <div class="search-container">
-        <form method="get" class="search-form">
+        <form method="get" class="search-form" action="/">
             <div class="search-group">
                 <label>Plate Number:</label>
                 <div class="number-dropdowns">
@@ -44,7 +44,7 @@
                         <option value="">Any</option>
                         {% for letter in valid_letters %}
                         <option value="{{ letter }}" {% if letter1 == letter %}selected{% endif %}>
-                            {{ letter }} ({{ letter_english[letter] }} - {{ letter_arabic[letter] }})
+                            {{ letter_arabic[letter] }} - {{ letter }}
                         </option>
                         {% endfor %}
                     </select>
@@ -52,7 +52,7 @@
                         <option value="">Any</option>
                         {% for letter in valid_letters %}
                         <option value="{{ letter }}" {% if letter2 == letter %}selected{% endif %}>
-                            {{ letter }} ({{ letter_english[letter] }} - {{ letter_arabic[letter] }})
+                            {{ letter_arabic[letter] }} - {{ letter }}
                         </option>
                         {% endfor %}
                     </select>
@@ -60,7 +60,7 @@
                         <option value="">Any</option>
                         {% for letter in valid_letters %}
                         <option value="{{ letter }}" {% if letter3 == letter %}selected{% endif %}>
-                            {{ letter }} ({{ letter_english[letter] }} - {{ letter_arabic[letter] }})
+                            {{ letter_arabic[letter] }} - {{ letter }}
                         </option>
                         {% endfor %}
                     </select>
@@ -104,12 +104,12 @@
                         <div class="letter-display">
                             <div class="arabic-row">
                                 {% for letter in plate.plateLetter %}
-                                <span>{{ letter }}</span>
+                                <span>{{ letter_arabic[letter] }}</span>
                                 {% endfor %}
                             </div>
                             <div class="english-row">
                                 {% for letter in plate.plateLetter %}
-                                <span>{{ letter_english[letter] }}</span>
+                                <span>{{ letter }}</span>
                                 {% endfor %}
                             </div>
                         </div>
@@ -125,7 +125,7 @@
                     <p class="description">{{ plate.description }}</p>
                 {% endif %}
                 <p class="date">Listed: {{ plate.created_at.strftime('%Y-%m-%d') }}</p>
-                <a href="/plate/{{ plate.plateID }}" class="view-button">View Details</a>
+                <a href="{{ url_for('view_plate_details', plate_id=plate.plateID) }}" class="view-button">View Details</a>
             </div>
             {% else %}
             <p class="no-results">No plates found matching your criteria.</p>

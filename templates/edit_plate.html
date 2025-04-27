@@ -1,0 +1,73 @@
+{% extends "Base.html" %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', path='css/edit_plate.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="mb-0">Edit Plate Details</h2>
+                </div>
+                <div class="card-body">
+                    <div class="plate-preview mb-4">
+                        <div class="plate-section numbers">
+                            <div class="number-section">
+                                <div class="arabic-row">
+                                    {% for digit in plate.plateNumber %}
+                                    <div class="plate-digit">{{ digit }}</div>
+                                    {% endfor %}
+                                </div>
+                                <div class="english-row">
+                                    {% for digit in plate.plateNumber %}
+                                    <div class="plate-digit">{{ digit }}</div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="plate-section letters">
+                            <div class="letter-section">
+                                <div class="arabic-row">
+                                    {% for letter in plate.plateLetter %}
+                                    <div class="plate-letter">{{ letter }}</div>
+                                    {% endfor %}
+                                </div>
+                                <div class="english-row">
+                                    {% for letter in plate.plateLetter %}
+                                    <div class="plate-letter">{{ letter }}</div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <form action="/plate/{{ plate.plateID }}/update" method="POST">
+                        <div class="mb-3">
+                            <label for="price" class="form-label">Price (SAR)</label>
+                            <input type="number" step="1" min="0" class="form-control" id="price" name="price" value="{{ plate.price|int }}" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="city" class="form-label">City</label>
+                            <select class="form-control" id="city" name="city" required>
+                                <option value="">Select City</option>
+                                <option value="Dammam" {% if plate.city == 'Dammam' %}selected{% endif %}>Dammam</option>
+                                <option value="Riyadh" {% if plate.city == 'Riyadh' %}selected{% endif %}>Riyadh</option>
+                                <option value="Jeddah" {% if plate.city == 'Jeddah' %}selected{% endif %}>Jeddah</option>
+                                <option value="Mecca" {% if plate.city == 'Mecca' %}selected{% endif %}>Mecca</option>
+                                <option value="Medina" {% if plate.city == 'Medina' %}selected{% endif %}>Medina</option>
+                            </select>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <a href="/seller-control-panel" class="btn btn-secondary">Cancel</a>
+                            <button type="submit" class="btn btn-primary">Save Changes</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

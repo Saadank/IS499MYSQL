@@ -9,6 +9,19 @@
 {% block content %}
 <div class="addlisting">
     <h2>Add New License Plate</h2>
+
+    {% if warning %}
+    <div class="warning-message">
+        {{ warning }}
+    </div>
+    {% endif %}
+
+    {% if error %}
+    <div class="error-message">
+        {{ error }}
+    </div>
+    {% endif %}
+
     <form method="POST" action="/addlisting" enctype="multipart/form-data" id="listingForm">
         <!-- Hidden fields -->
         <input type="hidden" name="transfer_cost" value="Buyer Responsibility">

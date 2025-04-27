@@ -48,12 +48,29 @@ class LicensePlateService:
                            user_id: int, listing_type: str = 'buy_now',
                            buy_now_price: Optional[float] = None,
                            city: str = '', transfer_cost: str = '',
-                           plate_type: str = '') -> LicensePlate:
+                           plate_type: str = '') -> tuple[Optional[LicensePlate], Optional[str]]:
+        # Validate first digit (must be 1-9 or 'x', not 0)
+        if digit1 == '0':
+            return None, "First digit cannot be 0. Please use a number between 1-9."
+        
         # Combine digits into plate number, excluding 'x'
         plate_number = ""
-        for digit in [digit1, digit2, digit3, digit4]:
-            if digit != 'x':
-                plate_number += digit
+        digits = [d for d in [digit1, digit2, digit3, digit4] if d != 'x']
+        
+        # Validate that zeros have adjacent non-zero digits
+        for i in range(len(digits)):
+            if digits[i] == '0':
+                # Check if there's a non-zero digit before or after
+                has_adjacent_nonzero = False
+                if i > 0 and digits[i-1] != '0':  # Check digit before
+                    has_adjacent_nonzero = True
+                if i < len(digits)-1 and digits[i+1] != '0':  # Check digit after
+                    has_adjacent_nonzero = True
+                if not has_adjacent_nonzero:
+                    return None, "Each zero must have an adjacent non-zero digit. Please revise the plate number."
+        
+        # Form the plate number
+        plate_number = ''.join(digits)
         
         # Combine letters, excluding 'any'
         plate_letter = letter1 if letter1 != 'any' else ''
@@ -68,19 +85,23 @@ class LicensePlateService:
         else:
             buy_now_price = None
 
-        return await self.create_license_plate(
-            plate_number=plate_number,
-            plate_letter=plate_letter,
-            description=description,
-            price=price,
-            listing_type=listing_type,
-            buy_now_price=buy_now_price,
-            owner_id=user_id,
-            city=city,
-            transfer_cost=transfer_cost,
-            plate_type=plate_type,
-            image=image
-        )
+        try:
+            plate = await self.create_license_plate(
+                plate_number=plate_number,
+                plate_letter=plate_letter,
+                description=description,
+                price=price,
+                listing_type=listing_type,
+                buy_now_price=buy_now_price,
+                owner_id=user_id,
+                city=city,
+                transfer_cost=transfer_cost,
+                plate_type=plate_type,
+                image=image
+            )
+            return plate, None
+        except ValueError as e:
+            return None, str(e)
 
     def get_plates_data(self, request: Request) -> Dict[str, Any]:
         # Get user from session
@@ -109,20 +130,29 @@ class LicensePlateService:
     def get_forsale_data(self, request: Request, digit1: Optional[str], digit2: Optional[str],
                         digit3: Optional[str], digit4: Optional[str], letter1: Optional[str],
                         letter2: Optional[str], letter3: Optional[str], sort_by: str) -> Dict[str, Any]:
-        # Get user from session
+        """
+        Get data for the forsale page including search results and form data.
+        """
+        # Get user session data
         user_id = request.session.get("user_id")
         is_admin = False
         if user_id:
             user = self.db.query(User).filter(User.id == user_id).first()
             is_admin = user.is_admin if user else False
 
-        # If user is admin, show all plates, otherwise only show approved plates
-        if is_admin:
-            plates = self.db.query(LicensePlate).filter(LicensePlate.is_sold == False).all()
-        else:
-            plates = self.get_license_plates(digit1, digit2, digit3, digit4,
-                                           letter1, letter2, letter3, sort_by)
-        
+        # Get plates based on search criteria
+        plates = self.get_license_plates(
+            digit1=digit1,
+            digit2=digit2,
+            digit3=digit3,
+            digit4=digit4,
+            letter1=letter1,
+            letter2=letter2,
+            letter3=letter3,
+            sort_by=sort_by
+        )
+
+        # Return template data
         return {
             "request": request,
             "plates": plates,
@@ -136,7 +166,8 @@ class LicensePlateService:
             "sort_by": sort_by,
             "valid_letters": self.VALID_LETTERS,
             "letter_english": self.LETTER_ENGLISH,
-            "letter_arabic": self.LETTER_ARABIC
+            "letter_arabic": self.LETTER_ARABIC,
+            "is_admin": is_admin
         }
 
     def validate_plate_letter(self, plate_letter: str) -> tuple[bool, str]:
@@ -225,55 +256,86 @@ class LicensePlateService:
 
     def get_license_plates(self, digit1=None, digit2=None, digit3=None, digit4=None,
                           letter1=None, letter2=None, letter3=None, sort_by="newest") -> List[LicensePlate]:
-        # Only show approved and unsold plates
-        plates = self.db.query(LicensePlate).filter(
+        """
+        Get license plates based on search criteria.
+        All parameters are optional and will be used as filters if provided.
+        Position-based matching: each digit must match its exact position.
+        """
+        # Start with base query
+        query = self.db.query(LicensePlate).filter(
             LicensePlate.is_sold == False,
             LicensePlate.is_approved == True
-        ).all()
-        
-        # Apply digit filters
-        if any([digit1, digit2, digit3, digit4]):
-            filtered_plates = []
-            for plate in plates:
-                plate_digits = list(plate.plateNumber)  # Convert to list of characters
-                matches = True
-                
-                # Check each digit position
-                for i, digit in enumerate([digit1, digit2, digit3, digit4]):
-                    if digit is not None and digit != 'x':  # Skip if digit is None or 'x'
-                        if i >= len(plate_digits):  # If plate number is shorter than expected
-                            matches = False
-                            break
-                        if plate_digits[i] != digit:  # If digits don't match
-                            matches = False
-                            break
-                
-                if matches:
-                    filtered_plates.append(plate)
-            plates = filtered_plates
+        )
 
-        # Apply letter filters
+        # Handle number search with position-based matching
+        if any([digit1, digit2, digit3, digit4]):
+            # For each position, if a digit is specified, add a filter
+            if digit1 and digit1.strip() and digit1 != 'x':
+                query = query.filter(LicensePlate.plateNumber.like(f"{digit1.strip()}%"))
+            
+            if digit2 and digit2.strip() and digit2 != 'x':
+                # Match second position: first digit + second digit
+                if digit1 and digit1.strip() and digit1 != 'x':
+                    query = query.filter(LicensePlate.plateNumber.like(f"{digit1.strip()}{digit2.strip()}%"))
+                else:
+                    # If first digit not specified, match any first digit + specified second digit
+                    query = query.filter(LicensePlate.plateNumber.like(f"_{digit2.strip()}%"))
+            
+            if digit3 and digit3.strip() and digit3 != 'x':
+                # Build pattern based on previous digits
+                pattern = ""
+                if digit1 and digit1.strip() and digit1 != 'x':
+                    pattern += digit1.strip()
+                else:
+                    pattern += "_"
+                if digit2 and digit2.strip() and digit2 != 'x':
+                    pattern += digit2.strip()
+                else:
+                    pattern += "_"
+                pattern += f"{digit3.strip()}%"
+                query = query.filter(LicensePlate.plateNumber.like(pattern))
+            
+            if digit4 and digit4.strip() and digit4 != 'x':
+                # Build pattern based on previous digits
+                pattern = ""
+                if digit1 and digit1.strip() and digit1 != 'x':
+                    pattern += digit1.strip()
+                else:
+                    pattern += "_"
+                if digit2 and digit2.strip() and digit2 != 'x':
+                    pattern += digit2.strip()
+                else:
+                    pattern += "_"
+                if digit3 and digit3.strip() and digit3 != 'x':
+                    pattern += digit3.strip()
+                else:
+                    pattern += "_"
+                pattern += digit4.strip()
+                query = query.filter(LicensePlate.plateNumber.like(pattern))
+
+        # Handle letter search
         if any([letter1, letter2, letter3]):
-            filtered_plates = []
-            for plate in plates:
-                plate_letters = list(plate.plateLetter)
-                if (not letter1 or letter1 == 'any' or plate_letters[0] == letter1) and \
-                   (not letter2 or letter2 == 'any' or (len(plate_letters) > 1 and plate_letters[1] == letter2)) and \
-                   (not letter3 or letter3 == 'any' or (len(plate_letters) > 2 and plate_letters[2] == letter3)):
-                    filtered_plates.append(plate)
-            plates = filtered_plates
-        
+            # Build the letter sequence
+            search_letters = []
+            for l in [letter1, letter2, letter3]:
+                if l and l.strip() and l.upper() != 'ANY':
+                    search_letters.append(l.strip().upper())
+            
+            if search_letters:
+                letter_sequence = ''.join(search_letters)
+                query = query.filter(LicensePlate.plateLetter.startswith(letter_sequence))
+
         # Apply sorting
         if sort_by == "newest":
-            plates.sort(key=lambda x: x.created_at, reverse=True)
+            query = query.order_by(LicensePlate.created_at.desc())
         elif sort_by == "oldest":
-            plates.sort(key=lambda x: x.created_at)
+            query = query.order_by(LicensePlate.created_at.asc())
         elif sort_by == "price_high":
-            plates.sort(key=lambda x: x.price, reverse=True)
+            query = query.order_by(LicensePlate.price.desc())
         elif sort_by == "price_low":
-            plates.sort(key=lambda x: x.price)
-            
-        return plates
+            query = query.order_by(LicensePlate.price.asc())
+
+        return query.all()
 
     def get_license_plate(self, plate_id: int) -> Optional[LicensePlate]:
         return self.db.query(LicensePlate).filter(
@@ -333,10 +395,6 @@ class LicensePlateService:
         # Delete associated wishlist items
         for wishlist_item in plate.wishlist_items:
             self.db.delete(wishlist_item)
-            
-        # Delete associated auctions
-        for auction in plate.auctions:
-            self.db.delete(auction)
         
         self.db.delete(plate)
         self.db.commit()
