@@ -250,4 +250,56 @@ async def seller_control_panel(
         "letter_arabic": plate_service.LETTER_ARABIC
     })
     
-    return templates.TemplateResponse("seller_control_panel.html", template_data) 
+    return templates.TemplateResponse("seller_control_panel.html", template_data)
+
+@router.post("/plate/{plate_id}/update")
+async def update_plate_details(
+    plate_id: int,
+    request: Request,
+    price: float = Form(...),
+    city: str = Form(...),
+    db: Session = Depends(get_db),
+    user_id: int = Depends(require_auth)
+):
+    plate_service = LicensePlateService(db)
+    
+    # Get the plate and verify ownership
+    plate = db.query(LicensePlate).filter(
+        LicensePlate.plateID == plate_id,
+        LicensePlate.owner_id == user_id
+    ).first()
+    
+    if not plate:
+        raise HTTPException(status_code=404, detail="Plate not found or you don't have permission to edit it")
+    
+    # Update the plate details
+    plate.price = price
+    plate.city = city
+    
+    db.commit()
+    return RedirectResponse(url="/seller-control-panel", status_code=status.HTTP_303_SEE_OTHER)
+
+@router.get("/plate/{plate_id}/edit", response_class=HTMLResponse)
+async def edit_plate_page(
+    request: Request,
+    plate_id: int,
+    db: Session = Depends(get_db),
+    user_id: int = Depends(require_auth)
+):
+    plate_service = LicensePlateService(db)
+    session_service = SessionService(request)
+    
+    # Get the plate and verify ownership
+    plate = db.query(LicensePlate).filter(
+        LicensePlate.plateID == plate_id,
+        LicensePlate.owner_id == user_id
+    ).first()
+    
+    if not plate:
+        raise HTTPException(status_code=404, detail="Plate not found or you don't have permission to edit it")
+    
+    template_data = session_service.get_template_data({
+        "plate": plate
+    })
+    
+    return templates.TemplateResponse("edit_plate.html", template_data) 
