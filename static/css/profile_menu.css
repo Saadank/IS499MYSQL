@@ -13,10 +13,25 @@
     display: flex;
     align-items: center;
     gap: 8px;
+    font-weight: 700;  /* Extra bold */
+    font-size: 18px;  /* Larger font size */
+    letter-spacing: 0.5px;  /* Added letter spacing */
 }
 
 .profile-button:hover {
     background-color: rgba(255, 255, 255, 0.1);
+}
+
+.profile-button i {
+    font-size: 20px;  /* Size of the icon */
+    margin-right: 4px;  /* Space between icon and text */
+}
+
+.profile-icon {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    object-fit: cover;
 }
 
 /* Dropdown container */

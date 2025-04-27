@@ -26,6 +26,7 @@
                     <li><div class="profile-menu-container">
                         <button class="profile-button" onclick="toggleProfileMenu()">
                             {{ username }}
+                            <img src="{{ url_for('static', path='img/12.svg') }}" alt="Profile" class="profile-icon">
                         </button>
                         <div class="profile-dropdown" id="profileDropdown">
                             <a href="{{ url_for('profile_page') }}" class="dropdown-item">Profile</a>
