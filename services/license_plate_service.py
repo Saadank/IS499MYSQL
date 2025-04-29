@@ -353,18 +353,20 @@ class LicensePlateService:
                 query = query.filter(func.length(LicensePlate.plateNumber) == 2)
             elif digit_count == 'triple':
                 query = query.filter(func.length(LicensePlate.plateNumber) == 3)
+            elif digit_count == 'quad':
+                query = query.filter(func.length(LicensePlate.plateNumber) == 4)
 
         # Handle letter search
         if any([letter1, letter2, letter3]):
-            # Build the letter sequence
-            search_letters = []
-            for l in [letter1, letter2, letter3]:
-                if l and l.strip() and l.upper() != 'ANY':
-                    search_letters.append(l.strip().upper())
+            # For each position, if a letter is specified and not 'ANY', add a filter
+            if letter1 and letter1.strip() and letter1.upper() != 'ANY':
+                query = query.filter(func.substr(LicensePlate.plateLetter, 1, 1) == letter1.strip().upper())
             
-            if search_letters:
-                letter_sequence = ''.join(search_letters)
-                query = query.filter(LicensePlate.plateLetter.startswith(letter_sequence))
+            if letter2 and letter2.strip() and letter2.upper() != 'ANY':
+                query = query.filter(func.substr(LicensePlate.plateLetter, 2, 1) == letter2.strip().upper())
+            
+            if letter3 and letter3.strip() and letter3.upper() != 'ANY':
+                query = query.filter(func.substr(LicensePlate.plateLetter, 3, 1) == letter3.strip().upper())
 
         # Apply sorting
         if sort_by == "newest":

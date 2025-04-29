@@ -60,7 +60,7 @@ async def home(
     letter3: Optional[str] = Query(None),
     sort_by: Optional[str] = Query("newest", regex="^(newest|oldest|price_high|price_low)$"),
     plate_type: Optional[str] = Query(None, regex="^(private|commercial)?$"),
-    digit_count: Optional[str] = Query(None, regex="^(single|double|triple)?$"),
+    digit_count: Optional[str] = Query(None, regex="^(single|double|triple|quad)?$"),
     db: Session = Depends(get_db)
 ):
     session_service = SessionService(request)
