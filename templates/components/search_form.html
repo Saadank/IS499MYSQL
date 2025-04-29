@@ -1,0 +1,77 @@
+{% macro search_form(digit1, digit2, digit3, digit4, letter1, letter2, letter3, sort_by, valid_letters, letter_arabic, action="/") %}
+<div class="search-container">
+    <form method="get" class="search-form" action="{{ action }}">
+        <div class="search-group">
+            <label>Plate Number:</label>
+            <div class="number-dropdowns">
+                <select name="digit1" class="digit-select">
+                    <option value="">Any</option>
+                    {% for i in range(10) %}
+                    <option value="{{ i }}" {% if digit1 == i|string %}selected{% endif %}>{{ i }}</option>
+                    {% endfor %}
+                </select>
+                <select name="digit2" class="digit-select">
+                    <option value="">Any</option>
+                    {% for i in range(10) %}
+                    <option value="{{ i }}" {% if digit2 == i|string %}selected{% endif %}>{{ i }}</option>
+                    {% endfor %}
+                </select>
+                <select name="digit3" class="digit-select">
+                    <option value="">Any</option>
+                    {% for i in range(10) %}
+                    <option value="{{ i }}" {% if digit3 == i|string %}selected{% endif %}>{{ i }}</option>
+                    {% endfor %}
+                </select>
+                <select name="digit4" class="digit-select">
+                    <option value="">Any</option>
+                    {% for i in range(10) %}
+                    <option value="{{ i }}" {% if digit4 == i|string %}selected{% endif %}>{{ i }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+
+        <div class="search-group">
+            <label>Plate Letters:</label>
+            <div class="letter-dropdowns">
+                <select name="letter1" class="letter-select">
+                    <option value="">Any</option>
+                    {% for letter in valid_letters %}
+                    <option value="{{ letter }}" {% if letter1 == letter %}selected{% endif %}>
+                        {{ letter }} ({{ letter_arabic[letter] }})
+                    </option>
+                    {% endfor %}
+                </select>
+                <select name="letter2" class="letter-select">
+                    <option value="">Any</option>
+                    {% for letter in valid_letters %}
+                    <option value="{{ letter }}" {% if letter2 == letter %}selected{% endif %}>
+                        {{ letter }} ({{ letter_arabic[letter] }})
+                    </option>
+                    {% endfor %}
+                </select>
+                <select name="letter3" class="letter-select">
+                    <option value="">Any</option>
+                    {% for letter in valid_letters %}
+                    <option value="{{ letter }}" {% if letter3 == letter %}selected{% endif %}>
+                        {{ letter }} ({{ letter_arabic[letter] }})
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+
+        <div class="sort-container">
+            <label for="sort_by">Sort By:</label>
+            <select name="sort_by" id="sort_by">
+                <option value="newest" {% if sort_by == 'newest' %}selected{% endif %}>Newest First</option>
+                <option value="oldest" {% if sort_by == 'oldest' %}selected{% endif %}>Oldest First</option>
+                <option value="price_high" {% if sort_by == 'price_high' %}selected{% endif %}>Most Expensive</option>
+                <option value="price_low" {% if sort_by == 'price_low' %}selected{% endif %}>Cheapest</option>
+            </select>
+        </div>
+
+        <button type="submit" class="search-button">Search</button>
+    </form>
+</div>
+{% endmacro %} 
