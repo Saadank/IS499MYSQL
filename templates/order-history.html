@@ -50,9 +50,16 @@
                             </td>
                             <td class="fw-bold">SAR {{ "%.2f"|format(order.price) }}</td>
                             <td>
-                                <span class="badge rounded-pill {% if order.status == 'completed' %}bg-success{% elif order.status == 'pending' %}bg-warning{% else %}bg-danger{% endif %}">
+                                <span class="badge rounded-pill {% if order.status == 'completed' %}bg-success{% elif order.status == 'pending' %}bg-warning{% elif order.status == 'in_progress' %}bg-info{% else %}bg-danger{% endif %}">
                                     {{ order.status|title }}
                                 </span>
+                                {% if order.status == 'in_progress' and order.seller_id == user_id %}
+                                <form action="/users/orders/{{ order.id }}/complete" method="post" class="d-inline ms-2" id="completeForm{{ order.id }}" onsubmit="return confirmCompleteOrder(event, {{ order.id }}, '{{ order.plate.plate_number }}{{ order.plate.plate_letter }}')">
+                                    <button type="submit" class="btn btn-success btn-sm">
+                                        <i class="fas fa-check"></i> Complete Order
+                                    </button>
+                                </form>
+                                {% endif %}
                             </td>
                             <td>
                                 <span class="text-primary">{{ order.seller.username }}</span>
@@ -66,7 +73,7 @@
             <div class="text-center py-4">
                 <i class="fas fa-shopping-bag fa-3x text-muted mb-3"></i>
                 <p class="text-muted">No purchases found.</p>
-                <a href="/forsale" class="btn btn-primary btn-sm">Browse Plates</a>
+                <a href="/" class="btn btn-primary btn-sm">Browse Plates</a>
             </div>
             {% endif %}
         </div>
@@ -108,9 +115,16 @@
                             </td>
                             <td class="fw-bold">SAR {{ "%.2f"|format(order.price) }}</td>
                             <td>
-                                <span class="badge rounded-pill {% if order.status == 'completed' %}bg-success{% elif order.status == 'pending' %}bg-warning{% else %}bg-danger{% endif %}">
+                                <span class="badge rounded-pill {% if order.status == 'completed' %}bg-success{% elif order.status == 'pending' %}bg-warning{% elif order.status == 'in_progress' %}bg-info{% else %}bg-danger{% endif %}">
                                     {{ order.status|title }}
                                 </span>
+                                {% if order.status == 'in_progress' and order.seller_id == user_id %}
+                                <form action="/users/orders/{{ order.id }}/complete" method="post" class="d-inline ms-2" id="completeForm{{ order.id }}" onsubmit="return confirmCompleteOrder(event, {{ order.id }}, '{{ order.plate.plate_number }}{{ order.plate.plate_letter }}')">
+                                    <button type="submit" class="btn btn-success btn-sm">
+                                        <i class="fas fa-check"></i> Complete Order
+                                    </button>
+                                </form>
+                                {% endif %}
                             </td>
                             <td>
                                 <span class="text-primary">{{ order.buyer.username }}</span>
@@ -130,4 +144,16 @@
         </div>
     </div>
 </div>
+
+{% block extra_js %}
+<script>
+function confirmCompleteOrder(event, orderId, plateNumber) {
+    event.preventDefault();
+    if (confirm(`Are you sure you have transferred the license plate ${plateNumber} to the buyer?`)) {
+        document.getElementById(`completeForm${orderId}`).submit();
+    }
+    return false;
+}
+</script>
+{% endblock %}
 {% endblock %} 

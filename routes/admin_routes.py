@@ -3,11 +3,12 @@ from fastapi.responses import HTMLResponse, RedirectResponse
 from sqlalchemy.orm import Session
 from typing import List
 from database import get_db
-from models import User, LicensePlate, Order
+from models import User, LicensePlate, Order, OrderStatus
 from schemas import UserResponse, LicensePlateResponse
 from routes.auth import get_current_user
 from utils.template_config import templates
 from services.email_service import EmailService
+from datetime import datetime
 
 router = APIRouter(
     prefix="/admin",
@@ -193,4 +194,72 @@ async def approve_license_plate(
         email_service = EmailService()
         email_service.send_listing_approved_email(user, plate)
     
-    return RedirectResponse(url="/admin/license-plates", status_code=status.HTTP_303_SEE_OTHER) 
+    return RedirectResponse(url="/admin/license-plates", status_code=status.HTTP_303_SEE_OTHER)
+
+@router.post("/orders/{order_id}/transfer-money", response_class=HTMLResponse)
+async def transfer_money(
+    request: Request,
+    order_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(verify_admin)
+):
+    # Get the order
+    order = db.query(Order).filter(Order.id == order_id).first()
+    if not order:
+        raise HTTPException(status_code=404, detail="Order not found")
+    
+    # Verify the order is completed
+    if order.status != OrderStatus.COMPLETED:
+        raise HTTPException(status_code=400, detail="Order must be completed before transferring money")
+    
+    # Verify money hasn't been transferred yet
+    if order.money_transferred:
+        raise HTTPException(status_code=400, detail="Money has already been transferred for this order")
+    
+    try:
+        # Get seller info
+        seller = db.query(User).filter(User.id == order.seller_id).first()
+        if not seller:
+            raise HTTPException(status_code=404, detail="Seller not found")
+        
+        # Verify seller has IBAN
+        if not seller.iban:
+            raise HTTPException(status_code=400, detail="Seller has not provided IBAN for money transfer")
+        
+        # Update order with money transfer details
+        order.money_transferred = True
+        order.money_transferred_at = datetime.utcnow()
+        db.commit()
+        
+        # Send email notification to seller
+        email_service = EmailService()
+        seller_info = {
+            'name': seller.username,
+            'email': seller.email,
+            'phone_number': seller.phone_number
+        }
+        plate_info = {
+            'number': order.plate.plateNumber,
+            'letter': order.plate.plateLetter,
+            'price': order.price
+        }
+        email_service.send_money_transfer_notification(seller_info, plate_info)
+        
+        # Redirect back to admin orders page
+        return RedirectResponse(url="/admin/orders", status_code=303)
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.get("/orders", response_class=HTMLResponse)
+async def admin_orders(
+    request: Request,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(verify_admin)
+):
+    """Admin orders management page"""
+    orders = db.query(Order).order_by(Order.created_at.desc()).all()
+    return templates.TemplateResponse(
+        "admin/orders.html",
+        {"request": request, "orders": orders}
+    ) 

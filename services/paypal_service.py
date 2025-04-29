@@ -103,8 +103,8 @@ class PayPalService:
                 # Mark the plate as sold
                 plate.is_sold = True
                 
-                # Update order status to completed
-                order.status = OrderStatus.COMPLETED
+                # Update order status to in progress
+                order.status = OrderStatus.IN_PROGRESS
                 order.updated_at = datetime.utcnow()
                 
                 # Get buyer and seller info
