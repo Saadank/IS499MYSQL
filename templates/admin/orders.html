@@ -2,62 +2,80 @@
 
 {% block title %}Admin - Orders Management{% endblock %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', path='css/order-history.css') }}">
+{% endblock %}
+
 {% block content %}
 <div class="container-fluid mt-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2>Manage Orders</h2>
+    <div class="order-history-header mb-4">
+        <div class="d-flex align-items-center justify-content-center mb-2">
+            <i class="fas fa-tasks me-2 text-primary"></i>
+            <h2 class="text-primary mb-0">Manage Orders</h2>
+        </div>
     </div>
     
-    <div class="card">
-        <div class="card-body">
+    <div class="card shadow-sm">
+        <div class="card-header bg-white border-bottom">
+            <div class="d-flex align-items-center">
+                <h3 class="h5 mb-0">All Orders <i class="fas fa-list text-primary ms-2"></i></h3>
+            </div>
+        </div>
+        <div class="card-body px-4">
             <div class="table-responsive">
-                <table class="table table-hover">
+                <table class="table table-hover align-middle">
                     <thead>
                         <tr>
-                            <th>Order ID</th>
-                            <th>Plate Number</th>
-                            <th>Buyer</th>
-                            <th>Seller</th>
-                            <th>Price</th>
-                            <th>Status</th>
-                            <th>Money Transfer</th>
-                            <th>Actions</th>
+                            <th style="width: 8%">Order ID</th>
+                            <th style="width: 15%">Plate Number</th>
+                            <th style="width: 12%">Buyer</th>
+                            <th style="width: 12%">Seller</th>
+                            <th style="width: 10%">Price</th>
+                            <th style="width: 10%">Status</th>
+                            <th style="width: 18%">Money Transfer</th>
+                            <th style="width: 15%">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for order in orders %}
                         <tr>
-                            <td>#{{ order.id }}</td>
-                            <td>{{ order.plate.plateNumber }}{{ order.plate.plateLetter }}</td>
-                            <td>{{ order.buyer.username }}</td>
-                            <td>{{ order.seller.username }}</td>
-                            <td>SAR {{ "%.2f"|format(order.price) }}</td>
+                            <td><span class="fw-bold">#{{ order.id }}</span></td>
                             <td>
-                                <span class="badge {% if order.status == 'completed' %}bg-success{% elif order.status == 'pending' %}bg-warning{% elif order.status == 'in_progress' %}bg-info{% else %}bg-danger{% endif %}">
-                                    {{ order.status|title }}
+                                <span class="plate-number">
+                                    {{ order.plate.plateNumber }}
+                                    <span class="plate-letter">{{ order.plate.plateLetter }}</span>
+                                </span>
+                            </td>
+                            <td><span class="text-primary">{{ order.buyer.username }}</span></td>
+                            <td><span class="text-primary">{{ order.seller.username }}</span></td>
+                            <td class="fw-bold">SAR {{ "%.2f"|format(order.price) }}</td>
+                            <td>
+                                <span class="badge rounded-pill {% if order.status == 'completed' %}bg-success{% elif order.status == 'pending' %}bg-warning{% elif order.status == 'in_progress' %}bg-warning{% else %}bg-danger{% endif %}">
+                                    {{ order.status|replace('_', ' ')|title }}
                                 </span>
                             </td>
                             <td>
                                 {% if order.status == 'completed' %}
                                     {% if order.money_transferred %}
-                                        <span class="badge bg-success">
-                                            Transferred on {{ order.money_transferred_at.strftime('%Y-%m-%d %H:%M') }}
+                                        <span class="badge bg-success rounded-pill">
+                                            <i class="fas fa-check me-1"></i> Transferred
+                                            <small class="d-block">{{ order.money_transferred_at.strftime('%Y-%m-%d %H:%M') }}</small>
                                         </span>
                                     {% else %}
-                                        <form action="/admin/orders/{{ order.id }}/transfer-money" method="post" class="d-inline">
-                                            <button type="submit" class="btn btn-primary btn-sm" 
-                                                    onclick="return confirm('Are you sure you want to mark the money as transferred for this order?')">
+                                        <form action="/admin/orders/{{ order.id }}/transfer-money" method="post" class="d-inline" id="transferForm{{ order.id }}">
+                                            <button type="button" class="btn btn-success" 
+                                                    onclick="initiateMoneyTransfer({{ order.id }}, '{{ order.plate.plateNumber }}{{ order.plate.plateLetter }}')">
                                                 <i class="fas fa-money-bill-wave"></i> Mark as Transferred
                                             </button>
                                         </form>
                                     {% endif %}
                                 {% else %}
-                                    <span class="text-muted">Not applicable</span>
+                                    <span class="badge bg-secondary rounded-pill">Not applicable</span>
                                 {% endif %}
                             </td>
                             <td>
-                                <a href="/admin/orders/{{ order.id }}" class="btn btn-info btn-sm">
-                                    <i class="fas fa-eye"></i> View Details
+                                <a href="/admin/orders/{{ order.id }}" class="btn btn-primary">
+                                    <i class="fas fa-eye me-1"></i> View Details
                                 </a>
                             </td>
                         </tr>
@@ -68,4 +86,18 @@
         </div>
     </div>
 </div>
+
+{% block extra_js %}
+<script>
+function initiateMoneyTransfer(orderId, plateNumber) {
+    // First confirmation
+    if (confirm(`Are you sure you want to mark the money as transferred for plate ${plateNumber}?`)) {
+        // Second confirmation
+        if (confirm(`Please confirm again that you have transferred the money to the seller. This action cannot be undone.`)) {
+            document.getElementById(`transferForm${orderId}`).submit();
+        }
+    }
+}
+</script>
+{% endblock %}
 {% endblock %} 
