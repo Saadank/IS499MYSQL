@@ -88,7 +88,7 @@ async def create_listing(
             })
             return templates.TemplateResponse("addlisting.html", template_data, status_code=400)
         
-        return RedirectResponse(url="/plates", status_code=status.HTTP_303_SEE_OTHER)
+        return RedirectResponse(url="/seller-control-panel", status_code=status.HTTP_303_SEE_OTHER)
         
     except Exception as e:
         # For unexpected errors, return to form with error message

@@ -8,6 +8,14 @@ from database import get_db
 from services.session_service import SessionService
 from services.email_service import EmailService
 
+def verify_password(plain_password: str, hashed_password: str) -> bool:
+    """Verify a password against its hash."""
+    return hashlib.sha256(plain_password.encode()).hexdigest() == hashed_password
+
+def get_password_hash(password: str) -> str:
+    """Generate a hash for the given password."""
+    return hashlib.sha256(password.encode()).hexdigest()
+
 async def get_current_user(
     request: Request,
     db: Session = Depends(get_db)
