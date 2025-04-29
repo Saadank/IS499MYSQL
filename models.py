@@ -6,6 +6,7 @@ from enum import Enum
 
 class OrderStatus(str, Enum):
     PENDING = "pending"
+    IN_PROGRESS = "in_progress"
     COMPLETED = "completed"
     CANCELLED = "cancelled"
 
@@ -102,6 +103,8 @@ class Order(Base):
     updated_at = Column(DateTime, default=lambda: datetime.now(UTC), onupdate=lambda: datetime.now(UTC))
     expires_at = Column(DateTime, default=lambda: datetime.now(UTC) + timedelta(minutes=1))
     payment_id = Column(String(50), nullable=True)  # PayPal payment ID
+    money_transferred = Column(Boolean, default=False)  # Track if money has been transferred to seller
+    money_transferred_at = Column(DateTime, nullable=True)  # When the money was transferred
 
     # Relationships
     plate = relationship("LicensePlate")

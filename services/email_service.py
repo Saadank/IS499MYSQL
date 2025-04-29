@@ -86,14 +86,14 @@ class EmailService:
 
     def send_purchase_notification(self, buyer_info: Dict, seller_info: Dict, plate_info: Dict):
         # Email to buyer
-        buyer_subject = "License Plate Purchase Confirmation"
+        buyer_subject = "License Plate Purchase - Payment Received"
         buyer_body = f"""
         <html>
             <body>
-                <h2>License Plate Purchase Confirmation</h2>
+                <h2>License Plate Purchase - Payment Received</h2>
                 <p>Dear {buyer_info['name']},</p>
                 
-                <p>Thank you for your purchase! Here are the details of your transaction:</p>
+                <p>Your payment has been received! Here are the details of your transaction:</p>
                 
                 <div style="background-color: #f8f9fa; padding: 15px; border-radius: 5px; margin: 15px 0;">
                     <h3 style="color: #333; margin-top: 0;">Plate Details</h3>
@@ -108,7 +108,8 @@ class EmailService:
                     <p>Phone: <strong>{seller_info.get('phone_number', 'Not provided')}</strong></p>
                 </div>
 
-                <p>Please contact the seller to arrange the transfer of the license plate.</p>
+                <p>Your order is now in progress. The seller will contact you to arrange the transfer of the license plate.</p>
+                <p>Once the seller confirms the transfer, you will receive another email notification.</p>
                 <br>
                 <p>Best regards,<br>License Plate Trading Platform</p>
             </body>
@@ -116,14 +117,14 @@ class EmailService:
         """
 
         # Email to seller
-        seller_subject = "License Plate Sale Confirmation"
+        seller_subject = "License Plate Sale - Payment Received"
         seller_body = f"""
         <html>
             <body>
-                <h2>License Plate Sale Confirmation</h2>
+                <h2>License Plate Sale - Payment Received</h2>
                 <p>Dear {seller_info['name']},</p>
                 
-                <p>Your license plate has been sold! Here are the details:</p>
+                <p>Payment has been received for your license plate! Here are the details:</p>
                 
                 <div style="background-color: #f8f9fa; padding: 15px; border-radius: 5px; margin: 15px 0;">
                     <h3 style="color: #333; margin-top: 0;">Plate Details</h3>
@@ -139,6 +140,58 @@ class EmailService:
                 </div>
 
                 <p>Please contact the buyer to arrange the transfer of the license plate.</p>
+                <p>Once the transfer is complete, please log in to your account and mark the order as completed.</p>
+                <br>
+                <p>Best regards,<br>License Plate Trading Platform</p>
+            </body>
+        </html>
+        """
+
+        # Send emails
+        self.send_email(buyer_info['email'], buyer_subject, buyer_body)
+        self.send_email(seller_info['email'], seller_subject, seller_body)
+
+    def send_order_completion_notification(self, buyer_info: Dict, seller_info: Dict, plate_info: Dict):
+        # Email to buyer
+        buyer_subject = "License Plate Purchase - Transfer Completed"
+        buyer_body = f"""
+        <html>
+            <body>
+                <h2>License Plate Purchase - Transfer Completed</h2>
+                <p>Dear {buyer_info['name']},</p>
+                
+                <p>Great news! The seller has confirmed the transfer of your license plate.</p>
+                
+                <div style="background-color: #f8f9fa; padding: 15px; border-radius: 5px; margin: 15px 0;">
+                    <h3 style="color: #333; margin-top: 0;">Plate Details</h3>
+                    <p>Plate Number: <strong>{plate_info['number']}{plate_info['letter']}</strong></p>
+                    <p>Price: <strong>SAR {plate_info['price']}</strong></p>
+                </div>
+
+                <p>Your purchase is now complete. Thank you for using our platform!</p>
+                <br>
+                <p>Best regards,<br>License Plate Trading Platform</p>
+            </body>
+        </html>
+        """
+
+        # Email to seller
+        seller_subject = "License Plate Sale - Transfer Completed"
+        seller_body = f"""
+        <html>
+            <body>
+                <h2>License Plate Sale - Transfer Completed</h2>
+                <p>Dear {seller_info['name']},</p>
+                
+                <p>You have successfully completed the transfer of your license plate.</p>
+                
+                <div style="background-color: #f8f9fa; padding: 15px; border-radius: 5px; margin: 15px 0;">
+                    <h3 style="color: #333; margin-top: 0;">Plate Details</h3>
+                    <p>Plate Number: <strong>{plate_info['number']}{plate_info['letter']}</strong></p>
+                    <p>Price: <strong>SAR {plate_info['price']}</strong></p>
+                </div>
+
+                <p>Thank you for using our platform!</p>
                 <br>
                 <p>Best regards,<br>License Plate Trading Platform</p>
             </body>
@@ -182,4 +235,30 @@ class EmailService:
             </body>
         </html>
         """
-        return self.send_email(user.email, subject, body) 
+        return self.send_email(user.email, subject, body)
+
+    def send_money_transfer_notification(self, seller_info: Dict, plate_info: Dict):
+        subject = "Money Transfer Confirmation"
+        body = f"""
+        <html>
+            <body>
+                <h2>Money Transfer Confirmation</h2>
+                <p>Dear {seller_info['name']},</p>
+                
+                <p>We are pleased to inform you that the money for your license plate sale has been transferred to your account.</p>
+                
+                <div style="background-color: #f8f9fa; padding: 15px; border-radius: 5px; margin: 15px 0;">
+                    <h3 style="color: #333; margin-top: 0;">Transaction Details</h3>
+                    <p>Plate Number: <strong>{plate_info['number']}{plate_info['letter']}</strong></p>
+                    <p>Amount: <strong>SAR {plate_info['price']}</strong></p>
+                </div>
+
+                <p>The money should appear in your account within 1-2 business days.</p>
+                <p>If you have any questions or concerns, please contact our support team.</p>
+                <br>
+                <p>Best regards,<br>License Plate Trading Platform</p>
+            </body>
+        </html>
+        """
+
+        return self.send_email(seller_info['email'], subject, body) 
