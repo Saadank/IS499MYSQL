@@ -62,7 +62,7 @@ class LicensePlate(Base):
             "plateLetter REGEXP '^[A-Z]{1,3}$'",
             name='plate_letter_format'
         ),
-        UniqueConstraint('plateNumber', 'plateLetter', name='unique_plate_number_letter'),
+        UniqueConstraint('plateNumber', 'plateLetter', 'plate_type', name='unique_plate_number_letter_type'),
     )
 
 class WishlistItem(Base):

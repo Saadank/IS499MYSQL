@@ -213,6 +213,24 @@ class LicensePlateService:
             raise ValueError(f"Invalid plate letter: {result}")
         english_plate_letter = result
 
+        # Check for existing plate with same number and letter
+        existing_plate = self.db.query(LicensePlate).filter(
+            LicensePlate.plateNumber == plate_number,
+            LicensePlate.plateLetter == english_plate_letter,
+            LicensePlate.is_sold == False  # Only check unsold plates
+        ).first()
+
+        if existing_plate:
+            # If both plates are of the same type (both private or both commercial)
+            if existing_plate.plate_type == plate_type:
+                raise ValueError(f"License plate {plate_number}-{plate_letter} already exists with the same type ({plate_type}).")
+            # If one is private and the other is commercial, allow it
+            elif (existing_plate.plate_type == 'Private' and plate_type == 'Commercial') or \
+                 (existing_plate.plate_type == 'Commercial' and plate_type == 'Private'):
+                pass  # Allow the creation
+            else:
+                raise ValueError(f"License plate {plate_number}-{plate_letter} already exists with a different type.")
+
         # Process image if provided
         image_path = None
         if image:
@@ -252,6 +270,9 @@ class LicensePlateService:
                     await self.file_service.delete_image(image_path)
                 except:
                     pass  # Ignore cleanup errors
+            # Check if it's a duplicate entry error
+            if "Duplicate entry" in str(e) and "unique_plate_number_letter" in str(e):
+                raise ValueError(f"License plate {plate_number}-{plate_letter} already exists with the same type ({plate_type}).")
             raise ValueError(f"Failed to create license plate: {str(e)}")
 
     def get_license_plates(self, digit1=None, digit2=None, digit3=None, digit4=None,
