@@ -21,19 +21,15 @@ async def profile_page(
 ):
     session_service = SessionService(request)
     user_service = UserService(db)
+    plate_service = LicensePlateService(db)
     
     user_data = user_service.get_user_profile_data(user_id)
     
-    # Define the letter mapping
-    letter_english = {
-        'أ': 'A', 'ب': 'B', 'س': 'C', 'د': 'D', 'ع': 'E',
-        'ف': 'F', 'ج': 'G', 'ح': 'H', 'ي': 'I', 'ك': 'K',
-        'ل': 'L', 'م': 'M', 'ن': 'N', 'و': 'O', 'ق': 'Q',
-        'ر': 'R', 'ت': 'T', 'ز': 'Z'
-    }
-    
-    # Add letter mapping to user data
-    user_data['letter_english'] = letter_english
+    # Add letter mappings from LicensePlateService
+    user_data.update({
+        "letter_arabic": plate_service.LETTER_ARABIC,
+        "letter_english": plate_service.LETTER_ENGLISH
+    })
     
     template_data = session_service.get_template_data(user_data)
     

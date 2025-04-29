@@ -84,12 +84,12 @@
                             <div class="letter-display">
                                 <div class="arabic-row">
                                     {% for letter in plate.plateLetter %}
-                                    <span>{{ letter }}</span>
+                                    <span>{{ letter_arabic[letter] }}</span>
                                     {% endfor %}
                                 </div>
                                 <div class="english-row">
                                     {% for letter in plate.plateLetter %}
-                                    <span>{{ letter_english[letter] }}</span>
+                                    <span>{{ letter }}</span>
                                     {% endfor %}
                                 </div>
                             </div>
