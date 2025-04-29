@@ -1,15 +1,17 @@
 from fastapi import APIRouter, Request, Depends, HTTPException, Form
-from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse
 from sqlalchemy.orm import Session
 from database import get_db
 from services.user_service import UserService
 from services.session_service import SessionService
 from dependencies import require_auth
 from services.auth_service import get_current_user, verify_password, get_password_hash
-from models import User, Order
+from models import User, Order, OrderStatus, LicensePlate
 from utils.template_config import templates
 from services.license_plate_service import LicensePlateService
 from services.order_service import OrderService
+from datetime import datetime
+from services.email_service import EmailService
 
 router = APIRouter(prefix="/users", tags=["users"])
 
@@ -226,4 +228,60 @@ async def update_password(
         user_service.update_user_password(current_user.id, hashed_password)
         return JSONResponse(content={"message": "Password updated successfully"})
     except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e)) 
+        raise HTTPException(status_code=400, detail=str(e))
+
+@router.post("/orders/{order_id}/complete", response_class=HTMLResponse)
+async def complete_order(
+    request: Request,
+    order_id: int,
+    db: Session = Depends(get_db),
+    user_id: int = Depends(require_auth)
+):
+    # Get the order
+    order = db.query(Order).filter(Order.id == order_id).first()
+    if not order:
+        raise HTTPException(status_code=404, detail="Order not found")
+    
+    # Verify the user is the seller
+    if order.seller_id != user_id:
+        raise HTTPException(status_code=403, detail="Not authorized to complete this order")
+    
+    # Verify the order is in progress
+    if order.status != OrderStatus.IN_PROGRESS:
+        raise HTTPException(status_code=400, detail="Order is not in progress")
+    
+    try:
+        # Get buyer and seller info
+        buyer = db.query(User).filter(User.id == order.buyer_id).first()
+        seller = db.query(User).filter(User.id == order.seller_id).first()
+        plate = db.query(LicensePlate).filter(LicensePlate.plateID == order.plate_id).first()
+
+        # Update order status to completed
+        order.status = OrderStatus.COMPLETED
+        order.updated_at = datetime.utcnow()
+        db.commit()
+
+        # Send completion notifications
+        email_service = EmailService()
+        buyer_info = {
+            'name': buyer.username,
+            'email': buyer.email,
+            'phone_number': buyer.phone_number
+        }
+        seller_info = {
+            'name': seller.username,
+            'email': seller.email,
+            'phone_number': seller.phone_number
+        }
+        plate_info = {
+            'number': plate.plateNumber,
+            'letter': plate.plateLetter,
+            'price': plate.price
+        }
+        email_service.send_order_completion_notification(buyer_info, seller_info, plate_info)
+        
+        # Redirect back to order history
+        return RedirectResponse(url="/users/order-history", status_code=303)
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail=str(e)) 
