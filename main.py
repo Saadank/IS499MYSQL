@@ -59,6 +59,8 @@ async def home(
     letter2: Optional[str] = Query(None),
     letter3: Optional[str] = Query(None),
     sort_by: Optional[str] = Query("newest", regex="^(newest|oldest|price_high|price_low)$"),
+    plate_type: Optional[str] = Query(None, regex="^(private|commercial)?$"),
+    digit_count: Optional[str] = Query(None, regex="^(single|double|triple)?$"),
     db: Session = Depends(get_db)
 ):
     session_service = SessionService(request)
@@ -88,7 +90,9 @@ async def home(
         letter1=cleaned_letters[0],
         letter2=cleaned_letters[1],
         letter3=cleaned_letters[2],
-        sort_by=sort_by
+        sort_by=sort_by,
+        plate_type=plate_type,
+        digit_count=digit_count
     )
     
     # Use the standardized letter mapping from LicensePlateService
@@ -108,7 +112,9 @@ async def home(
         "letter1": letter1,
         "letter2": letter2,
         "letter3": letter3,
-        "sort_by": sort_by
+        "sort_by": sort_by,
+        "plate_type": plate_type,
+        "digit_count": digit_count
     })
     
     return templates.TemplateResponse("landingpage.html", template_data)

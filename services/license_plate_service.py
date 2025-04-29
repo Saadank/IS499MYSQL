@@ -5,6 +5,7 @@ from datetime import datetime, UTC
 from services.file_service import FileService
 from fastapi import UploadFile, Request
 from services.email_service import EmailService
+from sqlalchemy import func
 
 class LicensePlateService:
     # Valid English letters in the correct order
@@ -129,7 +130,8 @@ class LicensePlateService:
 
     def get_forsale_data(self, request: Request, digit1: Optional[str], digit2: Optional[str],
                         digit3: Optional[str], digit4: Optional[str], letter1: Optional[str],
-                        letter2: Optional[str], letter3: Optional[str], sort_by: str) -> Dict[str, Any]:
+                        letter2: Optional[str], letter3: Optional[str], sort_by: str,
+                        plate_type: Optional[str] = None, digit_count: Optional[str] = None) -> Dict[str, Any]:
         """
         Get data for the forsale page including search results and form data.
         """
@@ -149,7 +151,9 @@ class LicensePlateService:
             letter1=letter1,
             letter2=letter2,
             letter3=letter3,
-            sort_by=sort_by
+            sort_by=sort_by,
+            plate_type=plate_type,
+            digit_count=digit_count
         )
 
         # Return template data
@@ -164,6 +168,8 @@ class LicensePlateService:
             "letter2": letter2,
             "letter3": letter3,
             "sort_by": sort_by,
+            "plate_type": plate_type,
+            "digit_count": digit_count,
             "valid_letters": self.VALID_LETTERS,
             "letter_english": self.LETTER_ENGLISH,
             "letter_arabic": self.LETTER_ARABIC,
@@ -276,7 +282,8 @@ class LicensePlateService:
             raise ValueError(f"Failed to create license plate: {str(e)}")
 
     def get_license_plates(self, digit1=None, digit2=None, digit3=None, digit4=None,
-                          letter1=None, letter2=None, letter3=None, sort_by="newest") -> List[LicensePlate]:
+                          letter1=None, letter2=None, letter3=None, sort_by="newest",
+                          plate_type=None, digit_count=None) -> List[LicensePlate]:
         """
         Get license plates based on search criteria.
         All parameters are optional and will be used as filters if provided.
@@ -287,6 +294,10 @@ class LicensePlateService:
             LicensePlate.is_sold == False,
             LicensePlate.is_approved == True
         )
+
+        # Filter by plate type if specified
+        if plate_type:
+            query = query.filter(LicensePlate.plate_type == plate_type)
 
         # Handle number search with position-based matching
         if any([digit1, digit2, digit3, digit4]):
@@ -333,6 +344,15 @@ class LicensePlateService:
                     pattern += "_"
                 pattern += digit4.strip()
                 query = query.filter(LicensePlate.plateNumber.like(pattern))
+
+        # Filter by digit count if specified
+        if digit_count:
+            if digit_count == 'single':
+                query = query.filter(func.length(LicensePlate.plateNumber) == 1)
+            elif digit_count == 'double':
+                query = query.filter(func.length(LicensePlate.plateNumber) == 2)
+            elif digit_count == 'triple':
+                query = query.filter(func.length(LicensePlate.plateNumber) == 3)
 
         # Handle letter search
         if any([letter1, letter2, letter3]):

@@ -20,8 +20,12 @@
     {% endif %}
 </div>
 
-<h2 class="text-center">Search License Plates</h2>
-{{ search_form(digit1, digit2, digit3, digit4, letter1, letter2, letter3, sort_by, valid_letters, letter_arabic, "/") }}
+<div class="landing-container">
+    <div class="search-section">
+        <h2 class="text-center">Search License Plates</h2>
+        {{ search_form(digit1, digit2, digit3, digit4, letter1, letter2, letter3, sort_by, valid_letters, letter_arabic, plate_type, digit_count, "/") }}
+    </div>
+</div>
 
 <div class="plates-section">
     <div class="plates-grid">

@@ -130,6 +130,8 @@ async def for_sale_page(
     letter2: Optional[str] = Query(None),
     letter3: Optional[str] = Query(None),
     sort_by: Optional[str] = Query("newest", regex="^(newest|oldest|price_high|price_low)$"),
+    plate_type: Optional[str] = Query(None, regex="^(private|commercial)?$"),
+    digit_count: Optional[str] = Query(None, regex="^(single|double|triple)?$"),
     db: Session = Depends(get_db),
     user_id: Optional[int] = Depends(get_current_user)
 ):
@@ -138,6 +140,8 @@ async def for_sale_page(
     - Digits must be single numbers or 'x'
     - Letters are validated against valid letter list
     - Sort options are validated
+    - Plate type can be private or commercial
+    - Digit count can be single, double, or triple
     """
     session_service = SessionService(request)
     plate_service = LicensePlateService(db)
@@ -167,7 +171,9 @@ async def for_sale_page(
         letter1=cleaned_letters[0],
         letter2=cleaned_letters[1],
         letter3=cleaned_letters[2],
-        sort_by=sort_by
+        sort_by=sort_by,
+        plate_type=plate_type,
+        digit_count=digit_count
     )
     
     template_data = session_service.get_template_data(plate_data)
