@@ -282,4 +282,43 @@ async def complete_order(
         return RedirectResponse(url="/users/order-history", status_code=303)
     except Exception as e:
         db.rollback()
-        raise HTTPException(status_code=500, detail=str(e)) 
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.post("/update-profile")
+async def update_profile(
+    username: str = Form(...),
+    email: str = Form(...),
+    phone_number: str = Form(...),
+    db: Session = Depends(get_db),
+    user_id: int = Depends(require_auth)
+):
+    user = db.query(User).filter(User.id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    # Check for unique username
+    if db.query(User).filter(User.username == username, User.id != user_id).first():
+        raise HTTPException(status_code=400, detail="Username already taken")
+    # Check for unique email
+    if db.query(User).filter(User.email == email, User.id != user_id).first():
+        raise HTTPException(status_code=400, detail="Email already registered")
+    # Check for unique phone number
+    if db.query(User).filter(User.phone_number == phone_number, User.id != user_id).first():
+        raise HTTPException(status_code=400, detail="Phone number already registered")
+    user.username = username
+    user.email = email
+    user.phone_number = phone_number
+    db.commit()
+    return {"message": "Profile updated successfully"}
+
+@router.post("/verify-password")
+async def verify_password_endpoint(
+    current_password: str = Form(...),
+    db: Session = Depends(get_db),
+    user_id: int = Depends(require_auth)
+):
+    user = db.query(User).filter(User.id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    if not verify_password(current_password, user.password):
+        raise HTTPException(status_code=400, detail="Incorrect password")
+    return {"verified": True} 

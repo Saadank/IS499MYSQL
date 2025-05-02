@@ -196,4 +196,59 @@
 .mini-ksa span {
     line-height: 1;
     color: #333;
+}
+
+.modal {
+    display: none;
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw; height: 100vh;
+    background: rgba(0,0,0,0.3);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+}
+.modal.show {
+    display: flex !important;
+}
+
+.modal input.form-control {
+    width: 100%;
+    padding: 14px 16px;
+    margin-bottom: 18px;
+    border: 1.5px solid #bfc4c9;
+    border-radius: 6px;
+    font-size: 1.1rem;
+    background: #f9f9fb;
+    transition: border-color 0.2s;
+}
+
+.modal input.form-control:focus {
+    border-color: #007bff;
+    outline: none;
+    background: #fff;
+}
+
+#edit-profile-modal-content label,
+#edit-profile-modal-content a {
+    font-size: 1rem;
+    color: #222;
+}
+
+#edit-profile-modal-content h3 {
+    font-size: 1.4rem;
+    font-weight: bold;
+    margin-bottom: 24px;
+}
+
+#edit-profile-modal-content form {
+    margin-top: 10px;
+}
+
+#edit-profile-fields-section > div {
+    margin-bottom: 18px !important;
+}
+
+#edit-profile-fields-section {
+    padding-top: 10px;
 } 
