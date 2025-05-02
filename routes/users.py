@@ -52,9 +52,9 @@ async def order_history(
     # Get user's orders
     orders = order_service.get_user_orders(user_id)
     
-    # Separate purchases and sales
-    purchases = [order for order in orders if order.buyer_id == user_id]
-    sales = [order for order in orders if order.seller_id == user_id]
+    # Separate purchases and sales, only show completed orders
+    purchases = [order for order in orders if order.buyer_id == user_id and order.status == OrderStatus.COMPLETED]
+    sales = [order for order in orders if order.seller_id == user_id and order.status == OrderStatus.COMPLETED]
     
     template_data = session_service.get_template_data({
         "purchases": purchases,

@@ -170,6 +170,28 @@
     text-decoration: none;
 }
 
+.action-btn-complete {
+    padding: 4px 8px;
+    border-radius: 4px;
+    text-decoration: none;
+    color: #fff;
+    background-color: #28a745;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    font-size: 14px;
+    min-width: 90px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.action-btn-complete:hover {
+    background-color: #218838;
+    color: #fff;
+    text-decoration: none;
+}
+
 .buyer-link {
     color: #0d6efd;
     text-decoration: none;
