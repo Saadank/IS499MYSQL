@@ -1,5 +1,9 @@
 {% extends "base.html" %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', path='css/admin_license_plates.css') }}">
+{% endblock %}
+
 {% block content %}
 <div class="container mt-4">
     <h1 class="mb-4">License Plate Management</h1>
