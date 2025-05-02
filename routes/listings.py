@@ -298,9 +298,18 @@ async def seller_control_panel(
     # Query all plates owned by the current user
     plates = db.query(LicensePlate).filter(LicensePlate.owner_id == user_id).all()
     
-    # For each plate, get the buyer information if sold
+    # For each plate, get the buyer information if sold or in progress
     for plate in plates:
-        if plate.is_sold:
+        # Check for in-progress order
+        in_progress_order = db.query(Order).filter(
+            Order.plate_id == plate.plateID,
+            Order.status == OrderStatus.IN_PROGRESS
+        ).first()
+        if in_progress_order:
+            plate.buyer = db.query(User).filter(User.id == in_progress_order.buyer_id).first()
+            plate.sale_date = None
+            plate.in_progress_order = in_progress_order
+        elif plate.is_sold:
             order = db.query(Order).filter(
                 Order.plate_id == plate.plateID,
                 Order.status == OrderStatus.COMPLETED
@@ -308,9 +317,11 @@ async def seller_control_panel(
             if order:
                 plate.buyer = db.query(User).filter(User.id == order.buyer_id).first()
                 plate.sale_date = order.updated_at
+                plate.in_progress_order = None
         else:
             plate.buyer = None
             plate.sale_date = None
+            plate.in_progress_order = None
     
     template_data = session_service.get_template_data({
         "plates": plates,

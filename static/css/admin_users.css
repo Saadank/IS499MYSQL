@@ -1,0 +1,98 @@
+.card {
+    border: none;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    margin-bottom: 2rem;
+}
+
+.custom-table {
+    border-collapse: separate;
+    border-spacing: 0;
+    width: 100%;
+}
+
+.custom-table th,
+.custom-table td {
+    padding: 12px 16px;
+    vertical-align: middle;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.custom-table th {
+    background-color: #f8f9fa;
+    font-weight: 600;
+    border-bottom: 2px solid #dee2e6;
+}
+
+.custom-table td {
+    background-color: white;
+    border-top: 1px solid #dee2e6;
+}
+
+.badge {
+    padding: 0.5em 0.75em;
+    font-weight: 500;
+}
+
+.custom-btn {
+    background-color: #0066cc;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    transition: background-color 0.3s;
+    min-width: 60px;
+    text-align: center;
+}
+
+.custom-btn:hover {
+    background-color: #0052a3;
+    color: white;
+}
+
+.custom-btn-warning {
+    background-color: #ffc107;
+    color: #000;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    transition: background-color 0.3s;
+    min-width: 60px;
+    text-align: center;
+}
+
+.custom-btn-warning:hover {
+    background-color: #e0a800;
+    color: #000;
+}
+
+.custom-btn-danger {
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    transition: background-color 0.3s;
+    min-width: 60px;
+    text-align: center;
+}
+
+.custom-btn-danger:hover {
+    background-color: #c82333;
+    color: white;
+}
+
+.btn-sm {
+    font-size: 0.875rem;
+}
+
+.d-flex {
+    display: flex !important;
+    align-items: center;
+}
+
+.table-responsive {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+} 

@@ -52,9 +52,9 @@ async def order_history(
     # Get user's orders
     orders = order_service.get_user_orders(user_id)
     
-    # Separate purchases and sales
-    purchases = [order for order in orders if order.buyer_id == user_id]
-    sales = [order for order in orders if order.seller_id == user_id]
+    # Separate purchases and sales, only show completed orders
+    purchases = [order for order in orders if order.buyer_id == user_id and order.status == OrderStatus.COMPLETED]
+    sales = [order for order in orders if order.seller_id == user_id and order.status == OrderStatus.COMPLETED]
     
     template_data = session_service.get_template_data({
         "purchases": purchases,
@@ -168,10 +168,12 @@ async def delete_user(
         raise HTTPException(status_code=400, detail="Cannot delete admin users")
     
     try:
-        # Delete user's orders
-        db.query(Order).filter(
+        # Delete user's orders as ORM objects to avoid integrity errors
+        orders = db.query(Order).filter(
             (Order.buyer_id == user_id) | (Order.seller_id == user_id)
-        ).delete(synchronize_session=False)
+        ).all()
+        for order in orders:
+            db.delete(order)
         
         # Delete the user
         db.delete(user)

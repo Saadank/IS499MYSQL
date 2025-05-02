@@ -111,6 +111,12 @@ async def delete_user(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="User not found"
         )
+    # Delete user's orders as ORM objects to avoid integrity errors
+    orders = db.query(Order).filter(
+        (Order.buyer_id == user_id) | (Order.seller_id == user_id)
+    ).all()
+    for order in orders:
+        db.delete(order)
     db.delete(user)
     db.commit()
     return RedirectResponse(url="/admin/users", status_code=status.HTTP_303_SEE_OTHER)
