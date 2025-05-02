@@ -1,0 +1,22 @@
+.card {
+    border: none;
+    box-shadow: 0 0 15px rgba(0,0,0,0.1);
+}
+.action-buttons {
+    display: flex;
+    gap: 0.5rem;
+}
+.badge {
+    padding: 0.5em 0.75em;
+}
+.table th {
+    background-color: #f8f9fa;
+    white-space: nowrap;
+}
+.table td {
+    vertical-align: middle;
+}
+.btn-sm {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.875rem;
+} 

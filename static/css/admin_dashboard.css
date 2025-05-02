@@ -1,0 +1,78 @@
+.management-section {
+    background-color: white;
+    padding: 15px;
+    border-radius: 5px;
+    position: relative;
+}
+
+.section-header {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.section-header h5 {
+    margin: 0;
+    font-weight: bold;
+}
+
+.section-header p {
+    margin: 0;
+}
+
+.section-header .btn {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+}
+
+.card {
+    margin-bottom: 20px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    transition: transform 0.2s;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+}
+
+.stat-box {
+    text-align: center;
+    padding: 15px;
+    background-color: #f8f9fa;
+    border-radius: 5px;
+}
+
+.stat-number {
+    font-size: 24px;
+    font-weight: bold;
+    margin: 10px 0;
+}
+
+.activity-list {
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.activity-item {
+    padding: 10px;
+    border-bottom: 1px solid #eee;
+}
+
+.activity-item:last-child {
+    border-bottom: none;
+}
+
+.custom-btn {
+    background-color: #0066cc;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    transition: background-color 0.3s;
+}
+
+.custom-btn:hover {
+    background-color: #0052a3;
+    color: white;
+} 

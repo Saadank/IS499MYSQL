@@ -168,10 +168,12 @@ async def delete_user(
         raise HTTPException(status_code=400, detail="Cannot delete admin users")
     
     try:
-        # Delete user's orders
-        db.query(Order).filter(
+        # Delete user's orders as ORM objects to avoid integrity errors
+        orders = db.query(Order).filter(
             (Order.buyer_id == user_id) | (Order.seller_id == user_id)
-        ).delete(synchronize_session=False)
+        ).all()
+        for order in orders:
+            db.delete(order)
         
         # Delete the user
         db.delete(user)
