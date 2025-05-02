@@ -4,15 +4,11 @@ from models import Order, OrderStatus, LicensePlate, User
 from datetime import datetime
 from services.email_service import EmailService
 from typing import Dict, Any
-import os
 
 class PayPalService:
     def __init__(self, db: Session):
         self.db = db
         self.email_service = EmailService()
-        
-        # Get base URL from environment variable, default to Elastic Beanstalk URL
-        self.base_url = os.getenv('BASE_URL', 'https://capstone-env.eba-scuvpwdi.us-west-2.elasticbeanstalk.com')
         
         # Configure PayPal SDK with sandbox credentials
         paypalrestsdk.configure({
@@ -47,8 +43,8 @@ class PayPalService:
                 "payment_method": "paypal"
             },
             "redirect_urls": {
-                "return_url": f"{self.base_url}/payment/success/{order_id}",
-                "cancel_url": f"{self.base_url}/payment/cancel/{order_id}"
+                "return_url": f"http://capstone-env.eba-scuvpwdi.us-west-2.elasticbeanstalk.com/payment/success/{order_id}",
+                "cancel_url": f"http://capstone-env.eba-scuvpwdi.us-west-2.elasticbeanstalk.com/payment/cancel/{order_id}"
             },
             "transactions": [{
                 "item_list": {
