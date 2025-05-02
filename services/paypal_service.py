@@ -43,8 +43,8 @@ class PayPalService:
                 "payment_method": "paypal"
             },
             "redirect_urls": {
-                "return_url": f"http://localhost:8000/payment/success/{order_id}",
-                "cancel_url": f"http://localhost:8000/payment/cancel/{order_id}"
+                "return_url": f"http://capstone-env.eba-scuvpwdi.us-west-2.elasticbeanstalk.com/users/order-history",
+                "cancel_url": f"http://capstone-env.eba-scuvpwdi.us-west-2.elasticbeanstalk.com/users/order-history"
             },
             "transactions": [{
                 "item_list": {
