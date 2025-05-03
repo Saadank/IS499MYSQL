@@ -4,6 +4,7 @@ from models import Order, OrderStatus, LicensePlate, User
 from datetime import datetime
 from services.email_service import EmailService
 from typing import Dict, Any
+import requests
 
 class PayPalService:
     def __init__(self, db: Session):
@@ -16,6 +17,12 @@ class PayPalService:
             "client_id": "AXTwuceoJm4yTCbB6QXZieKqfGBKs8MDkzSLQRFgZS9KD9bnI7RomoEwjKgZba1Hp-4sKk8JvQeyCS7g",
             "client_secret": "EKlnyvqAMScWWp0j9ZrxiUx0Rx7bvb4Lx_yEBm_EquQxxtgUNS_biLa6l4ZF1x_-QRzWJr3It_22OvdS"
         })
+
+    def convert_sar_to_usd(self, sar_amount: float) -> float:
+        """
+        Convert SAR to USD using the fixed rate of 1 USD = 3.75 SAR
+        """
+        return round(sar_amount / 3.75, 2)
 
     def create_payment(self, order_id: int) -> Dict[str, Any]:
         """
@@ -36,6 +43,9 @@ class PayPalService:
         if plate.is_sold:
             raise ValueError("Plate is already sold")
 
+        # Convert SAR price to USD using the fixed rate
+        usd_price = self.convert_sar_to_usd(order.price)
+
         # Create PayPal payment
         payment = paypalrestsdk.Payment({
             "intent": "sale",
@@ -51,16 +61,16 @@ class PayPalService:
                     "items": [{
                         "name": f"License Plate {plate.plateNumber}{plate.plateLetter}",
                         "sku": f"plate-{plate.plateID}",
-                        "price": str(order.price),
+                        "price": str(usd_price),
                         "currency": "USD",
                         "quantity": 1
                     }]
                 },
                 "amount": {
-                    "total": str(order.price),
+                    "total": str(usd_price),
                     "currency": "USD"
                 },
-                "description": f"Purchase of license plate {plate.plateNumber}{plate.plateLetter}"
+                "description": f"Purchase of license plate {plate.plateNumber}{plate.plateLetter} (SAR {order.price} converted to USD {usd_price} at rate 1 USD = 3.75 SAR)"
             }]
         })
 
