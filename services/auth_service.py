@@ -137,6 +137,7 @@ class AuthService:
         return user
 
     def create_user(self, username: str, email: str, password: str, firstname: str, lastname: str, idnumber: str, address: str, phone_number: Optional[str] = None, iban: Optional[str] = None) -> User:
+        # Creates a new user with hashed password and saves to database
         hashed_password = hashlib.sha256(password.encode()).hexdigest()
         db_user = User(
             username=username,

@@ -55,7 +55,10 @@
                 {% if plate.description %}
                     <p class="description">{{ plate.description }}</p>
                 {% endif %}
-                <button class="view-button remove-from-wishlist" data-plate-id="{{ plate.plateID }}">Remove from Wishlist</button>
+                <div class="button-group">
+                    <a href="{{ url_for('plate_details', plate_id=plate.plateID) }}" class="view-button">View Details</a>
+                    <button class="remove-from-wishlist" data-plate-id="{{ plate.plateID }}">Remove from Wishlist</button>
+                </div>
             </div>
             {% endfor %}
         </div>
